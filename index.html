@@ -122,10 +122,18 @@
 .organizer-picker-title{font-size:18px;font-weight:800;margin:0 0 12px}
 .organizer-picker-option{display:block;width:100%;padding:13px 14px;margin:6px 0;border:1px solid var(--line);border-radius:12px;background:#fff;color:var(--ink);text-align:left;font:inherit}
 .organizer-picker-option.selected{border-color:var(--blue);background:var(--softblue);font-weight:750}
-.checklist-grid{display:grid;gap:9px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--paper)}.checkrow{display:flex;width:100%;box-sizing:border-box;align-items:center;gap:9px;font-weight:500}.checkrow input{accent-color:var(--blue)}.checklist-scroll{max-height:230px;overflow-y:auto;overflow-x:hidden;display:block;padding:8px 12px;border:1px solid var(--line);border-radius:12px;background:var(--paper)}.checkrow{display:grid!important;grid-template-columns:20px minmax(0,1fr)!important;justify-content:initial!important;align-items:center!important;width:100%!important;min-width:0!important;box-sizing:border-box;column-gap:10px;font-weight:500;padding:7px 2px;white-space:normal;overflow-wrap:anywhere}.checkrow input{accent-color:var(--blue);margin:0!important;display:block;width:20px;height:20px;justify-self:start}.checkrow span{display:block;min-width:0;width:100%;text-align:left;white-space:normal;overflow-wrap:anywhere;word-break:normal}</style>
+.checklist-grid{display:grid;gap:9px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--paper)}.checkrow{display:flex;width:100%;box-sizing:border-box;align-items:center;gap:9px;font-weight:500}.checkrow input{accent-color:var(--blue)}.checklist-scroll{max-height:230px;overflow-y:auto;overflow-x:hidden;display:block;padding:8px 12px;border:1px solid var(--line);border-radius:12px;background:var(--paper)}.checkrow{display:grid!important;grid-template-columns:20px minmax(0,1fr)!important;justify-content:initial!important;align-items:center!important;width:100%!important;min-width:0!important;box-sizing:border-box;column-gap:10px;font-weight:500;padding:7px 2px;white-space:normal;overflow-wrap:anywhere}.checkrow input{accent-color:var(--blue);margin:0!important;display:block;width:20px;height:20px;justify-self:start}.checkrow span{display:block;min-width:0;width:100%;text-align:left;white-space:normal;overflow-wrap:anywhere;word-break:normal}
+/* V1.2.1: keep the episode editor mounted while choosing a dropdown value */
+.vault-select-overlay{position:fixed;inset:0;z-index:20000;display:flex;align-items:center;justify-content:center;padding:18px;background:rgba(16,24,43,.58)}
+.vault-select-panel{width:min(460px,100%);max-height:min(78vh,680px);overflow:hidden;display:flex;flex-direction:column;background:var(--paper,#fff);border:1px solid var(--line);border-radius:20px;box-shadow:0 24px 70px rgba(10,20,40,.28)}
+.vault-select-panel .modhead{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;border-bottom:1px solid var(--line)}
+.vault-select-panel .modalbody{padding:14px;overflow-y:auto;overscroll-behavior:contain}
+.vault-select-panel .vault-picker-options{max-height:60vh;overflow-y:auto}
+
+</style>
 </head>
 <body><div class="app">
-<header class="top"><div class="brand"><div class="logo">✦</div><div>The Vault <span class="muted" style="font-weight:600;font-size:13px">V1.2</span></div></div><div class="topright"><span class="pill" id="syncStatus">Offline-first • not signed in</span><button class="btn secondary small" id="exportBtn">Export backup</button><button class="btn secondary small" id="importBtn">Import backup</button><button class="btn secondary small" id="cloudBtn">Account & sync</button><input id="importFile" type="file" accept="application/json,.json" hidden></div></header>
+<header class="top"><div class="brand"><div class="logo">✦</div><div>The Vault <span class="muted" style="font-weight:600;font-size:13px">V1.2.1</span></div></div><div class="topright"><span class="pill" id="syncStatus">Offline-first • not signed in</span><button class="btn secondary small" id="exportBtn">Export backup</button><button class="btn secondary small" id="importBtn">Import backup</button><button class="btn secondary small" id="cloudBtn">Account & sync</button><input id="importFile" type="file" accept="application/json,.json" hidden></div></header>
 <nav class="nav" id="nav">
 <button class="active" data-view="home">⌂ Dashboard</button><button data-view="episodes">▣ Episodes</button><button data-view="interview">☷ Interview</button><button data-view="hub">✧ Convention Hub</button><button data-view="day">🎬 Convention Day</button>
 </nav>
@@ -248,19 +256,28 @@ function upgradeVaultSelects(root=document){
   const refresh=()=>{btn.querySelector(".vault-select-label").textContent=sel.selectedOptions[0]?.textContent||"Choose…";};
   refresh();
   btn.addEventListener("click",()=>{
-   const opts=[...sel.options].map((o,i)=>({value:o.value,label:o.textContent,disabled:o.disabled,selected:o.selected,index:i}));
-   showModal("Choose an option",`<div class="vault-picker-options">${opts.map(o=>`<button type="button" class="vault-picker-option ${o.selected?'selected':''}" ${o.disabled?'disabled':''} onclick="chooseVaultSelect(this,${JSON.stringify(sel.name||'')},${o.index})">${esc(o.label)}</button>`).join("")}</div>`);
+   document.getElementById("vault-select-overlay")?.remove();
+   const opts=[...sel.options].map((o,i)=>({label:o.textContent,disabled:o.disabled,selected:o.selected,index:i}));
    window.__vaultPickerSelect=sel;
+   const overlay=document.createElement("div");overlay.id="vault-select-overlay";overlay.className="vault-select-overlay";
+   overlay.innerHTML=`<div class="vault-select-panel" role="dialog" aria-modal="true"><div class="modhead"><strong>Choose an option</strong><button type="button" class="btn secondary small" id="vault-select-close">✕</button></div><div class="modalbody"><div class="vault-picker-options">${opts.map(o=>`<button type="button" class="vault-picker-option ${o.selected?'selected':''}" ${o.disabled?'disabled':''} data-option-index="${o.index}">${esc(o.label)}</button>`).join("")}</div></div></div>`;
+   overlay.addEventListener("click",ev=>{if(ev.target===overlay)closeVaultSelectPicker()});
+   overlay.querySelector("#vault-select-close").addEventListener("click",closeVaultSelectPicker);
+   overlay.querySelectorAll("[data-option-index]").forEach(option=>option.addEventListener("click",()=>chooseVaultSelect(Number(option.dataset.optionIndex))));
+   document.body.appendChild(overlay);
   });
   sel.addEventListener("change",refresh);
  });
 }
-function chooseVaultSelect(button,name,index){
+function closeVaultSelectPicker(){document.getElementById("vault-select-overlay")?.remove();window.__vaultPickerSelect=null;}
+function chooseVaultSelect(index){
  const sel=window.__vaultPickerSelect;if(!sel)return;
- sel.selectedIndex=index;sel.dispatchEvent(new Event("change",{bubbles:true}));
- // Fire inline handlers as well, including legacy onchange attributes.
- if(sel.onchange)sel.onchange.call(sel,new Event("change"));
- closeModal();window.__vaultPickerSelect=null;
+ sel.selectedIndex=index;
+ sel.dispatchEvent(new Event("change",{bubbles:true}));
+ // Refresh the visible custom control without replacing the episode form.
+ const label=sel.parentElement?.querySelector(".vault-select-button .vault-select-label");
+ if(label)label.textContent=sel.selectedOptions[0]?.textContent||"Choose…";
+ closeVaultSelectPicker();
 }
 
 function render(){document.querySelectorAll("#nav button").forEach(b=>b.classList.toggle("active",b.dataset.view===view));let m=document.getElementById("main");if(view==="home")m.innerHTML=home();if(view==="episodes")m.innerHTML=episodes();if(view==="hub")m.innerHTML=hub();if(view==="interview")m.innerHTML=interview();if(view==="day")m.innerHTML=day();bind();upgradeVaultSelects(document)}
