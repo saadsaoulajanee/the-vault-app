@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>The Vault V1.5.2</title>
+<title>The Vault V1.6.3</title>
 <style>
 :root{--ink:#182033;--muted:#778096;--line:#e7eaf2;--paper:#f6f7fb;--card:#fff;--blue:#4169e1;--pink:#ed5a9b;--softblue:#edf1ff;--softpink:#fff0f6;--green:#16866b;--shadow:0 12px 34px #1c2b5010}
 *{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.45 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}button,input,select,textarea{font:inherit}button{cursor:pointer;border:0}button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:3px solid #8ba2ff;outline-offset:2px}
@@ -244,7 +244,7 @@
 .guest-photo-preview img,.guest-photo-preview .guest-photo-placeholder{width:58px;height:58px;border-radius:50%;object-fit:cover;background:#eef1f8;display:grid;place-items:center;font-weight:800;color:var(--blue);border:2px solid #fff;box-shadow:0 2px 8px #18213a18}
 @media(max-width:420px){.episode .epicon.guest-photo{width:44px;height:44px}}
 
-/* V1.6.0 adjustable guest portrait crop */
+/* V1.6.3 adjustable guest portrait crop */
 .guest-photo-preview{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin:8px 0 14px}
 .guest-photo-preview .crop-preview{width:88px;height:88px;flex:none;border-radius:50%;overflow:hidden;background:#eef1f8;border:2px solid #fff;box-shadow:0 2px 8px #18213a18}
 .guest-photo-preview .crop-preview img{width:100%;height:100%;object-fit:cover;display:block}
@@ -253,7 +253,7 @@
 .photo-crop-controls input[type=range]{width:100%;accent-color:var(--blue)}
 .episode .epicon.guest-photo img{object-fit:cover}
 
-/* V1.6.0: fixed-size guest portrait frame */
+/* V1.6.3: fixed-size guest portrait frame */
 .guest-head .guest-portrait{
   width:58px!important;height:58px!important;min-width:58px;min-height:58px;
   flex:0 0 58px;position:relative;display:block;overflow:hidden;
@@ -306,7 +306,9 @@ function applyCloudPayload(payload){
  if(!payload || !Array.isArray(payload.organizers)||!Array.isArray(payload.conventions)||!Array.isArray(payload.episodes))throw new Error("The cloud data format is not valid.");
  applyingRemote=true;
  db={...db,guests:Array.isArray(payload.guests)?payload.guests:[],organizers:payload.organizers,conventions:payload.conventions,episodes:payload.episodes,checklistTemplate:Array.isArray(payload.checklistTemplate)?payload.checklistTemplate:DEFAULT_CHECKLIST.slice()};ensureGuestProfiles();
+ const migratedProjects=migrateGuestProjects();
  localStorage.setItem("vault03",JSON.stringify(db));lastCloudPayload=JSON.stringify(cloudPayload());applyingRemote=false;render();
+ if(migratedProjects&&cloudUser&&navigator.onLine)scheduleCloudSync();
 }
 async function syncNow(mode="both"){
  if(!cloudUser||!supabaseClient||!navigator.onLine)return;
@@ -451,6 +453,13 @@ function chooseVaultSelect(index){
  closeVaultSelectPicker();
 }
 
+// V1.6.3: conventions and their schedule are weekend-only.
+function enforceWeekendConventionDays(){
+ db.conventions.forEach(c=>(c.panels||[]).forEach(p=>{if(p.day==="Friday")p.day="Saturday"}));
+ db.episodes.forEach(e=>{if(e.interviewDay==="Friday")e.interviewDay="Saturday"});
+}
+enforceWeekendConventionDays();
+localStorage.setItem("vault03",JSON.stringify(db));
 function render(){document.querySelectorAll("#nav button").forEach(b=>b.classList.toggle("active",b.dataset.view===view));let m=document.getElementById("main");if(view==="home")m.innerHTML=home();if(view==="episodes")m.innerHTML=episodes();if(view==="guests")m.innerHTML=guestsView();if(view==="hub")m.innerHTML=hub();if(view==="interview")m.innerHTML=interview();if(view==="day")m.innerHTML=day();if(view==="kpis")m.innerHTML=kpis();bind();upgradeVaultSelects(document)}
 function home(){
  let count=n=>db.episodes.filter(e=>e.status===n).length;
@@ -503,6 +512,7 @@ function interview(){
  const available=db.episodes.filter(e=>e.conventionId===window.interviewConvention);
  if(!available.some(e=>e.id===activeEpisode))activeEpisode=available[0]?.id||null;
  const e=db.episodes.find(x=>x.id===activeEpisode && x.conventionId===window.interviewConvention);
+ const guest=e?(db.guests.find(g=>g.id===e.guestId)||db.guests.find(g=>normalizeGuestName(g.name)===normalizeGuestName(e.guest))):null;
  return `<section class="hero"><div><div class="eyebrow">Live interview workspace</div><h1>Questions, in your flow.</h1><p class="sub">Choose a convention first, then select the guest you are interviewing.</p></div></section>
  <section class="card interview-controls"><div class="field"><label>1. Convention</label><button type="button" class="episode-picker-trigger" onclick="openInterviewConventionPicker()">${esc(convention?.name||"Choose a convention")}<span>⌄</span></button></div>
  <div class="field"><label>2. Guest interview</label><button type="button" class="episode-picker-trigger" ${available.length?'':'disabled'} onclick="openInterviewGuestPicker()">${esc(e?`${e.guest||"Untitled guest"} · Episode ${e.status===10?"X":e.number}`:available.length?"Choose a guest":"No guest interviews for this convention")}<span>⌄</span></button></div></section>
@@ -513,7 +523,7 @@ function day(){
  const conventions=db.conventions;
  const selected=window.dayConvention||conventions[0]?.id||"";
  const c=conv(selected);
- const days=["Friday","Saturday","Sunday"];
+ const days=["Saturday","Sunday"];
  const activeDay=window.dayMode||"Saturday";
  const interviews=db.episodes.filter(e=>e.conventionId===selected&&e.time&&e.status!==10&&e.interviewDay===activeDay).map(e=>({kind:"Interview",time:e.time,title:e.guest||"Guest interview",detail:e.duration||"Duration TBD",guests:[e.guest].filter(Boolean),id:e.id}));
  const panels=(c?.panels||[]).filter(p=>p.day===activeDay&&p.time).map(p=>({kind:"Panel",time:p.time,title:p.title||"Panel",detail:"Stage panel",guests:(p.guestIds||[]).map(id=>db.guests.find(g=>g.id===id)?.name).filter(Boolean),id:p.id}));
@@ -606,24 +616,33 @@ document.getElementById("closemodal").onclick=closeModal;document.getElementById
 function newEpisode(daymode=false){editing=null;let num=nextNum();showModal("Create episode",episodeForm({number:num,guest:"",conventionId:"",date:nextDate(),status:0,questions:[],longLink:"",shorts:[],notes:"",time:"",duration:""}));}
 function openEpisode(id){if(window.__suppressEpisodeOpen&&Date.now()<window.__suppressEpisodeOpen)return;let e=db.episodes.find(x=>x.id===id);if(!e)return;activeEpisode=id;editing=id;showModal("Edit episode",episodeForm(e,true))}
 const PROJECT_TYPES=["Film","TV show","Podcast","Book","Other"];
-// V1.6.0: migrate project credits from episodes to reusable guest profiles.
+// V1.6.3: migrate project credits from episodes to reusable guest profiles.
 function migrateGuestProjects(){
- const byGuest=new Map();
+ let changed=false;
  db.episodes.forEach(e=>{
   const g=db.guests.find(x=>x.id===e.guestId)||db.guests.find(x=>normalizeGuestName(x.name)===normalizeGuestName(e.guest));
   if(!g)return;
   if(!Array.isArray(g.projects))g.projects=[];
-  (e.projects||[]).forEach(p=>{
-   const title=String(p.title||"").trim();if(!title)return;
+  (Array.isArray(e.projects)?e.projects:[]).forEach(raw=>{
+   const p=raw&&typeof raw==="object"?raw:{title:String(raw||"")};
+   const title=String(p.title??p.name??p.project??"").trim();
+   if(!title)return;
    const key=title.toLocaleLowerCase();
-   if(!g.projects.some(x=>String(x.title||"").trim().toLocaleLowerCase()===key))g.projects.push({title,type:PROJECT_TYPES.includes(p.type)?p.type:"Other"});
+   const existing=g.projects.find(x=>String(x.title??x.name??"").trim().toLocaleLowerCase()===key);
+   if(existing){
+    // Keep every field from the episode project, while retaining already-entered guest-profile values.
+    Object.keys(p).forEach(k=>{if(existing[k]===undefined||existing[k]===null||existing[k]==="")existing[k]=p[k]});
+    if(!existing.title)existing.title=title;
+   }else{
+    g.projects.push({...p,title,type:PROJECT_TYPES.includes(p.type)?p.type:(p.type||"Other")});
+   }
+   changed=true;
   });
-  e.guestId=g.id;
-  delete e.projects;
+  if(e.guestId!==g.id){e.guestId=g.id;changed=true}
+  if(Array.isArray(e.projects)){delete e.projects;changed=true}
  });
+ return changed;
 }
-
-migrateGuestProjects();
 function projectEditor(e){return (e.projects||[]).map((p,i)=>projectRow(p,i)).join("")}
 function projectRow(p={},i=0){let type=PROJECT_TYPES.includes(p.type)?p.type:"Film";return `<div class="project-editor-row"><input aria-label="Project title" placeholder="Project title" value="${esc(p.title||"")}"><button type="button" class="vault-select-button project-type-button" data-type="${type}" onclick="openProjectTypePicker(this)"><span class="vault-select-label">${type}</span><span class="vault-select-chevron" aria-hidden="true">⌄</span></button><button type="button" class="btn danger small" aria-label="Remove project" onclick="this.closest('.project-editor-row').remove()">×</button></div>`}
 function openProjectTypePicker(button){document.getElementById("project-type-overlay")?.remove();window.__projectTypeButton=button;let overlay=document.createElement("div");overlay.id="project-type-overlay";overlay.className="modalback show";overlay.style.zIndex="10001";overlay.innerHTML=`<div class="modal"><div class="modhead"><strong>Choose project type</strong><button type="button" class="btn secondary small" onclick="closeProjectTypePicker()">✕</button></div><div class="modalbody"><div class="vault-picker-options">${PROJECT_TYPES.map(t=>`<button type="button" class="vault-picker-option ${button.dataset.type===t?'selected':''}" onclick="setProjectType('${t}')">${t}</button>`).join("")}</div></div></div>`;overlay.addEventListener("click",e=>{if(e.target===overlay)closeProjectTypePicker()});document.body.appendChild(overlay)}
@@ -660,7 +679,7 @@ function editConventionPanel(conventionId,panelId){
  const p=c.panels.find(x=>x.id===panelId)||{id:"",title:"",day:"Saturday",time:"",guestIds:[],notes:""};
  const guestOptions=(c.guestIds||[]).map(id=>db.guests.find(g=>g.id===id)).filter(Boolean);
  if(!guestOptions.length){alert("Add guests to this convention first. Edit the convention and select its guest lineup.");return}
- showModal(panelId?"Edit panel":"Add panel",`<form id="panel-form"><div class="field"><label>Panel title</label><input name="title" value="${esc(p.title)}" placeholder="e.g. The world of..." required></div><div class="row"><div class="field"><label>Day</label><select name="day">${["Friday","Saturday","Sunday"].map(d=>`<option ${p.day===d?"selected":""}>${d}</option>`).join("")}</select></div><div class="field"><label>Start time</label><input type="time" name="time" value="${esc(p.time)}" required></div></div><div class="field"><label>Guests on this panel</label><div class="guest-check-grid">${guestOptions.map(g=>`<label><input type="checkbox" name="panelguest_${g.id}" ${(p.guestIds||[]).includes(g.id)?"checked":""}><span>${esc(g.name)}</span></label>`).join("")}</div></div><div class="field"><label>Notes (optional)</label><textarea name="notes">${esc(p.notes||"")}</textarea></div><div class="row"><button class="btn blue">Save panel</button><button type="button" class="btn secondary" onclick="managePanels('${c.id}')">Cancel</button></div></form>`);
+ showModal(panelId?"Edit panel":"Add panel",`<form id="panel-form"><div class="field"><label>Panel title</label><input name="title" value="${esc(p.title)}" placeholder="e.g. The world of..." required></div><div class="row"><div class="field"><label>Day</label><select name="day">${["Saturday","Sunday"].map(d=>`<option ${p.day===d?"selected":""}>${d}</option>`).join("")}</select></div><div class="field"><label>Start time</label><input type="time" name="time" value="${esc(p.time)}" required></div></div><div class="field"><label>Guests on this panel</label><div class="guest-check-grid">${guestOptions.map(g=>`<label><input type="checkbox" name="panelguest_${g.id}" ${(p.guestIds||[]).includes(g.id)?"checked":""}><span>${esc(g.name)}</span></label>`).join("")}</div></div><div class="field"><label>Notes (optional)</label><textarea name="notes">${esc(p.notes||"")}</textarea></div><div class="row"><button class="btn blue">Save panel</button><button type="button" class="btn secondary" onclick="managePanels('${c.id}')">Cancel</button></div></form>`);
  document.getElementById("panel-form").onsubmit=e=>{e.preventDefault();const f=new FormData(e.target);const panel={...p,id:p.id||uid(),title:String(f.get("title")||"").trim(),day:f.get("day"),time:f.get("time"),guestIds:guestOptions.filter(g=>f.get("panelguest_"+g.id)==="on").map(g=>g.id),notes:String(f.get("notes")||"")};if(!panel.guestIds.length&&!confirm("No guests are selected for this panel. Save it anyway?"))return;const i=c.panels.findIndex(x=>x.id===panel.id);if(i<0)c.panels.push(panel);else c.panels[i]=panel;save();managePanels(c.id)};
 }
 function deleteConventionPanel(conventionId,panelId){const c=conv(conventionId);if(!c||!confirm("Delete this panel?"))return;c.panels=(c.panels||[]).filter(p=>p.id!==panelId);save();managePanels(c.id)}
