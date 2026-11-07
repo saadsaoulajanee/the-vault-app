@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>The Vault V1.6.8</title>
+<title>The Vault V1.7.0</title>
 <style>
 :root{--ink:#182033;--muted:#778096;--line:#e7eaf2;--paper:#f6f7fb;--card:#fff;--blue:#4169e1;--pink:#ed5a9b;--softblue:#edf1ff;--softpink:#fff0f6;--green:#16866b;--shadow:0 12px 34px #1c2b5010}
 *{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.45 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}button,input,select,textarea{font:inherit}button{cursor:pointer;border:0}button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:3px solid #8ba2ff;outline-offset:2px}
@@ -310,6 +310,45 @@
 
 
 .fixed-duration-display{padding:12px 14px;border:1px solid var(--line,#e5e7eb);border-radius:12px;background:var(--soft,#f4f6fb);font-weight:700}
+
+/* V1.7.0 convention poster guest lineup */
+.convention-poster{
+ margin:16px 0;padding:18px;border-radius:18px;
+ background:linear-gradient(135deg,rgba(74,103,220,.12),rgba(132,91,190,.08));
+ border:1px solid rgba(90,110,190,.14);
+}
+.convention-poster .sectionhead{align-items:flex-start;margin-bottom:14px}
+.convention-poster .sectionhead h2{margin:2px 0 3px}
+.convention-poster .sectionhead .smalltext{margin:0}
+.convention-poster-guests{
+ display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));
+ gap:16px 10px;align-items:start;
+}
+.convention-poster-guest{
+ min-width:0;display:flex;flex-direction:column;align-items:center;
+ gap:8px;text-align:center;
+}
+.convention-poster-avatar{
+ width:76px;height:76px;flex:0 0 76px;border-radius:50%;
+ overflow:hidden;background:var(--soft,#eef1f8);
+ border:3px solid rgba(255,255,255,.9);
+ box-shadow:0 3px 12px rgba(30,40,80,.12);
+ display:grid;place-items:center;
+}
+.convention-poster-avatar img{
+ width:100%;height:100%;display:block;object-fit:cover;
+}
+.convention-poster-avatar span{font-size:21px;font-weight:800;color:var(--accent,#526bd7)}
+.convention-poster-guest b{
+ max-width:100%;font-size:12px;line-height:1.25;
+ overflow-wrap:anywhere;
+}
+@media(max-width:520px){
+ .convention-poster{padding:14px}
+ .convention-poster-guests{grid-template-columns:repeat(3,minmax(0,1fr));gap:14px 7px}
+ .convention-poster-avatar{width:68px;height:68px;flex-basis:68px}
+}
+
 </style>
 </head>
 <body><div class="app">
@@ -578,6 +617,18 @@ function interview(){
  ${!convention?'<div class="empty">Create a convention in Convention Hub to get started.</div>':!e?'<div class="empty">Add an episode and link it to this convention to prepare an interview.</div>':`<section class="card"><div class="sectionhead"><div><h2>${e.status===10?"✕ ":""}${esc(epTitle(e))}</h2>${e.status===10?'<span class="tag">Cancelled</span>':""}<span class="smalltext">${e.questions.filter(q=>q.asked).length} of ${e.questions.length} asked</span></div><button class="btn secondary small" onclick="openEpisode('${e.id}')">Edit episode</button></div><div class="bar"><i style="width:${e.questions.length?100*e.questions.filter(q=>q.asked).length/e.questions.length:0}%"></i></div>${(guest?.projects||[]).filter(p=>p.title&&p.title.trim()).length?`<div class="project-strip-label">Guest projects</div><div class="project-strip">${guest.projects.filter(p=>p.title&&p.title.trim()).map(p=>`<span class="project-chip"><strong>${esc(p.title)}</strong> · ${esc(p.type||"Other")}</span>`).join("")}</div>`:""}${e.questions.map(q=>`<label class="qrow"><input type="checkbox" ${q.asked?'checked':''} onchange="toggleAsked('${e.id}','${q.id}',this.checked)"><span class="qtext ${q.asked?'done':''}">${esc(q.text)}</span></label>`).join("")||'<div class="empty">No questions yet. Add them in the episode editor.</div>'}</section>`}`
 }
 function openDayConventionPicker(){const conventions=db.conventions;if(!conventions.length){showModal('Choose a convention','<div class="empty">Add a convention in Convention Hub first.</div>');return}showModal('Choose a convention',`<div class="episode-picker-list">${conventions.map(x=>`<button type="button" class="episode-picker-option ${x.id===window.dayConvention?'selected':''}" onclick="window.dayConvention='${x.id}';closeModal();render()">${esc(x.name)}</button>`).join('')}</div>`)}
+function addMinutesToTime(time,minutes){
+ if(!time||!/^\\d{2}:\\d{2}$/.test(time))return "";
+ const [h,m]=time.split(":").map(Number),total=h*60+m+minutes;
+ return `${String(Math.floor((total%(24*60))/60)).padStart(2,"0")}:${String(total%(24*60)).padStart(2,"0")}`;
+}
+function nextConventionId(){
+ const today=new Date();today.setHours(0,0,0,0);
+ const upcoming=db.conventions.filter(c=>c.startDate).map(c=>({c,d:new Date(c.startDate+"T00:00:00")})).filter(x=>!Number.isNaN(x.d.getTime())&&x.d>=today).sort((a,b)=>a.d-b.d);
+ if(upcoming.length)return upcoming[0].c.id;
+ const dated=db.conventions.filter(c=>c.startDate).slice().sort((a,b)=>b.startDate.localeCompare(a.startDate));
+ return dated[0]?.id||db.conventions[0]?.id||"";
+}
 function day(){
  const conventions=db.conventions;
  const selected=window.dayConvention||conventions[0]?.id||"";
@@ -585,14 +636,18 @@ function day(){
  const days=["Saturday","Sunday"];
  const activeDay=window.dayMode||"Saturday";
  const interviews=db.episodes.filter(e=>e.conventionId===selected&&e.time&&e.status!==10&&e.interviewDay===activeDay).map(e=>({kind:"Interview",time:e.time,title:e.guest||"Guest interview",detail:e.duration||"Duration TBD",guests:[e.guest].filter(Boolean),id:e.id}));
- const panels=(c?.panels||[]).filter(p=>p.day===activeDay&&p.time).map(p=>({kind:"Panel",time:p.time,title:p.title||"Panel",detail:"30 minutes",guests:(p.guestIds||[]).map(id=>db.guests.find(g=>g.id===id)?.name).filter(Boolean),id:p.id}));
+ const panels=(c?.panels||[]).filter(p=>p.day===activeDay&&p.time).map(p=>({kind:"Panel",time:p.time,endTime:addMinutesToTime(p.time,30),title:p.title||"Panel",detail:"",guests:(p.guestIds||[]).map(id=>db.guests.find(g=>g.id===id)?.name).filter(Boolean),id:p.id}));
  const schedule=[...interviews,...panels].sort((a,b)=>a.time.localeCompare(b.time)||a.kind.localeCompare(b.kind));
  const dayButtons=days.map(d=>`<button type="button" class="${activeDay===d?'active':''}" onclick="window.dayMode='${d}';render()">${d}</button>`).join("");
  return `<section class="hero"><div><div class="eyebrow">Your convention companion</div><h1>Convention Day Mode 🎬</h1><p class="sub">One timeline for stage panels and interview-room appointments.</p></div></section>
  <section class="card"><div class="field"><label>Convention</label><button type="button" class="episode-picker-trigger" onclick="openDayConventionPicker()">${esc(c?.name||"Choose a convention")}<span aria-hidden="true">⌄</span></button></div>
  <div class="panel-day-tabs">${dayButtons}</div>
+ <section class="convention-poster">
+  <div class="sectionhead"><div><div class="eyebrow">Meet the lineup</div><h2>${esc(c?.name||"Convention guests")}</h2><p class="smalltext">Your convention guest preview</p></div><span class="tag">${(c?.guestIds||[]).length} guests</span></div>
+  <div class="convention-poster-guests">${(c?.guestIds||[]).map(id=>db.guests.find(g=>g.id===id)).filter(Boolean).map(g=>{const photo=g.photo&&safeGuestUrl(g.photo);const initials=String(g.name||"?").trim().split(/\\s+/).slice(0,2).map(x=>x[0]||"").join("").toUpperCase();return `<div class="convention-poster-guest"><div class="convention-poster-avatar">${photo?`<img src="${esc(photo)}" alt="${esc(g.name)}" style="object-position:${Number(g.photoX??50)}% ${Number(g.photoY??50)}%;transform:scale(${Number(g.photoZoom??1)});transform-origin:${Number(g.photoX??50)}% ${Number(g.photoY??50)}%">`:`<span>${esc(initials||"✦")}</span>`}</div><b>${esc(g.name)}</b></div>`}).join("")||'<div class="empty">No guests linked to this convention yet. Add guests in Convention Hub.</div>'}</div>
+ </section>
  <div class="sectionhead"><h2>${activeDay} schedule</h2><span class="tag">${schedule.length} events</span></div>
- ${!selected?'<div class="empty">Add a convention in Convention Hub, then select it here.</div>':schedule.length?schedule.map(item=>`<div class="schedule-item"><div class="schedule-time">${esc(item.time)}</div><div><div class="schedule-kind">${item.kind}</div><b>${esc(item.title)}</b><div class="schedule-guests">${item.kind==="Panel"?"Guests: ":""}${esc(item.guests.join(", ")||"Guests to be confirmed")} · ${esc(item.detail)}</div></div>${item.kind==="Interview"?`<button class="btn secondary small" onclick="activeEpisode='${item.id}';go('interview')">Open questions →</button>`:`<button class="btn secondary small" onclick="managePanels('${selected}')">Edit panels</button>`}</div>`).join(""):'<div class="empty">Nothing scheduled for this day yet. Add panels or set interview times and days.</div>'}
+ ${!selected?'<div class="empty">Add a convention in Convention Hub, then select it here.</div>':schedule.length?schedule.map(item=>`<div class="schedule-item"><div class="schedule-time">${esc(item.time)}${item.kind==="Panel"&&item.endTime?` – ${esc(item.endTime)}`:""}</div><div><div class="schedule-kind">${item.kind}</div><b>${esc(item.title)}</b><div class="schedule-guests">${item.kind==="Panel"?"Guests: ":""}${esc(item.guests.join(", ")||"Guests to be confirmed")}${item.detail?` · ${esc(item.detail)}`:""}</div></div>${item.kind==="Interview"?`<button class="btn secondary small" onclick="activeEpisode='${item.id}';go('interview')">Open questions →</button>`:`<button class="btn secondary small" onclick="managePanels('${selected}')">Edit panels</button>`}</div>`).join(""):'<div class="empty">Nothing scheduled for this day yet. Add panels or set interview times and days.</div>'}
  </section>
  <div class="grid" style="margin-top:16px"><section class="card wide"><h2>Convention recap</h2><div class="row"><div><span class="smalltext">Published / completed</span><h2>${db.episodes.filter(e=>e.conventionId===selected&&e.status===8).length}</h2></div><div><span class="smalltext">Cancelled</span><h2>${db.episodes.filter(e=>e.conventionId===selected&&e.status===10).length}</h2></div><div><span class="smalltext">Still in progress</span><h2>${db.episodes.filter(e=>e.conventionId===selected&&![8,10].includes(e.status)).length}</h2></div></div></section><section class="card side"><h2>Quick notes</h2><p class="smalltext">Use an episode’s notes field for guest-specific moments and follow-ups. Notes are saved with the episode.</p></section></div>`
 }
@@ -636,7 +691,7 @@ function kpis(){
   </div>`;
 }
 function go(v){view=v;render()}
-function bind(){document.querySelectorAll("#nav button").forEach(b=>b.onclick=()=>go(b.dataset.view));if(view==="episodes"&&episodesMode==="kanban")setupKanbanDrag()}
+function bind(){document.querySelectorAll("#nav button").forEach(b=>b.onclick=()=>{if(b.dataset.view==="day")window.dayConvention=nextConventionId();go(b.dataset.view)});if(view==="episodes"&&episodesMode==="kanban")setupKanbanDrag()}
 function changeEpisodeStatus(id,status){let e=db.episodes.find(x=>x.id===id);if(!e)return;e.status=Number(status);if(e.status===10)e.date="";save();render()}
 function setupKanbanDrag(){
  document.querySelectorAll(".kanban-lane").forEach(l=>{l.addEventListener("dragover",e=>{e.preventDefault();l.classList.add("drop-target")});l.addEventListener("dragleave",()=>l.classList.remove("drop-target"));l.addEventListener("drop",e=>{e.preventDefault();l.classList.remove("drop-target");let id=e.dataTransfer.getData("text/plain");if(id)changeEpisodeStatus(id,Number(l.dataset.status))})});
@@ -741,7 +796,7 @@ function managePanels(conventionId){
  const c=conv(conventionId);if(!c)return;
  if(!Array.isArray(c.panels))c.panels=[];
  const lineup=(c.guestIds||[]).map(id=>db.guests.find(g=>g.id===id)).filter(Boolean);
- showModal("Manage convention panels",`<p class="sub">Build the stage schedule for this convention. Each panel can have its own day, start time, and guest lineup.</p><div class="sectionhead"><h3>Panels</h3><button type="button" class="btn blue small" onclick="addConventionPanel('${c.id}')">＋ Add panel</button></div>${c.panels.slice().sort((a,b)=>(a.day||"").localeCompare(b.day||"")||(a.time||"").localeCompare(b.time||"")).map(p=>`<div class="episode"><div class="epbody"><b>${esc(p.title||"Untitled panel")}</b><div class="epmeta">${esc(p.day||"Day not set")} · ${esc(p.time||"Time not set")} · ${(p.guestIds||[]).map(id=>esc(db.guests.find(g=>g.id===id)?.name||"")).filter(Boolean).join(", ")||"No guests selected"}</div></div><div class="epactions"><button class="btn secondary small" onclick="editConventionPanel('${c.id}','${p.id}')">Edit</button><button class="btn danger small" onclick="deleteConventionPanel('${c.id}','${p.id}')">Delete</button></div></div>`).join("")||'<div class="empty">No panels added yet.</div>'}<div class="row" style="margin-top:14px"><button class="btn secondary" onclick="closeModal()">Done</button></div>`);
+ showModal("Manage convention panels",`<p class="sub">Build the stage schedule for this convention. Each panel can have its own day, start time, and guest lineup.</p><div class="sectionhead"><h3>Panels</h3><button type="button" class="btn blue small" onclick="addConventionPanel('${c.id}')">＋ Add panel</button></div>${c.panels.slice().sort((a,b)=>(a.day||"").localeCompare(b.day||"")||(a.time||"").localeCompare(b.time||"")).map(p=>`<div class="episode"><div class="epbody"><b>${esc(p.title||"Untitled panel")}</b><div class="epmeta">${esc(p.day||"Day not set")} · ${esc(p.time||"Time not set")}${p.time?`–${esc(addMinutesToTime(p.time,30))}`:""} · ${(p.guestIds||[]).map(id=>esc(db.guests.find(g=>g.id===id)?.name||"")).filter(Boolean).join(", ")||"No guests selected"}</div></div><div class="epactions"><button class="btn secondary small" onclick="editConventionPanel('${c.id}','${p.id}')">Edit</button><button class="btn danger small" onclick="deleteConventionPanel('${c.id}','${p.id}')">Delete</button></div></div>`).join("")||'<div class="empty">No panels added yet.</div>'}<div class="row" style="margin-top:14px"><button class="btn secondary" onclick="closeModal()">Done</button></div>`);
 }
 function addConventionPanel(conventionId){editConventionPanel(conventionId,null)}
 function enforcePanelDuration(){
