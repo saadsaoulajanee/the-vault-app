@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>The Vault V2.6.4</title>
+<title>The Vault V2.6.5</title>
 <style>
 :root{--ink:#182033;--muted:#778096;--line:#e7eaf2;--paper:#f6f7fb;--card:#fff;--blue:#4169e1;--pink:#ed5a9b;--softblue:#edf1ff;--softpink:#fff0f6;--green:#16866b;--shadow:0 12px 34px #1c2b5010}
 *{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.45 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}button,input,select,textarea{font:inherit}button{cursor:pointer;border:0}button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:3px solid #8ba2ff;outline-offset:2px}
@@ -608,10 +608,52 @@ body[data-theme="dark"] .project-chip,body[data-theme="dark"] .status,body[data-
   #conventionGuestGrid{max-height:205px}
 }
 
+
+/* V2.6.5: tidy organizer and convention action rows on phones */
+@media(max-width:900px){
+  .split{grid-template-columns:minmax(0,1fr);gap:14px}
+  .split>.card{min-width:0;width:100%}
+  .split .episode{
+    display:flex !important;
+    flex-direction:column;
+    align-items:stretch !important;
+    justify-content:flex-start;
+    gap:10px;
+    width:100%;
+    box-sizing:border-box;
+    padding:13px;
+  }
+  .split .episode .epbody{
+    flex:0 1 auto;
+    width:100%;
+    min-width:0;
+  }
+  .split .episode .epactions{
+    display:flex !important;
+    flex-direction:row !important;
+    flex-wrap:wrap !important;
+    align-items:center !important;
+    justify-content:flex-start !important;
+    align-self:stretch;
+    width:100%;
+    min-width:0;
+    gap:8px;
+    margin:0;
+  }
+  .split .episode .epactions .btn{
+    flex:0 0 auto !important;
+    width:auto;
+    min-width:0;
+    white-space:nowrap;
+    padding:9px 13px;
+  }
+  .split .sectionhead>div{display:flex;flex-wrap:wrap;gap:7px}
+}
+
 </style>
 </head>
 <body><div class="app">
-<header class="top"><div class="brand"><div class="logo">✦</div><div>The Vault <span class="muted" style="font-weight:600;font-size:13px">V2.6.4</span></div></div><div class="topright"><span class="pill" id="syncStatus">Offline-first • not signed in</span><button class="btn secondary small" id="themeBtn" title="Switch theme">☾</button><button class="btn secondary small" id="exportBtn">Export backup</button><button class="btn secondary small" id="importBtn">Import backup</button><button class="btn secondary small" id="cloudBtn">Account & sync</button><input id="importFile" type="file" accept="application/json,.json" hidden></div></header>
+<header class="top"><div class="brand"><div class="logo">✦</div><div>The Vault <span class="muted" style="font-weight:600;font-size:13px">V2.6.5</span></div></div><div class="topright"><span class="pill" id="syncStatus">Offline-first • not signed in</span><button class="btn secondary small" id="themeBtn" title="Switch theme">☾</button><button class="btn secondary small" id="exportBtn">Export backup</button><button class="btn secondary small" id="importBtn">Import backup</button><button class="btn secondary small" id="cloudBtn">Account & sync</button><input id="importFile" type="file" accept="application/json,.json" hidden></div></header>
 <nav class="nav" id="nav">
 <button class="active" data-view="home">⌂ Dashboard</button><button data-view="episodes">▣ Episodes</button><button data-view="guests">👤 Guests</button><button data-view="interview">☷ Interview</button><button data-view="hub">✧ Convention Hub</button><button data-view="day">🎬 Convention Day</button><button data-view="kpis">📊 KPIs</button><button data-view="budget">💶 Budget</button><button data-view="youtube">▶ YouTube</button><button data-view="venues">📍 Venues</button>
 </nav>
