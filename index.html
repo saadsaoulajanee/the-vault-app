@@ -210,6 +210,31 @@
 .interview-details-gate .gate-note{font-size:13px;color:var(--muted);margin:5px 0 12px}
 .invitation-summary{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0}
 .invitation-summary .tag{padding:7px 10px}
+
+/* V1.5.1 responsive layout polish */
+.split{grid-template-columns:repeat(2,minmax(0,1fr));align-items:start}
+.split>section{min-width:0}
+.split .episode{display:grid;grid-template-columns:minmax(0,1fr);align-items:start;gap:8px}
+.split .epbody{width:100%;min-width:0}
+.split .epbody b{overflow-wrap:break-word;word-break:normal}
+.split .epactions{display:flex;flex-wrap:wrap;justify-content:flex-start;align-items:center;gap:8px}
+.split .epactions .btn{flex:0 0 auto}
+.episode-gallery .episode{display:grid;grid-template-columns:48px minmax(0,1fr);column-gap:12px;row-gap:8px;align-items:start}
+.episode-gallery .episode>.epicon{grid-column:1;grid-row:1 / span 2}
+.episode-gallery .episode>.epbody{grid-column:2;grid-row:1;min-width:0}
+.episode-gallery .episode>.epactions{grid-column:2;grid-row:2;display:flex;flex-direction:row;flex-wrap:wrap;align-items:center;justify-content:flex-start;gap:7px;min-width:0}
+.episode-gallery .status{display:inline-flex;align-items:center;max-width:100%;font-size:11px;line-height:1.25;padding:4px 8px;white-space:normal;overflow-wrap:anywhere}
+.episode-gallery .epactions .btn{font-size:12px;padding:7px 10px;min-height:32px}
+.episode-gallery .epbody b{overflow-wrap:break-word;word-break:normal}
+@media(max-width:760px){
+ .split{grid-template-columns:minmax(0,1fr)}
+}
+@media(max-width:420px){
+ .episode-gallery .episode{grid-template-columns:40px minmax(0,1fr);padding:10px;gap:7px}
+ .episode-gallery .episode>.epicon{width:40px;height:40px}
+ .episode-gallery .epactions{gap:6px}
+ .episode-gallery .status{font-size:10px;padding:4px 7px}
+}
 </style>
 </head>
 <body><div class="app">
