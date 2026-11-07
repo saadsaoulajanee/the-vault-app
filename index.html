@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>The Vault V2.7.0</title>
+<title>The Vault V2.7.1</title>
 <style>
 :root{--ink:#182033;--muted:#778096;--line:#e7eaf2;--paper:#f6f7fb;--card:#fff;--blue:#4169e1;--pink:#ed5a9b;--softblue:#edf1ff;--softpink:#fff0f6;--green:#16866b;--shadow:0 12px 34px #1c2b5010}
 *{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.45 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}button,input,select,textarea{font:inherit}button{cursor:pointer;border:0}button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:3px solid #8ba2ff;outline-offset:2px}
@@ -665,12 +665,68 @@ body[data-theme="dark"] .project-chip,body[data-theme="dark"] .status,body[data-
 .venue-room-row span{font-size:12px;color:var(--muted);margin-top:2px}
 @media(max-width:700px){#quickNotesBtn{font-size:12px;padding:8px 10px}.venue-room-list{grid-template-columns:1fr}}
 
+
+/* V2.7.1: compact phone header and cleaner navigation */
+@media(max-width:900px){
+  .topright{
+    display:grid !important;
+    grid-template-columns:42px repeat(3,minmax(0,1fr)) !important;
+    grid-template-rows:auto auto !important;
+    gap:7px !important;
+    width:100% !important;
+    min-width:0 !important;
+    align-items:stretch !important;
+  }
+  .topright .pill{display:none !important}
+  .topright #quickNotesBtn{
+    grid-column:1/-1 !important;
+    grid-row:1 !important;
+    order:0 !important;
+    width:100% !important;
+    min-height:42px !important;
+    white-space:nowrap !important;
+    padding:9px 12px !important;
+    font-size:13px !important;
+  }
+  .topright #themeBtn{grid-column:1 !important;grid-row:2 !important;order:1 !important}
+  .topright #exportBtn{grid-column:2 !important;grid-row:2 !important;order:2 !important}
+  .topright #importBtn{grid-column:3 !important;grid-row:2 !important;order:3 !important}
+  .topright #cloudBtn{grid-column:4 !important;grid-row:2 !important;order:4 !important}
+  .topright .btn{
+    min-width:0 !important;
+    width:100% !important;
+    padding:9px 5px !important;
+    font-size:12px !important;
+    line-height:1.25 !important;
+    white-space:normal !important;
+    min-height:42px !important;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    text-align:center;
+  }
+  .topright #themeBtn{font-size:18px !important;padding:8px 4px !important}
+  .nav{
+    display:flex !important;
+    flex-wrap:nowrap !important;
+    overflow-x:auto !important;
+    overflow-y:hidden !important;
+    max-width:calc(100vw - 24px);
+    scrollbar-width:thin;
+    -webkit-overflow-scrolling:touch;
+  }
+}
+@media(max-width:380px){
+  .topright{grid-template-columns:36px repeat(3,minmax(0,1fr)) !important;gap:5px !important}
+  .topright .btn{font-size:11px !important;padding:8px 3px !important}
+}
+
 </style>
 </head>
 <body><div class="app">
-<header class="top"><div class="brand"><div class="logo">✦</div><div>The Vault <span class="muted" style="font-weight:600;font-size:13px">V2.7.0</span></div></div><div class="topright"><span class="pill" id="syncStatus">Offline-first • not signed in</span><button class="btn secondary small" id="quickNotesBtn" onclick="openQuickNotes()">📝 Quick notes</button><button class="btn secondary small" id="themeBtn" title="Switch theme">☾</button><button class="btn secondary small" id="exportBtn">Export backup</button><button class="btn secondary small" id="importBtn">Import backup</button><button class="btn secondary small" id="cloudBtn">Account & sync</button><input id="importFile" type="file" accept="application/json,.json" hidden></div></header>
+<header class="top"><div class="brand"><div class="logo">✦</div><div>The Vault <span class="muted" style="font-weight:600;font-size:13px">V2.7.1</span></div></div><div class="topright"><span class="pill" id="syncStatus">Offline-first • not signed in</span><button class="btn secondary small" id="quickNotesBtn" onclick="openQuickNotes()">📝 Quick notes</button><button class="btn secondary small" id="themeBtn" title="Switch theme">☾</button><button class="btn secondary small" id="exportBtn">Export backup</button><button class="btn secondary small" id="importBtn">Import backup</button><button class="btn secondary small" id="cloudBtn">Account & sync</button><input id="importFile" type="file" accept="application/json,.json" hidden></div></header>
 <nav class="nav" id="nav">
-<button class="active" data-view="home">⌂ Dashboard</button><button data-view="episodes">▣ Episodes</button><button data-view="guests">👤 Guests</button><button data-view="interview">☷ Interview</button><button data-view="hub">✧ Convention Hub</button><button data-view="day">🎬 Convention Day</button><button data-view="kpis">📊 KPIs</button><button data-view="budget">💶 Budget</button><button data-view="youtube">▶ YouTube</button><button data-view="venues">📍 Venues</button>
+<button class="active" data-view="home">⌂ Dashboard</button><button data-view="episodes">▣ Episodes</button><button data-view="guests">👤 Guests</button><button data-view="interview">☷ Interview</button><button data-view="hub">✧ Convention Hub</button><button data-view="day">🎬 Convention Day</button><button data-view="kpis">📊 KPIs</button><button data-view="budget">💶 Budget</button><button data-view="venues">📍 Venues</button>
 </nav>
 <main id="main"></main>
 </div>
@@ -893,7 +949,7 @@ localStorage.setItem("vault03",JSON.stringify(db));
 function applyTheme(){let p=db.settings?.theme||"system",dark=p==="dark"||(p==="system"&&window.matchMedia?.("(prefers-color-scheme: dark)").matches);document.body.dataset.theme=dark?"dark":"light";let b=document.getElementById("themeBtn");if(b){b.textContent=dark?"☀":"☾";b.title="Theme: "+p+" (tap to change)"}}
 function cycleTheme(){db.settings=db.settings||{};db.settings.theme=({system:"dark",dark:"light",light:"system"})[db.settings.theme||"system"];save();applyTheme()}
 
-function render(){document.querySelectorAll("#nav button").forEach(b=>b.classList.toggle("active",b.dataset.view===view));let m=document.getElementById("main");if(view==="home")m.innerHTML=home();if(view==="episodes")m.innerHTML=episodes();if(view==="guests")m.innerHTML=guestsView();if(view==="hub")m.innerHTML=hub();if(view==="interview")m.innerHTML=interview();if(view==="day")m.innerHTML=day();if(view==="kpis")m.innerHTML=kpis();if(view==="budget")m.innerHTML=budgetView();if(view==="youtube")m.innerHTML=youtubeView();if(view==="venues")m.innerHTML=venuesView();bind();applyTheme();upgradeVaultSelects(document)}
+function render(){if(view==="youtube")view="home";document.querySelectorAll("#nav button").forEach(b=>b.classList.toggle("active",b.dataset.view===view));let m=document.getElementById("main");if(view==="home")m.innerHTML=home();if(view==="episodes")m.innerHTML=episodes();if(view==="guests")m.innerHTML=guestsView();if(view==="hub")m.innerHTML=hub();if(view==="interview")m.innerHTML=interview();if(view==="day")m.innerHTML=day();if(view==="kpis")m.innerHTML=kpis();if(view==="budget")m.innerHTML=budgetView();if(view==="venues")m.innerHTML=venuesView();bind();applyTheme();upgradeVaultSelects(document)}
 function home(){
  let count=n=>db.episodes.filter(e=>e.status===n).length;
  let active=db.episodes.filter(e=>![8,10].includes(e.status));
