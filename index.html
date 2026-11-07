@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>The Vault V2.2.0</title>
+<title>The Vault V2.4.0</title>
 <style>
 :root{--ink:#182033;--muted:#778096;--line:#e7eaf2;--paper:#f6f7fb;--card:#fff;--blue:#4169e1;--pink:#ed5a9b;--softblue:#edf1ff;--softpink:#fff0f6;--green:#16866b;--shadow:0 12px 34px #1c2b5010}
 *{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.45 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}button,input,select,textarea{font:inherit}button{cursor:pointer;border:0}button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:3px solid #8ba2ff;outline-offset:2px}
@@ -408,10 +408,38 @@ body[data-theme="dark"] .project-chip,body[data-theme="dark"] .status,body[data-
 .weekend-grid .weekend-empty{background:transparent;border:0}
 .flight-leg{padding:12px 0;border-top:1px solid var(--line)}
 .flight-leg:first-of-type{border-top:0}
+
+.flight-prominent{padding:16px 0}
+.flight-route{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:16px}
+.flight-number{font-size:12px;background:var(--softblue);padding:5px 8px;border-radius:8px;font-weight:800}
+.flight-datetime{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:13px 0}
+.flight-datetime>div{background:var(--paper);border:1px solid var(--line);border-radius:13px;padding:12px;min-width:0}
+.flight-datetime span{display:block;font-size:10px;letter-spacing:.08em;color:var(--muted);font-weight:800}
+.flight-datetime strong{display:block;font-size:clamp(19px,5vw,25px);line-height:1.25;margin-top:5px;overflow-wrap:anywhere}
+.flight-live{display:flex;align-items:center;flex-wrap:wrap;gap:8px;min-height:42px;padding:10px 12px;border-radius:11px;background:var(--paper);margin:10px 0;font-size:13px}
+.flight-status-dot{width:9px;height:9px;border-radius:50%;background:#d69b35;display:inline-block;flex:none}
+.flight-status-dot.offline{background:#d65b5b}
+.flight-status-pill{font-weight:800;text-transform:capitalize;padding:5px 9px;border-radius:8px;background:#e8f4ec;color:#247344}
+.flight-status-pill[data-status*="cancel"]{background:#fde9e9;color:#a12b2b}
+.flight-status-pill[data-status*="delay"]{background:#fff0d9;color:#965c09}
+.flight-actions{flex-wrap:wrap;margin-top:9px}
+@media(max-width:520px){.flight-datetime strong{font-size:20px}}
+
+
+.week-nav{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:12px 0}
+.week-nav b{font-size:13px;text-align:center}
+.week-calendar{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.week-day-card{border:1px solid var(--line);border-radius:15px;padding:14px;background:var(--card);min-width:0;min-height:130px}
+.week-day-heading{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px}
+.week-day-heading b{font-size:17px}.week-day-heading strong{font-size:14px;color:var(--muted)}
+.week-event{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 9px;padding:9px 0;border-top:1px solid var(--line)}
+.week-event>b{font-size:13px;color:var(--blue)}.week-event span{font-weight:700;overflow-wrap:anywhere}.week-event small{grid-column:2;color:var(--muted)}
+.week-empty{padding:16px 0}
+@media(max-width:520px){.week-nav{flex-wrap:wrap}.week-nav b{order:-1;width:100%}.week-calendar{grid-template-columns:1fr}}
 </style>
 </head>
 <body><div class="app">
-<header class="top"><div class="brand"><div class="logo">✦</div><div>The Vault <span class="muted" style="font-weight:600;font-size:13px">V2.2.0</span></div></div><div class="topright"><span class="pill" id="syncStatus">Offline-first • not signed in</span><button class="btn secondary small" id="themeBtn" title="Switch theme">☾</button><button class="btn secondary small" id="exportBtn">Export backup</button><button class="btn secondary small" id="importBtn">Import backup</button><button class="btn secondary small" id="cloudBtn">Account & sync</button><input id="importFile" type="file" accept="application/json,.json" hidden></div></header>
+<header class="top"><div class="brand"><div class="logo">✦</div><div>The Vault <span class="muted" style="font-weight:600;font-size:13px">V2.4.0</span></div></div><div class="topright"><span class="pill" id="syncStatus">Offline-first • not signed in</span><button class="btn secondary small" id="themeBtn" title="Switch theme">☾</button><button class="btn secondary small" id="exportBtn">Export backup</button><button class="btn secondary small" id="importBtn">Import backup</button><button class="btn secondary small" id="cloudBtn">Account & sync</button><input id="importFile" type="file" accept="application/json,.json" hidden></div></header>
 <nav class="nav" id="nav">
 <button class="active" data-view="home">⌂ Dashboard</button><button data-view="episodes">▣ Episodes</button><button data-view="guests">👤 Guests</button><button data-view="interview">☷ Interview</button><button data-view="hub">✧ Convention Hub</button><button data-view="day">🎬 Convention Day</button><button data-view="kpis">📊 KPIs</button><button data-view="budget">💶 Budget</button><button data-view="youtube">▶ YouTube</button><button data-view="venues">📍 Venues</button>
 </nav>
@@ -707,15 +735,56 @@ function addPlannerDays(date,n){if(!date)return "";let d=new Date(date+"T12:00:0
 function addPlannerActivity(cid){let c=conv(cid);if(!c)return;showModal("Add schedule activity",`<form id="planner-event-form"><div class="field"><label>Activity</label><input name="title" required placeholder="Press interview, photo op, meal..."></div><div class="row"><div class="field"><label>Date</label><input name="date" type="date" value="${plannerDate(c,window.dayMode||"Saturday")}" required></div><div class="field"><label>Time</label><input name="time" type="time" required></div></div><div class="row"><div class="field"><label>Type</label><select name="kind"><option>Interview</option><option>Photo op</option><option>Autograph</option><option>Meal / break</option><option>Travel</option><option>Other</option></select></div><div class="field"><label>Duration (minutes)</label><input name="duration" type="number" min="5" step="5" value="30"></div></div><div class="field"><label>Notes</label><textarea name="notes"></textarea></div><button class="btn blue">Save activity</button></form>`);document.getElementById("planner-event-form").onsubmit=e=>{e.preventDefault();let f=new FormData(e.target);c.events=c.events||[];c.events.push({id:uid(),title:f.get("title"),date:f.get("date"),time:f.get("time"),kind:f.get("kind"),duration:+f.get("duration")||30,notes:f.get("notes")});save();closeModal();render()}}
 function plannerCalendar(c){
  if(!c)return "";
- let base=new Date((c.startDate||new Date().toISOString().slice(0,10))+"T12:00:00"),y=base.getFullYear(),m=base.getMonth(),first=new Date(y,m,1),last=new Date(y,m+1,0),events=[...(c.events||[]),...(c.panels||[]).map(p=>({title:p.title,date:p.date||plannerDate(c,p.day),time:p.time,kind:"Panel"})),...db.episodes.filter(e=>e.conventionId===c.id&&e.time).map(e=>({title:"Interview: "+e.guest,date:e.interviewDate||plannerDate(c,e.interviewDay),time:e.time,kind:"Interview"}))];
- let weekends=[];for(let d=1;d<=last.getDate();d++){let date=new Date(y,m,d);if(date.getDay()===6){let sat=d,sun=d+1<=last.getDate()?d+1:null;weekends.push([sat,sun])}}
- let cells=weekends.map(([sat,sun])=>[sat,sun].map(day=>{if(!day)return `<div class="month-cell weekend-empty"></div>`;let date=`${y}-${String(m+1).padStart(2,"0")}-${String(day).padStart(2,"0")}`,items=events.filter(e=>e.date===date);return `<div class="month-cell weekend-cell"><b>${day}</b>${items.map(e=>`<span class="cal-event">${esc(e.time||"")} ${esc(e.title||e.kind||"")}</span>`).join("")||'<span class="smalltext">No events</span>'}</div>`}).join("")).join("");
- return `<p class="smalltext">${first.toLocaleDateString(undefined,{month:"long",year:"numeric"})} · Weekends only</p><div class="month-grid weekend-grid"><div class="smalltext" style="text-align:center">Saturday</div><div class="smalltext" style="text-align:center">Sunday</div>${cells}</div>`;
+ let start=new Date((c.startDate||new Date().toISOString().slice(0,10))+"T12:00:00"),end=new Date((c.endDate||c.startDate||new Date().toISOString().slice(0,10))+"T12:00:00");
+ let weekends=[],cursor=new Date(start);while(cursor.getDay()!==6)cursor.setDate(cursor.getDate()+1);
+ for(;cursor<=end;cursor.setDate(cursor.getDate()+7)){let sat=new Date(cursor),sun=new Date(cursor);sun.setDate(sun.getDate()+1);weekends.push([new Date(sat),sun<=end?sun:null])}
+ if(!weekends.length){let sat=new Date(start);sat.setDate(sat.getDate()-(sat.getDay()+1)%7);let sun=new Date(sat);sun.setDate(sun.getDate()+1);weekends=[[sat,sun]]}
+ let idx=Math.max(0,Math.min(weekends.length-1,Number(window.plannerWeekIndex)||0));window.plannerWeekIndex=idx;
+ let [sat,sun]=weekends[idx],key=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+ let events=[...(c.events||[]),...(c.panels||[]).map(x=>({title:x.title,date:x.date||plannerDate(c,x.day),time:x.time,kind:"Panel"})),...db.episodes.filter(e=>e.conventionId===c.id&&e.time).map(e=>({title:"Interview: "+e.guest,date:e.interviewDate||plannerDate(c,e.interviewDay),time:e.time,kind:"Interview"}))];
+ let card=d=>{if(!d)return `<div class="week-day-card muted-day"><b>Sunday</b><span class="smalltext">Outside convention dates</span></div>`;let items=events.filter(e=>e.date===key(d)).sort((x,y)=>(x.time||"").localeCompare(y.time||""));return `<div class="week-day-card"><div class="week-day-heading"><b>${d.toLocaleDateString(undefined,{weekday:"long"})}</b><strong>${d.toLocaleDateString(undefined,{day:"numeric",month:"short"})}</strong></div>${items.map(e=>`<div class="week-event"><b>${esc(e.time||"Time TBC")}</b><span>${esc(e.title||e.kind||"Activity")}</span><small>${esc(e.kind||"Activity")}</small></div>`).join("")||'<div class="smalltext week-empty">No events scheduled</div>'}</div>`};
+ return `<div class="week-nav"><button class="btn secondary small" ${idx===0?"disabled":""} onclick="window.plannerWeekIndex=${idx-1};render()">‹ Previous weekend</button><b>Weekend ${idx+1} of ${weekends.length}</b><button class="btn secondary small" ${idx===weekends.length-1?"disabled":""} onclick="window.plannerWeekIndex=${idx+1};render()">Next weekend ›</button></div><div class="week-calendar">${card(sat)}${card(sun)}</div>`;
 }
+const VAULT_FLIGHT_WORKER_URL="https://the-vault-flight-api.saadsaoulajane.workers.dev";
+
 function conventionFlights(c){
  let legs=[["outbound","Toulouse → Paris","Toulouse","Paris"],["return","Paris → Toulouse","Paris","Toulouse"]];
- return `<section class="card" style="margin-top:16px"><div class="sectionhead"><div><h2>✈️ Flights</h2><div class="smalltext">Your travel details for this convention</div></div></div>${legs.map(([key,label,from,to])=>{let f=c.flights?.[key]||{},date=f.date||"",flight=f.flightNumber||"",time=f.time||"",route=`${from} ${to}`;let google=`https://www.google.com/travel/flights?q=${encodeURIComponent("Flights from "+from+" to "+to+(date?" on "+date:""))}`,status=flight?`https://www.google.com/search?q=${encodeURIComponent(flight+" flight status")}`:`https://www.google.com/search?q=${encodeURIComponent("flight status "+from+" to "+to+(date?" "+date:""))}`;return `<div class="flight-leg"><div class="sectionhead"><b>${label}</b>${flight?`<span class="tag">${esc(flight)}</span>`:""}</div><div class="smalltext">${date?fmt(date):"Date not set"}${time?" · "+esc(time):""}</div><div class="row" style="margin-top:8px;flex-wrap:wrap"><a class="btn secondary small" href="${google}" target="_blank" rel="noopener">Google Flights ↗</a><a class="btn secondary small" href="${status}" target="_blank" rel="noopener">Check live flight status ↗</a></div></div>`}).join("")}<p class="smalltext">Flight status opens Google Search using your flight number. Google Flights does not provide a public live-status feed for embedding directly in this offline app.</p></section>`;
+ return `<section class="card flight-dashboard" style="margin-top:16px"><div class="sectionhead"><div><h2>✈️ Your flights</h2><div class="smalltext">Flight details and on-demand status checks</div></div><span class="tag">TLS ⇄ PAR</span></div>
+ ${legs.map(([key,label,from,to])=>{let f=c.flights?.[key]||{},date=f.date||"",flight=f.flightNumber||"",time=f.time||"",google=`https://www.google.com/travel/flights?q=${encodeURIComponent("Flights from "+from+" to "+to+(date?" on "+date:""))}`;return `<div class="flight-leg flight-prominent">
+ <div class="flight-route"><b>${label}</b>${flight?`<span class="flight-number">${esc(flight)}</span>`:""}</div>
+ <div class="flight-datetime"><div><span>FLIGHT DATE</span><strong>${date?fmt(date):"Date not set"}</strong></div><div><span>DEPARTURE TIME</span><strong>${time||"Time not set"}</strong></div></div>
+ <div class="flight-live" id="flightStatus-${key}"><span class="flight-status-dot"></span><span>${f.liveStatus?renderFlightStatus(f.liveStatus):"Live status has not been checked yet."}</span></div>
+ <div class="row flight-actions"><a class="btn secondary small" href="${google}" target="_blank" rel="noopener">Google Flights ↗</a><button class="btn blue small" ${(!flight||!date)?"disabled":""} onclick="refreshFlightStatus('${c.id}','${key}')">↻ Check live status</button></div>
+ </div>`}).join("")}
+ <p class="smalltext">Status is checked only when you tap the button. Your Aviationstack key stays on Cloudflare and is never sent to this app.</p>
+ </section>`;
 }
+function renderFlightStatus(s){
+ if(!s)return "Live status has not been checked yet.";
+ let status=s.flight_status||"Status unavailable",dep=s.departure||{},arr=s.arrival||{};
+ let detail=[dep.gate?"Gate "+dep.gate:"",dep.terminal?"Terminal "+dep.terminal:"",arr.gate?"Arrival gate "+arr.gate:"",dep.delay!=null&&dep.delay!==0?"Departure delay "+dep.delay+" min":""].filter(Boolean).join(" · ");
+ return `<span class="flight-status-pill" data-status="${esc(status.toLowerCase())}">${esc(status)}</span><span class="smalltext">${esc(detail||"Latest provider update")}</span>${dep.estimated?`<small>Est. departure: ${esc(dep.estimated)}</small>`:""}${arr.estimated?`<small>Est. arrival: ${esc(arr.estimated)}</small>`:""}`;
+}
+async function refreshFlightStatus(conventionId,leg){
+ let c=db.conventions.find(x=>x.id===conventionId),f=c?.flights?.[leg];
+ if(!f?.flightNumber||!f.date)return;
+ let target=document.getElementById("flightStatus-"+leg);
+ if(!navigator.onLine){if(target)target.innerHTML='<span class="flight-status-dot offline"></span><span>You are offline. Connect to the internet and try again.</span>';return}
+ if(target)target.textContent="Checking live flight status…";
+ try{
+  let url=VAULT_FLIGHT_WORKER_URL+"?"+new URLSearchParams({flight_iata:f.flightNumber.trim().toUpperCase(),flight_date:f.date});
+  let response=await fetch(url,{method:"GET",headers:{Accept:"application/json"}});
+  let result=await response.json();
+  if(!response.ok)throw new Error(result.error||"Flight status service returned an error.");
+  let found=(result.data||[])[0];
+  if(!found)throw new Error("No matching flight was found. Check the flight number and date.");
+  f.liveStatus=found;f.liveStatusCheckedAt=new Date().toISOString();save();
+  if(target)target.innerHTML=renderFlightStatus(found);
+ }catch(err){
+  if(target)target.innerHTML='<span class="flight-status-dot offline"></span><span>'+esc(err.message||"Live status unavailable")+'</span>';
+ }
+}
+
 
 function day(){
  const conventions=db.conventions;
@@ -738,7 +807,7 @@ function day(){
  <div class="sectionhead"><h2>${activeDay} schedule</h2><div class="row" style="flex:0 1 auto"><button class="btn secondary small" onclick="addPlannerActivity('${selected}')">＋ Add activity</button><span class="tag">${schedule.length} events</span></div></div>
  ${!selected?'<div class="empty">Add a convention in Convention Hub, then select it here.</div>':schedule.length?schedule.map(item=>`<div class="schedule-item"><div class="schedule-time">${esc(item.time)}${item.endTime?` – ${esc(item.endTime)}`:""}</div><div><div class="schedule-kind">${item.kind}</div><b>${esc(item.title)}</b><div class="schedule-guests">${item.kind==="Panel"?"Guests: ":""}${esc(item.guests.join(", ")||"Guests to be confirmed")}${item.detail?` · ${esc(item.detail)}`:""}</div></div>${item.kind==="Interview"?`<button class="btn secondary small" onclick="activeEpisode='${item.id}';go('interview')">Open questions →</button>`:`<button class="btn secondary small" onclick="managePanels('${selected}')">Edit panels</button>`}</div>`).join(""):'<div class="empty">Nothing scheduled for this day yet. Add panels or set interview times and days.</div>'}
  </section>
- ${conventionFlights(c)}<section class="card" style="margin-top:16px"><div class="sectionhead"><h2>Convention calendar</h2><span class="tag">Month view</span></div>${plannerCalendar(c)}</section><div class="grid" style="margin-top:16px"><section class="card wide"><h2>Convention recap</h2><div class="row"><div><span class="smalltext">Published / completed</span><h2>${db.episodes.filter(e=>e.conventionId===selected&&e.status===8).length}</h2></div><div><span class="smalltext">Cancelled</span><h2>${db.episodes.filter(e=>e.conventionId===selected&&e.status===10).length}</h2></div><div><span class="smalltext">Still in progress</span><h2>${db.episodes.filter(e=>e.conventionId===selected&&![8,10].includes(e.status)).length}</h2></div></div></section><section class="card side"><h2>Quick notes</h2><p class="smalltext">Use an episode’s notes field for guest-specific moments and follow-ups. Notes are saved with the episode.</p></section></div>`
+ ${conventionFlights(c)}<section class="card" style="margin-top:16px"><div class="sectionhead"><h2>Convention calendar</h2><span class="tag">Weekend-by-weekend</span></div>${plannerCalendar(c)}</section><div class="grid" style="margin-top:16px"><section class="card wide"><h2>Convention recap</h2><div class="row"><div><span class="smalltext">Published / completed</span><h2>${db.episodes.filter(e=>e.conventionId===selected&&e.status===8).length}</h2></div><div><span class="smalltext">Cancelled</span><h2>${db.episodes.filter(e=>e.conventionId===selected&&e.status===10).length}</h2></div><div><span class="smalltext">Still in progress</span><h2>${db.episodes.filter(e=>e.conventionId===selected&&![8,10].includes(e.status)).length}</h2></div></div></section><section class="card side"><h2>Quick notes</h2><p class="smalltext">Use an episode’s notes field for guest-specific moments and follow-ups. Notes are saved with the episode.</p></section></div>`
 }
 function kpis(){
  const active=db.episodes.filter(e=>e.status!==10);
