@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>The Vault V2.0.0</title>
+<title>The Vault V2.1.0</title>
 <style>
 :root{--ink:#182033;--muted:#778096;--line:#e7eaf2;--paper:#f6f7fb;--card:#fff;--blue:#4169e1;--pink:#ed5a9b;--softblue:#edf1ff;--softpink:#fff0f6;--green:#16866b;--shadow:0 12px 34px #1c2b5010}
 *{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.45 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}button,input,select,textarea{font:inherit}button{cursor:pointer;border:0}button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:3px solid #8ba2ff;outline-offset:2px}
@@ -361,10 +361,51 @@ body[data-theme="dark"] .project-chip,body[data-theme="dark"] .status,body[data-
 .theme-toggle{min-width:42px}.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(115px,1fr));gap:9px}.metric-tile{border:1px solid var(--line);border-radius:12px;padding:12px}.metric-tile strong{display:block;font-size:22px}.expense-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;padding:10px 0;border-bottom:1px solid var(--line)}
 .month-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px}.month-cell{min-height:75px;padding:5px;border:1px solid var(--line);border-radius:9px;background:var(--card);font-size:11px;overflow:hidden}.month-cell .cal-event{display:block;margin-top:4px;padding:3px;background:var(--softblue);border-radius:5px;font-size:9px}
 @media(max-width:520px){.month-cell{min-height:60px;padding:3px}.month-grid{gap:3px}}
+
+/* V2.1.0 budget dashboard + venue floor-plan editor */
+.budget-toolbar{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:end;margin:0 0 16px}
+.budget-toolbar .field{margin:0;min-width:0}
+.budget-select{width:100%;min-height:48px;border:1px solid var(--line);border-radius:13px;padding:10px 14px;background:var(--card);color:var(--ink);font-weight:700}
+.budget-overview{display:grid;grid-template-columns:150px minmax(0,1fr);gap:20px;align-items:center}
+.budget-ring{width:142px;height:142px;border-radius:50%;display:grid;place-items:center;position:relative;background:conic-gradient(var(--blue) var(--spent-angle,0deg),#e9edf5 0)}
+.budget-ring:before{content:"";position:absolute;inset:13px;background:var(--card);border-radius:50%}
+.budget-ring-center{position:relative;text-align:center;display:grid;gap:1px}
+.budget-ring-center strong{font-size:23px;letter-spacing:-1px}
+.budget-ring-center span{font-size:11px;color:var(--muted)}
+.budget-legend{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.budget-legend-item{background:var(--paper);border:1px solid var(--line);border-radius:13px;padding:12px;min-width:0}
+.budget-legend-item span{display:block;font-size:12px;color:var(--muted)}
+.budget-legend-item strong{display:block;font-size:19px;margin-top:3px;overflow-wrap:anywhere}
+.budget-progress{height:12px;background:#e9edf5;border-radius:99px;overflow:hidden;margin-top:15px}
+.budget-progress i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--blue),var(--pink));border-radius:99px;transition:width .35s}
+.budget-expenses{display:grid;gap:8px;margin-top:14px}
+.budget-expense{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:10px;align-items:center;padding:12px;border:1px solid var(--line);border-radius:13px;background:var(--card)}
+.budget-expense-main{min-width:0}.budget-expense-main b{display:block;overflow-wrap:anywhere}
+.budget-expense-amount{font-weight:800;white-space:nowrap}
+.budget-limit-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;margin-top:14px}
+.budget-limit-row .field{margin:0}
+.budget-remaining-tile{border:1px solid var(--line);border-radius:13px;padding:11px 13px;background:var(--paper)}
+.budget-remaining-tile span{display:block;font-size:12px;color:var(--muted)}
+.budget-remaining-tile strong{font-size:20px;display:block;margin-top:3px}
+.budget-card{padding:18px}
+.budget-card .sectionhead{align-items:flex-start}
+.floorplan-tools{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.floorplan-tabs{display:flex;gap:7px;flex-wrap:wrap;margin:12px 0}
+.floorplan-tab{padding:8px 11px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);font-weight:650}
+.floorplan-tab.active{background:var(--softblue);border-color:#aebeff;color:#4059bb}
+.floorplan-stage{position:relative;width:100%;min-height:220px;background:#f1f3f8;border:1px solid var(--line);border-radius:14px;overflow:hidden;touch-action:pan-y}
+.floorplan-stage img{display:block;width:100%;height:auto;max-height:72vh;object-fit:contain;user-select:none;-webkit-user-drag:none}
+.floorplan-marker{position:absolute;left:var(--x);top:var(--y);transform:translate(-50%,-50%);padding:6px 9px;border-radius:9px;background:#4169e9;color:#fff;font-size:12px;font-weight:800;box-shadow:0 3px 12px #17264b55;white-space:nowrap;max-width:75%;overflow:hidden;text-overflow:ellipsis;touch-action:none;cursor:grab;border:2px solid #fff}
+.floorplan-marker[data-kind="panel"]{background:#7654c8}.floorplan-marker[data-kind="interview"]{background:#e04f92}.floorplan-marker[data-kind="photoshoot"]{background:#d17b24}.floorplan-marker[data-kind="autographs"]{background:#16866b}.floorplan-marker[data-kind="meeting"]{background:#4169e9}
+.floorplan-empty{padding:26px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:14px}
+.floorplan-help{font-size:12px;color:var(--muted);margin:8px 0}
+.venue-plan-card{margin-top:14px}
+@media(max-width:600px){.budget-toolbar{grid-template-columns:1fr}.budget-overview{grid-template-columns:1fr;justify-items:center}.budget-legend{width:100%}.budget-limit-row{grid-template-columns:1fr}.budget-expense{grid-template-columns:minmax(0,1fr) auto}.budget-expense .btn{grid-column:2}.floorplan-marker{font-size:10px;padding:5px 7px}}
+
 </style>
 </head>
 <body><div class="app">
-<header class="top"><div class="brand"><div class="logo">✦</div><div>The Vault <span class="muted" style="font-weight:600;font-size:13px">V2.0.0</span></div></div><div class="topright"><span class="pill" id="syncStatus">Offline-first • not signed in</span><button class="btn secondary small" id="themeBtn" title="Switch theme">☾</button><button class="btn secondary small" id="exportBtn">Export backup</button><button class="btn secondary small" id="importBtn">Import backup</button><button class="btn secondary small" id="cloudBtn">Account & sync</button><input id="importFile" type="file" accept="application/json,.json" hidden></div></header>
+<header class="top"><div class="brand"><div class="logo">✦</div><div>The Vault <span class="muted" style="font-weight:600;font-size:13px">V2.1.0</span></div></div><div class="topright"><span class="pill" id="syncStatus">Offline-first • not signed in</span><button class="btn secondary small" id="themeBtn" title="Switch theme">☾</button><button class="btn secondary small" id="exportBtn">Export backup</button><button class="btn secondary small" id="importBtn">Import backup</button><button class="btn secondary small" id="cloudBtn">Account & sync</button><input id="importFile" type="file" accept="application/json,.json" hidden></div></header>
 <nav class="nav" id="nav">
 <button class="active" data-view="home">⌂ Dashboard</button><button data-view="episodes">▣ Episodes</button><button data-view="guests">👤 Guests</button><button data-view="interview">☷ Interview</button><button data-view="hub">✧ Convention Hub</button><button data-view="day">🎬 Convention Day</button><button data-view="kpis">📊 KPIs</button><button data-view="budget">💶 Budget</button><button data-view="youtube">▶ YouTube</button><button data-view="venues">📍 Venues</button>
 </nav>
@@ -397,7 +438,7 @@ function cloudPayload(){return {guests:db.guests,organizers:db.organizers,conven
 function applyCloudPayload(payload){
  if(!payload || !Array.isArray(payload.organizers)||!Array.isArray(payload.conventions)||!Array.isArray(payload.episodes))throw new Error("The cloud data format is not valid.");
  applyingRemote=true;
- db={...db,guests:Array.isArray(payload.guests)?payload.guests:[],organizers:payload.organizers,conventions:payload.conventions,episodes:payload.episodes,checklistTemplate:Array.isArray(payload.checklistTemplate)?payload.checklistTemplate:DEFAULT_CHECKLIST.slice(),settings:payload.settings||db.settings||{theme:"system",youtubeApiKey:""},venues:Array.isArray(payload.venues)?payload.venues:[],youtubeVideos:Array.isArray(payload.youtubeVideos)?payload.youtubeVideos:[]};ensureGuestProfiles();
+ db={...db,guests:Array.isArray(payload.guests)?payload.guests:[],organizers:payload.organizers,conventions:payload.conventions,episodes:payload.episodes,checklistTemplate:Array.isArray(payload.checklistTemplate)?payload.checklistTemplate:DEFAULT_CHECKLIST.slice(),settings:payload.settings||db.settings||{theme:"system",youtubeApiKey:""},venues:Array.isArray(payload.venues)?payload.venues.map(v=>({...v,floorPlans:v.floorPlans||[]})):[],youtubeVideos:Array.isArray(payload.youtubeVideos)?payload.youtubeVideos:[]};ensureGuestProfiles();
  const migratedProjects=migrateGuestProjects();
  localStorage.setItem("vault03",JSON.stringify(db));lastCloudPayload=JSON.stringify(cloudPayload());applyingRemote=false;render();
  if(migratedProjects&&cloudUser&&navigator.onLine)scheduleCloudSync();
@@ -724,7 +765,31 @@ function kpis(){
 }
 
 function money(n){return new Intl.NumberFormat("en-US",{style:"currency",currency:"EUR"}).format(Number(n)||0)}
-function budgetView(){let total=db.conventions.reduce((s,c)=>s+(c.expenses||[]).reduce((a,x)=>a+(+x.amount||0),0),0);return `<section class="hero"><div><div class="eyebrow">Convention finances</div><h1>Budget tracker 💶</h1><p class="sub">Record costs per convention. Currency: EUR.</p></div></section><div class="card stat"><span>Total spending</span><strong>${money(total)}</strong><span>Across all conventions</span></div>${db.conventions.map(c=>{let rows=c.expenses||[],sum=rows.reduce((s,x)=>s+(+x.amount||0),0),budget=+c.budget||0;return `<section class="card" style="margin-top:14px"><div class="sectionhead"><div><h2>${esc(c.name)}</h2><div class="smalltext">${rows.length} expenses · ${money(sum)} spent</div></div><button class="btn blue small" onclick="addExpense('${c.id}')">＋ Add expense</button></div><div class="row"><div class="field"><label>Budget limit (€)</label><input type="number" min="0" step=".01" value="${budget||""}" onchange="setBudget('${c.id}',this.value)"></div><div class="metric-tile"><span class="smalltext">Remaining</span><strong>${budget?money(budget-sum):"Not set"}</strong></div></div>${rows.map(x=>`<div class="expense-row"><div><b>${esc(x.title)}</b><div class="smalltext">${esc(x.category)} · ${esc(x.date)}</div></div><div><b>${money(x.amount)}</b><button class="btn danger small" onclick="removeExpense('${c.id}','${x.id}')">×</button></div></div>`).join("")||'<div class="empty">No expenses recorded yet.</div>'}</section>`}).join("")||'<div class="empty">Create a convention first.</div>'}`}
+function budgetView(){
+ const all=db.conventions||[];
+ if(!all.length)return `<section class="hero"><div><div class="eyebrow">Convention finances</div><h1>Budget tracker 💶</h1><p class="sub">Choose a convention to see its budget.</p></div></section><div class="empty">Create a convention first.</div>`;
+ let selected=all.some(c=>c.id===window.budgetConventionId)?window.budgetConventionId:all[0].id;
+ window.budgetConventionId=selected;
+ let c=all.find(x=>x.id===selected),rows=c.expenses||[],sum=rows.reduce((s,x)=>s+(+x.amount||0),0),budget=+c.budget||0;
+ let remaining=budget-sum,pct=budget?Math.min(100,Math.max(0,sum/budget*100)):0;
+ return `<section class="hero"><div><div class="eyebrow">Convention finances</div><h1>Budget tracker 💶</h1><p class="sub">One convention at a time. No more endless scrolling.</p></div></section>
+ <div class="budget-toolbar"><div class="field"><label for="budgetConventionSelect">SELECT CONVENTION</label><select id="budgetConventionSelect" class="budget-select" onchange="selectBudgetConvention(this.value)">${all.slice().sort((a,b)=>(b.startDate||"").localeCompare(a.startDate||"")).map(x=>`<option value="${x.id}" ${x.id===selected?"selected":""}>${esc(x.name)}</option>`).join("")}</select></div><button class="btn blue" onclick="addExpense('${c.id}')">＋ Add expense</button></div>
+ <section class="card budget-card">
+  <div class="sectionhead"><div><h2>${esc(c.name)}</h2><div class="smalltext">${rows.length} ${rows.length===1?"expense":"expenses"} recorded</div></div><span class="tag">${budget?"Budget set":"No budget set"}</span></div>
+  <div class="budget-overview">
+   <div class="budget-ring" style="--spent-angle:${pct*3.6}deg"><div class="budget-ring-center"><strong>${budget?Math.round(pct)+"%":money(sum)}</strong><span>${budget?"of budget used":"spent so far"}</span></div></div>
+   <div style="min-width:0;width:100%"><div class="budget-legend">
+    <div class="budget-legend-item"><span>Spent</span><strong>${money(sum)}</strong></div>
+    <div class="budget-legend-item"><span>${budget?"Remaining":"Budget limit"}</span><strong>${budget?money(remaining):"Not set"}</strong></div>
+   </div><div class="budget-progress"><i style="width:${pct}%"></i></div><div class="smalltext" style="margin-top:7px">${budget?(remaining<0?"Over budget by "+money(Math.abs(remaining)):money(remaining)+" left to spend"):"Set a budget limit below to activate the spending graph."}</div></div>
+  </div>
+  <div class="budget-limit-row"><div class="field"><label>Budget limit (€)</label><input type="number" min="0" step=".01" value="${budget||""}" placeholder="e.g. 500" onchange="setBudget('${c.id}',this.value)"></div><div class="budget-remaining-tile"><span>Budget status</span><strong>${budget?(remaining<0?"Over budget":remaining===0?"Exactly on budget":"On track"):"Not set"}</strong></div></div>
+ </section>
+ <section class="card budget-card" style="margin-top:14px"><div class="sectionhead"><div><h2>Expenses</h2><div class="smalltext">Your costs for this convention</div></div><button class="btn secondary small" onclick="addExpense('${c.id}')">＋ Add</button></div>
+ <div class="budget-expenses">${rows.slice().sort((a,b)=>(b.date||"").localeCompare(a.date||"")).map(x=>`<div class="budget-expense"><div class="budget-expense-main"><b>${esc(x.title)}</b><div class="smalltext">${esc(x.category||"Other")} · ${esc(x.date||"")}</div></div><div class="budget-expense-amount">${money(x.amount)}</div><button class="btn danger small" aria-label="Delete expense" onclick="removeExpense('${c.id}','${x.id}')">×</button></div>`).join("")||'<div class="empty">No expenses recorded yet. Add your first one above.</div>'}</div></section>`;
+}
+function selectBudgetConvention(id){window.budgetConventionId=id;render()}
+
 function setBudget(id,v){let c=conv(id);if(c){c.budget=+v||0;save();render()}}
 function addExpense(id){let c=conv(id);showModal("Add expense",`<form id="expense-form"><div class="field"><label>Description</label><input name="title" required></div><div class="row"><div class="field"><label>Amount (€)</label><input name="amount" type="number" min="0" step=".01" required></div><div class="field"><label>Date</label><input name="date" type="date" value="${new Date().toISOString().slice(0,10)}"></div></div><div class="field"><label>Category</label><select name="category">${["Travel","Accommodation","Convention tickets","Autographs & photo ops","Food","Shopping","Other"].map(x=>`<option>${x}</option>`).join("")}</select></div><button class="btn blue">Save expense</button></form>`);document.getElementById("expense-form").onsubmit=e=>{e.preventDefault();let f=new FormData(e.target);c.expenses=c.expenses||[];c.expenses.push({id:uid(),title:f.get("title"),amount:+f.get("amount"),date:f.get("date"),category:f.get("category")});save();closeModal();render()}}
 function removeExpense(cid,eid){let c=conv(cid);if(c&&confirm("Delete expense?")){c.expenses=(c.expenses||[]).filter(x=>x.id!==eid);save();render()}}
@@ -732,8 +797,49 @@ function youtubeView(){return `<section class="hero"><div><div class="eyebrow">C
 function saveYtKey(){db.settings=db.settings||{};db.settings.youtubeApiKey=document.getElementById("ytkey").value.trim();save();alert("API key saved.")}
 function ytId(s){try{let u=new URL(s);if(u.hostname.includes("youtu.be"))return u.pathname.slice(1);return u.searchParams.get("v")||u.pathname.match(/\/(?:shorts|embed)\/([^/]+)/)?.[1]||""}catch{return ""}}
 async function fetchYt(){let id=ytId(document.getElementById("yturl").value.trim()),key=db.settings?.youtubeApiKey,out=document.getElementById("ytresult");if(!id)return out.innerHTML='<div class="note">Enter a valid YouTube video URL.</div>';if(!key)return out.innerHTML='<div class="note">Save your free YouTube Data API key first.</div>';out.textContent="Fetching…";try{let r=await fetch(`https://www.googleapis.com/youtube/v3/videos?part=snippet,statistics,contentDetails&id=${encodeURIComponent(id)}&key=${encodeURIComponent(key)}`),j=await r.json();if(!r.ok)throw Error(j.error?.message||"API error");let v=j.items?.[0];if(!v)throw Error("Video not found or not publicly accessible.");let s=v.statistics||{},rec={id,url:"https://www.youtube.com/watch?v="+id,title:v.snippet?.title||"Untitled",thumbnail:v.snippet?.thumbnails?.medium?.url||"",views:+s.viewCount||0,likes:+s.likeCount||0,comments:+s.commentCount||0,duration:v.contentDetails?.duration||"",published:v.snippet?.publishedAt||"",fetchedAt:new Date().toISOString()};db.youtubeVideos=db.youtubeVideos||[];let i=db.youtubeVideos.findIndex(x=>x.id===id);if(i<0)db.youtubeVideos.unshift(rec);else db.youtubeVideos[i]=rec;save();out.innerHTML=`${rec.thumbnail?`<img src="${esc(rec.thumbnail)}" style="max-width:100%;border-radius:12px">`:""}<h3>${esc(rec.title)}</h3><div class="metric-grid"><div class="metric-tile"><strong>${rec.views.toLocaleString()}</strong>Views</div><div class="metric-tile"><strong>${rec.likes.toLocaleString()}</strong>Likes</div><div class="metric-tile"><strong>${rec.comments.toLocaleString()}</strong>Comments</div><div class="metric-tile"><strong>${esc(rec.duration)}</strong>Duration</div></div><p class="smalltext">Published ${esc(rec.published.slice(0,10))} · fetched ${new Date(rec.fetchedAt).toLocaleString()}</p>`}catch(e){out.innerHTML=`<div class="note">${esc(e.message)}</div>`}}
-function venuesView(){return `<section class="hero"><div><div class="eyebrow">Reusable places</div><h1>Venue library 📍</h1><p class="sub">Save a venue once and reuse its address and floor plan.</p></div><button class="btn blue" onclick="editVenue()">＋ Add venue</button></section>${(db.venues||[]).map(v=>`<section class="card" style="margin-bottom:12px"><div class="sectionhead"><div><h2>${esc(v.name)}</h2><div class="smalltext">${esc(v.address||"No address")}</div></div><button class="btn secondary small" onclick="editVenue('${v.id}')">Edit</button></div>${v.address?`<a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(v.address)}" target="_blank" rel="noopener">Open in Google Maps</a>`:""} ${v.floorPlan?`· <a href="${esc(v.floorPlan)}" target="_blank" rel="noopener">Open floor plan</a>`:""}</section>`).join("")||'<div class="empty">No saved venues yet.</div>'}`}
-function editVenue(id){let v=(db.venues||[]).find(x=>x.id===id)||{id:"",name:"",address:"",floorPlan:""};showModal("Venue",`<form id="venue-form"><div class="field"><label>Venue name</label><input name="name" required value="${esc(v.name)}"></div><div class="field"><label>Address</label><input name="address" value="${esc(v.address)}"></div><div class="field"><label>Floor plan URL (optional)</label><input name="floorPlan" type="url" value="${esc(v.floorPlan)}"></div><button class="btn blue">Save venue</button></form>`);document.getElementById("venue-form").onsubmit=e=>{e.preventDefault();let f=new FormData(e.target);db.venues=db.venues||[];let row={id:v.id||uid(),name:f.get("name"),address:f.get("address"),floorPlan:f.get("floorPlan")};let i=db.venues.findIndex(x=>x.id===v.id);if(i<0)db.venues.push(row);else db.venues[i]=row;save();closeModal();render()}}
+function venuesView(){
+ return `<section class="hero"><div><div class="eyebrow">Reusable places</div><h1>Venue library 📍</h1><p class="sub">Store venue details and annotate floor plans with room labels.</p></div><button class="btn blue" onclick="editVenue()">＋ Add venue</button></section>
+ ${(db.venues||[]).map(v=>`<section class="card venue-plan-card"><div class="sectionhead"><div><h2>${esc(v.name)}</h2><div class="smalltext">${esc(v.address||"No address")}</div></div><button class="btn secondary small" onclick="editVenue('${v.id}')">Edit details</button></div>
+ ${v.address?`<a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(v.address)}" target="_blank" rel="noopener">Open in Google Maps</a>`:""}
+ <div class="floorplan-tools"><button class="btn blue small" onclick="uploadVenuePlans('${v.id}')">＋ Upload floor plans</button>${(v.floorPlans||[]).length?`<button class="btn secondary small" onclick="openFloorplanEditor('${v.id}')">✎ Annotate plans</button>`:""}</div>
+ ${(v.floorPlans||[]).length?`<div class="smalltext">${v.floorPlans.length} plan${v.floorPlans.length===1?"":"s"} saved · Images and PDF pages</div><div class="floorplan-tabs">${v.floorPlans.map((p,i)=>`<button class="floorplan-tab" onclick="openFloorplanEditor('${v.id}',${i})">${esc(p.name||"Plan "+(i+1))}</button>`).join("")}</div>`:'<div class="floorplan-empty">No floor plan uploaded yet. Add JPG, PNG, or PDF files to get started.</div>'}
+ </section>`).join("")||'<div class="empty">No saved venues yet.</div>'}`;
+}
+function editVenue(id){
+ let v=(db.venues||[]).find(x=>x.id===id)||{id:"",name:"",address:"",floorPlans:[]};
+ showModal("Venue details",`<form id="venue-form"><div class="field"><label>Venue name</label><input name="name" required value="${esc(v.name)}"></div><div class="field"><label>Address</label><input name="address" value="${esc(v.address||"")}"></div><div class="smalltext">Floor plans are uploaded and annotated from the venue card after saving.</div><button class="btn blue">Save venue</button></form>`);
+ document.getElementById("venue-form").onsubmit=e=>{e.preventDefault();let f=new FormData(e.target);db.venues=db.venues||[];let row={...v,id:v.id||uid(),name:String(f.get("name")).trim(),address:String(f.get("address")||""),floorPlans:v.floorPlans||[]};let i=db.venues.findIndex(x=>x.id===v.id);if(i<0)db.venues.push(row);else db.venues[i]=row;save();closeModal();render()};
+}
+function uploadVenuePlans(venueId){
+ let input=document.createElement("input");input.type="file";input.accept="image/jpeg,image/png,application/pdf,.jpg,.jpeg,.png,.pdf";input.multiple=true;
+ input.onchange=async()=>{let v=db.venues.find(x=>x.id===venueId);if(!v)return;v.floorPlans=v.floorPlans||[];let files=[...input.files];if(!files.length)return;
+  for(let file of files){try{if(file.type==="application/pdf"||file.name.toLowerCase().endsWith(".pdf")){let pages=await pdfToPlanImages(file);pages.forEach((data,i)=>v.floorPlans.push({id:uid(),name:pages.length>1?file.name+" · Page "+(i+1):file.name,data,markers:[]}));}else{let data=await compressPlanImage(file);v.floorPlans.push({id:uid(),name:file.name,data,markers:[]});}}catch(err){alert("Could not import "+file.name+": "+err.message)}}
+  save();render();if(v.floorPlans.length)openFloorplanEditor(venueId,v.floorPlans.length-1);
+ };input.click();
+}
+function compressPlanImage(file){return new Promise((resolve,reject)=>{let reader=new FileReader();reader.onerror=()=>reject(Error("File could not be read"));reader.onload=()=>{let img=new Image();img.onerror=()=>reject(Error("Image could not be opened"));img.onload=()=>{let scale=Math.min(1,1800/Math.max(img.width,img.height)),canvas=document.createElement("canvas");canvas.width=Math.round(img.width*scale);canvas.height=Math.round(img.height*scale);canvas.getContext("2d").drawImage(img,0,0,canvas.width,canvas.height);resolve(canvas.toDataURL("image/jpeg",.82))};img.src=reader.result};reader.readAsDataURL(file)})}
+async function pdfToPlanImages(file){
+ if(!window.pdfjsLib){await new Promise((resolve,reject)=>{let s=document.createElement("script");s.src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js";s.onload=resolve;s.onerror=()=>reject(Error("PDF viewer could not load. Connect to the internet and try again."));document.head.appendChild(s)});window.pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js"}
+ let bytes=await file.arrayBuffer(),pdf=await pdfjsLib.getDocument({data:bytes}).promise,pages=[];
+ for(let n=1;n<=Math.min(pdf.numPages,12);n++){let page=await pdf.getPage(n),viewport=page.getViewport({scale:Math.min(1.7,1800/page.getViewport({scale:1}).width)}),canvas=document.createElement("canvas");canvas.width=Math.ceil(viewport.width);canvas.height=Math.ceil(viewport.height);await page.render({canvasContext:canvas.getContext("2d"),viewport}).promise;pages.push(canvas.toDataURL("image/jpeg",.84))}
+ if(pdf.numPages>12)alert("Only the first 12 PDF pages were imported to keep the app responsive.");return pages;
+}
+function openFloorplanEditor(venueId,index=0){
+ let v=db.venues.find(x=>x.id===venueId);if(!v||!v.floorPlans?.length)return;let p=v.floorPlans[Math.max(0,Math.min(index,v.floorPlans.length-1))];
+ let kinds=[["panel","Panel room"],["interview","Interview room"],["photoshoot","Photoshoot room"],["autographs","Autographs"],["meeting","Meeting room"],["other","Other"]];
+ showModal("Floor plan · "+v.name,`<div class="floorplan-tabs">${v.floorPlans.map((x,i)=>`<button class="floorplan-tab ${i===index?"active":""}" onclick="openFloorplanEditor('${v.id}',${i})">${esc(x.name||"Plan "+(i+1))}</button>`).join("")}</div>
+ <div class="floorplan-tools"><select id="markerKind" class="budget-select" style="flex:1">${kinds.map(k=>`<option value="${k[0]}">${k[1]}</option>`).join("")}</select><button class="btn blue small" onclick="addFloorplanMarker('${v.id}','${p.id}')">＋ Add room label</button></div>
+ <div class="floorplan-help">Add a room label, then drag it to the right place. Tap a label to rename or delete it. Changes save automatically.</div>
+ <div class="floorplan-stage" id="floorplanStage"><img src="${p.data}" alt="${esc(p.name)}" id="floorplanImage">${(p.markers||[]).map((m,i)=>`<button class="floorplan-marker" data-kind="${esc(m.kind||"other")}" data-marker="${i}" style="--x:${m.x}%;--y:${m.y}%" onpointerdown="dragFloorplanMarker(event,'${v.id}','${p.id}',${i})" onclick="editFloorplanMarker(event,'${v.id}','${p.id}',${i})">${esc(m.label)}</button>`).join("")}</div>
+ <div class="floorplan-tools"><button class="btn secondary small" onclick="renameFloorplan('${v.id}','${p.id}')">Rename plan</button><button class="btn danger small" onclick="deleteFloorplan('${v.id}','${p.id}')">Delete plan</button></div>`);
+}
+function getPlan(venueId,planId){let v=db.venues.find(x=>x.id===venueId);return {v,p:v?.floorPlans?.find(x=>x.id===planId)}}
+function addFloorplanMarker(venueId,planId){let {p}=getPlan(venueId,planId);if(!p)return;let kind=document.getElementById("markerKind").value,label=({panel:"Panel Room",interview:"Interview Room",photoshoot:"Photoshoot Room",autographs:"Autographs",meeting:"Meeting Room"})[kind]||"Room";p.markers=p.markers||[];p.markers.push({id:uid(),kind,label,x:50,y:50});save();openFloorplanEditor(venueId,p.id?db.venues.find(v=>v.id===venueId).floorPlans.findIndex(x=>x.id===p.id):0)}
+function editFloorplanMarker(ev,venueId,planId,i){if(window.floorplanDragging)return;let {p}=getPlan(venueId,planId);if(!p?.markers?.[i])return;let m=p.markers[i],label=prompt("Room label:",m.label);if(label===null)return;if(!label.trim()){if(confirm("Delete this room label?"))p.markers.splice(i,1)}else m.label=label.trim();save();let idx=db.venues.find(v=>v.id===venueId).floorPlans.findIndex(x=>x.id===planId);openFloorplanEditor(venueId,idx)}
+function dragFloorplanMarker(ev,venueId,planId,i){if(ev.target.closest("button")!==ev.target)return;let stage=document.getElementById("floorplanStage"),marker=ev.target;window.floorplanDragging=false;marker.setPointerCapture?.(ev.pointerId);let move=e=>{let r=stage.getBoundingClientRect(),x=Math.max(2,Math.min(98,(e.clientX-r.left)/r.width*100)),y=Math.max(2,Math.min(98,(e.clientY-r.top)/r.height*100));marker.style.setProperty("--x",x+"%");marker.style.setProperty("--y",y+"%");marker.dataset.newx=x;marker.dataset.newy=y;window.floorplanDragging=true},up=()=>{marker.removeEventListener("pointermove",move);marker.removeEventListener("pointerup",up);let {p}=getPlan(venueId,planId);if(p?.markers?.[i]&&marker.dataset.newx){p.markers[i].x=+marker.dataset.newx;p.markers[i].y=+marker.dataset.newy;save()}setTimeout(()=>window.floorplanDragging=false,100)};marker.addEventListener("pointermove",move);marker.addEventListener("pointerup",up)}
+function renameFloorplan(venueId,planId){let {p}=getPlan(venueId,planId);if(!p)return;let name=prompt("Plan name:",p.name||"Floor plan");if(name?.trim()){p.name=name.trim();save();let idx=db.venues.find(v=>v.id===venueId).floorPlans.findIndex(x=>x.id===planId);openFloorplanEditor(venueId,idx)}}
+function deleteFloorplan(venueId,planId){if(!confirm("Delete this floor plan and its room labels?"))return;let {v}=getPlan(venueId,planId);v.floorPlans=v.floorPlans.filter(x=>x.id!==planId);save();closeModal();render()}
+
 function normalizeQuestion(s){return String(s||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^\w\s]/g," ").replace(/\b(what|how|why|when|where|who|which|the|a|an|you|your|of|to|from|about|have|has|is|are|was|were|ever|most)\b/g," ").replace(/\s+/g," ").trim()}
 function questionSimilarity(a,b){let A=new Set(normalizeQuestion(a).split(" ").filter(x=>x.length>2)),B=new Set(normalizeQuestion(b).split(" ").filter(x=>x.length>2));if(!A.size||!B.size)return 0;let n=[...A].filter(x=>B.has(x)).length;return n/(A.size+B.size-n)}
 function detectDuplicateQuestions(){let rows=[...document.querySelectorAll("#editquestions .qrow")].map(r=>r.querySelector('[aria-label="Question"]')?.value.trim()).filter(Boolean),prior=db.episodes.filter(e=>e.id!==editing).flatMap(e=>(e.questions||[]).map(q=>({text:q.text,ep:epTitle(e)}))),hits=[];rows.forEach(q=>prior.forEach(p=>{let s=questionSimilarity(q,p.text);if(normalizeQuestion(q)===normalizeQuestion(p.text)||s>=.55)hits.push({q,p,s})}));showModal("Duplicate question check",hits.length?hits.slice(0,30).map(x=>`<div class="expense-row"><div><b>${esc(x.q)}</b><div class="smalltext">Similar to "${esc(x.p.text)}" · ${esc(x.p.ep)}</div></div><span class="tag">${Math.round(x.s*100)}%</span></div>`).join(""):'<div class="empty">No likely duplicates found.</div>')}
