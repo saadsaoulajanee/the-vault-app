@@ -192,7 +192,18 @@
 @media(max-width:600px){.kanban-lane{flex-basis:min(290px,84vw);width:min(290px,84vw);max-width:min(290px,84vw)}}
 
 
-.panel-day-tabs{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+
+.day-picker-wrap{margin:14px 0 16px}
+.day-picker-label{font-size:10px;font-weight:850;letter-spacing:1.3px;color:var(--muted);margin:0 0 7px 2px}
+.panel-day-tabs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:0}
+.panel-day-tabs button.day-toggle{appearance:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-width:0;min-height:58px;padding:9px 12px;border:1.5px solid var(--line);border-radius:12px;background:var(--paper);color:var(--text);font-weight:800;box-shadow:0 1px 2px rgba(0,0,0,.04);transition:background .15s ease,border-color .15s ease,box-shadow .15s ease}
+.panel-day-tabs button.day-toggle .day-toggle-name{font-size:15px;line-height:1.15}
+.panel-day-tabs button.day-toggle .day-toggle-state{font-size:9px;line-height:1.1;letter-spacing:1.1px;color:var(--muted);font-weight:850}
+.panel-day-tabs button.day-toggle.active{background:var(--accent);color:#fff;border-color:var(--accent);box-shadow:0 3px 9px rgba(0,0,0,.14)}
+.panel-day-tabs button.day-toggle.active .day-toggle-state{color:rgba(255,255,255,.86)}
+.panel-day-tabs button.day-toggle:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+@media(min-width:700px){.panel-day-tabs button.day-toggle{min-height:54px}}
+
 .panel-day-tabs button{border:1px solid var(--line);background:var(--panel);color:var(--text);border-radius:999px;padding:9px 14px;font-weight:700}
 .panel-day-tabs button.active{background:var(--accent);color:white;border-color:var(--accent)}
 .schedule-item{display:grid;grid-template-columns:76px minmax(0,1fr) auto;gap:12px;align-items:center;padding:13px 0;border-bottom:1px solid var(--line)}
@@ -439,6 +450,27 @@ body[data-theme="dark"] .project-chip,body[data-theme="dark"] .status,body[data-
 
 :root{--chart-0:#536fe8;--chart-1:#e16ca7;--chart-2:#20a58a;--chart-3:#e5a23b;--chart-4:#8b6bd6;--chart-5:#58a6d8}
 .kpi-visual-card{margin-top:14px}
+.yearly-budget-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:12px 0 18px}
+.yearly-budget-tile{min-width:0;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--paper)}
+.yearly-budget-tile span{display:block;color:var(--muted);font-size:11px}
+.yearly-budget-tile strong{display:block;margin-top:4px;font-size:clamp(16px,2.5vw,22px);overflow-wrap:anywhere}
+.yearly-budget-chart{display:grid;gap:15px;margin-top:12px}
+.yearly-budget-year{display:grid;gap:6px}
+.yearly-budget-year-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.yearly-budget-year-head strong{font-size:15px;font-variant-numeric:tabular-nums}
+.yearly-budget-year>small{font-size:11px;color:var(--muted);line-height:1.4}
+.yearly-budget-details{display:grid;gap:7px;margin-top:18px}
+.yearly-budget-detail{border:1px solid var(--line);border-radius:11px;padding:10px 12px;background:var(--paper)}
+.yearly-budget-detail summary{display:flex;justify-content:space-between;gap:10px;cursor:pointer;font-size:13px;font-weight:700;list-style:none}
+.yearly-budget-detail summary::-webkit-details-marker{display:none}
+.yearly-budget-conventions{display:grid;gap:8px;margin-top:12px}
+.yearly-budget-conventions>div{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;padding-top:8px;border-top:1px solid var(--line);font-size:12px}
+.yearly-budget-conventions small{display:block;color:var(--muted);font-size:10px;margin-top:2px}
+.yearly-category-wrap{margin-top:20px}
+.yearly-category-wrap h3{font-size:14px;margin-bottom:8px}
+.yearly-budget-footnote{margin-top:14px}
+@media(max-width:560px){.yearly-budget-summary{grid-template-columns:1fr 1fr}.yearly-budget-summary .yearly-budget-tile:first-child{grid-column:1/-1}}
+
 .kpi-month-chart{display:flex;align-items:flex-end;gap:7px;height:190px;padding:16px 4px 0;border-bottom:1px solid var(--line);overflow-x:auto}
 .kpi-month-bar{flex:1;min-width:30px;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:6px;border:0;background:transparent;color:var(--ink);padding:0 2px;cursor:pointer}
 .kpi-month-bar span{font-size:11px;font-weight:800}.kpi-month-bar i{display:block;width:70%;min-height:4px;border-radius:7px 7px 2px 2px;background:linear-gradient(180deg,#8b9cff,var(--blue));transition:filter .2s}.kpi-month-bar:active i{filter:brightness(.8)}.kpi-month-bar small{font-size:10px;color:var(--muted)}
@@ -1176,10 +1208,10 @@ function day(){
  const panels=(c?.panels||[]).filter(p=>p.day===activeDay&&p.time).map(p=>({kind:"Panel",time:p.time,endTime:addMinutesToTime(p.time,30),title:p.title||"Panel",detail:"",guests:(p.guestIds||[]).map(id=>db.guests.find(g=>g.id===id)?.name).filter(Boolean),id:p.id}));
  const extras=(c?.events||[]).filter(x=>x.date===plannerDate(c,activeDay)).map(x=>({kind:x.kind||"Activity",time:x.time||"",endTime:addMinutesToTime(x.time||"00:00",Number(x.duration)||30),title:x.title,detail:x.notes||"",guests:[],id:x.id}));
  const schedule=[...interviews,...panels,...extras].sort((a,b)=>a.time.localeCompare(b.time)||a.kind.localeCompare(b.kind));
- const dayButtons=days.map(d=>`<button type="button" class="${activeDay===d?'active':''}" onclick="window.dayMode='${d}';render()">${d}</button>`).join("");
+ const dayButtons=days.map(d=>`<button type="button" class="day-toggle ${activeDay===d?'active':''}" aria-pressed="${activeDay===d?'true':'false'}" onclick="window.dayMode='${d}';render()"><span class="day-toggle-name">${d}</span><span class="day-toggle-state">${activeDay===d?'SELECTED':'VIEW DAY'}</span></button>`).join("");
  return `<section class="hero"><div><div class="eyebrow">Your convention companion</div><h1>Convention Day Mode 🎬</h1><p class="sub">One timeline for stage panels and interview-room appointments.</p></div></section>
  <section class="card"><div class="field"><label>Convention</label><button type="button" class="episode-picker-trigger" onclick="openDayConventionPicker()">${esc(c?.name||"Choose a convention")}<span aria-hidden="true">⌄</span></button></div>
- <div class="panel-day-tabs">${dayButtons}</div>
+ <div class="day-picker-wrap"><div class="day-picker-label">SELECT CONVENTION DAY</div><div class="panel-day-tabs" role="group" aria-label="Select convention day">${dayButtons}</div></div>
  <section class="convention-poster">
   <div class="sectionhead"><div><div class="eyebrow">Meet the lineup</div><h2>${esc(c?.name||"Convention guests")}</h2><p class="smalltext">Your convention guest preview</p></div><span class="tag">${(c?.guestIds||[]).length} guests</span></div>
   <div class="convention-poster-guests">${(c?.guestIds||[]).map(id=>db.guests.find(g=>g.id===id)).filter(Boolean).map(g=>{const photo=g.photo&&safeGuestUrl(g.photo);const initials=String(g.name||"?").trim().split(/\\s+/).slice(0,2).map(x=>x[0]||"").join("").toUpperCase();return `<div class="convention-poster-guest"><div class="convention-poster-avatar">${photo?`<img src="${esc(photo)}" alt="${esc(g.name)}" style="object-position:${Number(g.photoX??50)}% ${Number(g.photoY??50)}%;transform:scale(${Number(g.photoZoom??1)});transform-origin:${Number(g.photoX??50)}% ${Number(g.photoY??50)}%">`:`<span>${esc(initials||"✦")}</span>`}</div><b>${esc(g.name)}</b></div>`}).join("")||'<div class="empty">No guests linked to this convention yet. Add guests in Convention Hub.</div>'}</div>
@@ -1200,10 +1232,32 @@ function kpis(){
  const publishedRate=active.length?Math.round(completed.length/active.length*100):0,cancelledTotal=db.episodes.filter(e=>e.status===10).length,cancellationRate=db.episodes.length?Math.round(cancelledTotal/db.episodes.length*100):0;
  const monthly={};active.forEach(e=>{let m=String(e.date||"").slice(0,7);if(/^\d{4}-\d{2}$/.test(m))monthly[m]=(monthly[m]||0)+1});
  const monthRows=Object.entries(monthly).sort((a,b)=>a[0].localeCompare(b[0])).slice(-12),maxMonth=Math.max(1,...monthRows.map(x=>x[1])),maxProject=Math.max(1,...ranked.map(x=>x[1])),maxConvention=Math.max(1,...conventionCounts.map(x=>x.total));
+ const yearlyBudget={};
+ db.conventions.forEach(c=>{
+  const yearMatch=String(c.startDate||"").match(/^(\\d{4})/);
+  if(!yearMatch)return;
+  const year=yearMatch[1];
+  if(!yearlyBudget[year])yearlyBudget[year]={year,conventions:0,budget:0,spent:0,expenseCount:0,categories:{},items:[]};
+  const y=yearlyBudget[year],expenses=Array.isArray(c.expenses)?c.expenses:[];
+  y.conventions++;y.budget+=Number(c.budget)||0;
+  expenses.forEach(x=>{const amount=Number(x.amount)||0;y.spent+=amount;y.expenseCount++;const category=x.category||"Other";y.categories[category]=(y.categories[category]||0)+amount});
+  y.items.push({name:c.name||"Unnamed convention",spent:expenses.reduce((s,x)=>s+(Number(x.amount)||0),0),budget:Number(c.budget)||0,expenseCount:expenses.length});
+ });
+ const yearRows=Object.values(yearlyBudget).sort((a,b)=>a.year.localeCompare(b.year));
+ const maxYearSpend=Math.max(1,...yearRows.map(y=>y.spent));
+ const yearlyCategoryTotals={};
+ yearRows.forEach(y=>Object.entries(y.categories).forEach(([k,v])=>yearlyCategoryTotals[k]=(yearlyCategoryTotals[k]||0)+v));
+ const yearlyCategoryRows=Object.entries(yearlyCategoryTotals).sort((a,b)=>b[1]-a[1]);
  const typeEntries=Object.entries(typeCounts).sort((a,b)=>b[1]-a[1]),typeTotal=typeEntries.reduce((n,x)=>n+x[1],0);
  let angle=0,stops=typeEntries.map(([t,n],i)=>{let from=angle;angle+=typeTotal?n/typeTotal*360:0;return `var(--chart-${i%6}) ${from}deg ${angle}deg`}).join(",");
  return `<section class="hero"><div><div class="eyebrow">Your channel at a glance</div><h1>Performance & KPIs</h1><p class="sub">Explore your interview output, guest projects and convention performance.</p></div></section>
  <div class="grid kpi-grid"><div class="card stat"><span>Total interviews</span><strong>${active.length}</strong><span>Excludes cancelled interviews</span></div><div class="card stat"><span>Published interviews</span><strong>${completed.length}</strong><span>Ready for the audience</span></div><div class="card stat"><span>Conventions covered</span><strong>${new Set(active.map(e=>e.conventionId).filter(Boolean)).size}</strong><span>With at least one interview</span></div><div class="card stat"><span>Cancelled interviews</span><strong>${cancelledTotal}</strong><span>Kept in your history</span></div></div>
+ <section class="card kpi-visual-card yearly-budget-kpi"><div class="sectionhead"><div><h2>💶 Annual convention finances</h2><p class="smalltext">All expenses are grouped by the year each convention starts, not by the date an individual expense was entered.</p></div></div>
+ ${yearRows.length?`<div class="yearly-budget-summary"><div class="yearly-budget-tile"><span>Total convention expenses</span><strong>${money(yearRows.reduce((s,y)=>s+y.spent,0))}</strong></div><div class="yearly-budget-tile"><span>Combined planned budgets</span><strong>${money(yearRows.reduce((s,y)=>s+y.budget,0))}</strong></div><div class="yearly-budget-tile"><span>Conventions tracked</span><strong>${yearRows.reduce((s,y)=>s+y.conventions,0)}</strong></div></div>
+ <div class="yearly-budget-chart">${yearRows.map(y=>`<div class="yearly-budget-year"><div class="yearly-budget-year-head"><b>${y.year}</b><strong>${money(y.spent)}</strong></div><div class="kpi-graph-track"><i style="width:${y.spent/maxYearSpend*100}%"></i></div><small>${y.conventions} convention${y.conventions===1?"":"s"} · ${y.expenseCount} expense${y.expenseCount===1?"":"s"} · Budget ${money(y.budget)}${y.budget?` · ${y.spent<=y.budget?money(y.budget-y.spent)+" remaining":money(y.spent-y.budget)+" over budget"}`:""}</small></div>`).join("")}</div>
+ <div class="yearly-budget-details">${yearRows.map(y=>`<details class="yearly-budget-detail"><summary><span>${y.year} breakdown</span><b>${money(y.spent)}</b></summary><div class="yearly-budget-conventions">${y.items.sort((a,b)=>b.spent-a.spent).map(c=>`<div><span>${esc(c.name)}<small>${c.expenseCount} expense${c.expenseCount===1?"":"s"}${c.budget?` · Budget ${money(c.budget)}`:""}</small></span><strong>${money(c.spent)}</strong></div>`).join("")}</div></details>`).join("")}</div>
+ ${yearlyCategoryRows.length?`<div class="yearly-category-wrap"><h3>Expense categories across all years</h3><div class="kpi-graph-list">${yearlyCategoryRows.map(([name,value])=>`<div class="kpi-graph-row"><div><b>${esc(name)}</b><small>${money(value)}</small></div><div class="kpi-graph-track"><i style="width:${value/Math.max(1,yearlyCategoryRows[0][1])*100}%"></i></div></div>`).join("")}</div></div>`:""}`:'<div class="empty">Add dated conventions and record expenses in the Budget tab to build your annual financial KPIs.</div>'}
+ <p class="smalltext yearly-budget-footnote">Conventions are assigned to a year using their start date. Only expenses recorded against those conventions are included. Conventions without a start date are not assigned to a year.</p></section>
  <section class="card kpi-visual-card"><div class="sectionhead"><div><h2>📈 Interview activity</h2><p class="smalltext">Monthly interview volume. Tap a bar to see its count.</p></div></div>
  ${monthRows.length?`<div class="kpi-month-chart">${monthRows.map(([m,n])=>`<button class="kpi-month-bar" title="${m}: ${n} interviews" onclick="alert('${m}: ${n} interviews')"><span>${n}</span><i style="height:${Math.max(8,n/maxMonth*100)}%"></i><small>${m.slice(5)}</small></button>`).join("")}</div><div class="smalltext">Months shown: ${monthRows[0][0]} to ${monthRows[monthRows.length-1][0]}</div>`:'<div class="empty">Add interview dates to build your activity chart.</div>'}</section>
  <div class="split kpi-sections">
