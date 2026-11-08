@@ -825,6 +825,82 @@ body[data-theme="dark"] .project-chip,body[data-theme="dark"] .status,body[data-
 @media(max-width:700px){.organizer-contact-row{grid-template-columns:repeat(2,minmax(0,1fr))}.organizer-contact-row>button{justify-self:start}}
 @media(max-width:560px){.filmography-idea{align-items:flex-start}.filmography-idea .btn{padding:6px 8px;font-size:11px}.organizer-contact-row{grid-template-columns:1fr 1fr}}
 
+
+/* V3.0.2: keep organizer actions on the same row as the organizer name */
+.organizer-entry {
+  align-items: flex-start;
+  gap: 12px;
+}
+.organizer-entry > .epbody {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.organizer-entry > .epactions {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: row !important;
+  flex-wrap: nowrap;
+  align-items: center !important;
+  justify-content: flex-end;
+  gap: 7px;
+  margin-left: auto;
+}
+.organizer-entry > .epactions .btn {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+@media (max-width: 520px) {
+  .organizer-entry {
+    gap: 8px;
+    padding: 11px;
+  }
+  .organizer-entry > .epactions {
+    gap: 5px;
+  }
+  .organizer-entry > .epactions .btn {
+    padding: 6px 8px;
+    font-size: 11px;
+  }
+}
+
+
+/* V3.0.3: keep convention actions beside each convention name */
+.convention-entry {
+  align-items: flex-start;
+  gap: 12px;
+}
+.convention-entry > .epbody {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.convention-entry > .epactions {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: row !important;
+  flex-wrap: nowrap;
+  align-items: center !important;
+  justify-content: flex-end;
+  gap: 6px;
+  margin-left: auto;
+}
+.convention-entry > .epactions .btn {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+@media (max-width: 620px) {
+  .convention-entry {
+    gap: 7px;
+    padding: 10px;
+  }
+  .convention-entry > .epactions {
+    gap: 4px;
+  }
+  .convention-entry > .epactions .btn {
+    padding: 5px 6px;
+    font-size: 10px;
+  }
+}
+
 </style>
 </head>
 <body><div class="app">
@@ -1104,7 +1180,7 @@ function home(){
  <div class="card stat"><span>Published</span><strong>${count(8)}</strong><span>Out in the world 🎉</span></div>
  <div class="card stat"><span>Guest profiles</span><strong>${db.guests.length}</strong><span>Reusable guest records</span></div>
  <section class="card wide"><div class="sectionhead"><h2>Needs your attention</h2><span class="tag">${active.length} active</span></div><div class="stack">${attention.map(episodeCard).join("")||'<div class="empty">Nothing urgent in the production queue.</div>'}</div></section>
- <section class="card side"><h2>Upcoming conventions</h2>${upcoming.map(c=>`<div class="episode"><div class="epbody"><b>${esc(c.name)}</b><div class="epmeta">${fmt(c.startDate)}</div></div><button class="btn secondary small" onclick="window.dayConvention='${c.id}';go('day')">Open</button></div>`).join("")||'<div class="empty">No future dates recorded.</div>'}</section>
+ <section class="card side"><h2>Upcoming conventions</h2>${upcoming.map(c=>`<div class="episode convention-entry"><div class="epbody"><b>${esc(c.name)}</b><div class="epmeta">${fmt(c.startDate)}</div></div><button class="btn secondary small" onclick="window.dayConvention='${c.id}';go('day')">Open</button></div>`).join("")||'<div class="empty">No future dates recorded.</div>'}</section>
  <section class="card wide"><div class="sectionhead"><h2>Pick up where you left off</h2><button class="btn secondary small" onclick="go('episodes')">All episodes →</button></div><div class="stack">${db.episodes.slice().sort((a,b)=>(b.number||0)-(a.number||0)).slice(0,5).map(episodeCard).join("")||'<div class="empty">Your first episode is waiting to be added.</div>'}</div></section>
  <section class="card side"><h2>Quick launch</h2><div class="stack"><button class="btn blue" onclick="go('interview')">☷ Interview questions</button><button class="btn secondary" onclick="go('guests')">👤 Guest CRM</button><button class="btn secondary" onclick="go('hub')">✧ Convention Command Centre</button><button class="btn secondary" onclick="go('day')">🎬 Convention Day Mode</button><button class="btn secondary" onclick="go('kpis')">📊 Performance & KPIs</button></div><p class="smalltext" style="margin-top:15px">Your changes save automatically on this device. Export a backup before major updates.</p></section>
  </div>`;
