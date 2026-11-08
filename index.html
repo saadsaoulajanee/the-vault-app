@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>The Vault V2.7.1</title>
+<title>The Vault V2.8.0</title>
 <style>
 :root{--ink:#182033;--muted:#778096;--line:#e7eaf2;--paper:#f6f7fb;--card:#fff;--blue:#4169e1;--pink:#ed5a9b;--softblue:#edf1ff;--softpink:#fff0f6;--green:#16866b;--shadow:0 12px 34px #1c2b5010}
 *{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.45 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}button,input,select,textarea{font:inherit}button{cursor:pointer;border:0}button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:3px solid #8ba2ff;outline-offset:2px}
@@ -721,10 +721,20 @@ body[data-theme="dark"] .project-chip,body[data-theme="dark"] .status,body[data-
   .topright .btn{font-size:11px !important;padding:8px 3px !important}
 }
 
+
+.day-venue-card{padding:14px;border:1px solid var(--line);border-radius:14px;background:var(--paper);margin:12px 0}
+.day-venue-top{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+.day-venue-top h3{margin:5px 0}
+.day-venue-top .smalltext{margin:4px 0}
+.day-venue-actions{display:flex;flex-wrap:wrap;gap:7px}
+.day-venue-actions a{text-decoration:none}
+.day-venue-room-list{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}
+.day-venue-room{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:7px 10px;font-size:12px}
+@media(max-width:900px){.day-venue-top{align-items:flex-start}.day-venue-actions{width:100%}.day-venue-actions>*{flex:1 1 auto;text-align:center}}
 </style>
 </head>
 <body><div class="app">
-<header class="top"><div class="brand"><div class="logo">✦</div><div>The Vault <span class="muted" style="font-weight:600;font-size:13px">V2.7.1</span></div></div><div class="topright"><span class="pill" id="syncStatus">Offline-first • not signed in</span><button class="btn secondary small" id="quickNotesBtn" onclick="openQuickNotes()">📝 Quick notes</button><button class="btn secondary small" id="themeBtn" title="Switch theme">☾</button><button class="btn secondary small" id="exportBtn">Export backup</button><button class="btn secondary small" id="importBtn">Import backup</button><button class="btn secondary small" id="cloudBtn">Account & sync</button><input id="importFile" type="file" accept="application/json,.json" hidden></div></header>
+<header class="top"><div class="brand"><div class="logo">✦</div><div>The Vault <span class="muted" style="font-weight:600;font-size:13px">V2.8.0</span></div></div><div class="topright"><span class="pill" id="syncStatus">Offline-first • not signed in</span><button class="btn secondary small" id="quickNotesBtn" onclick="openQuickNotes()">📝 Quick notes</button><button class="btn secondary small" id="themeBtn" title="Switch theme">☾</button><button class="btn secondary small" id="exportBtn">Export backup</button><button class="btn secondary small" id="importBtn">Import backup</button><button class="btn secondary small" id="cloudBtn">Account & sync</button><input id="importFile" type="file" accept="application/json,.json" hidden></div></header>
 <nav class="nav" id="nav">
 <button class="active" data-view="home">⌂ Dashboard</button><button data-view="episodes">▣ Episodes</button><button data-view="guests">👤 Guests</button><button data-view="interview">☷ Interview</button><button data-view="hub">✧ Convention Hub</button><button data-view="day">🎬 Convention Day</button><button data-view="kpis">📊 KPIs</button><button data-view="budget">💶 Budget</button><button data-view="venues">📍 Venues</button>
 </nav>
@@ -747,10 +757,52 @@ function ensureGuestProfiles(){db.episodes.forEach(e=>{if(!e.guest)return;let g=
 ensureGuestProfiles();
 let view="home",editing=null,activeEpisode=null,inspireOffset=0,inspireSelected=new Set(),episodesMode="gallery";
 let cloudUser=null, cloudChannel=null, syncTimer=null, syncBusy=false, applyingRemote=false, lastCloudPayload=null;
+
+function syncEpisodeBudgetExpenses(){
+ const episodes=Array.isArray(db.episodes)?db.episodes:[];
+ const conventions=Array.isArray(db.conventions)?db.conventions:[];
+ const valid=new Map();
+ for(const ep of episodes){
+  if(!ep.id||!ep.conventionId||!conventions.some(c=>c.id===ep.conventionId))continue;
+  for(const kind of ["editing","marketing"]){
+   valid.set(ep.id+"|"+kind,{ep,kind});
+  }
+ }
+ let changed=false;
+ for(const c of conventions){
+  if(!Array.isArray(c.expenses))c.expenses=[];
+  // Remove previously generated rows when the associated episode is deleted or reassigned.
+  const before=c.expenses.length;
+  c.expenses=c.expenses.filter(x=>!x.autoEpisodeExpense||(
+    valid.has(String(x.episodeId)+"|"+String(x.autoEpisodeExpense))&&
+    valid.get(String(x.episodeId)+"|"+String(x.autoEpisodeExpense)).ep.conventionId===c.id
+  ));
+  if(c.expenses.length!==before)changed=true;
+  for(const ep of episodes.filter(e=>e.conventionId===c.id&&e.id)){
+   for(const kind of ["editing","marketing"]){
+    const matches=c.expenses.filter(x=>x.autoEpisodeExpense===kind&&x.episodeId===ep.id);
+    if(matches.length>1){
+     const keep=matches[0];
+     c.expenses=c.expenses.filter(x=>x===keep||!(x.autoEpisodeExpense===kind&&x.episodeId===ep.id));
+     changed=true;
+    }
+    let x=matches[0];
+    if(!x){x={id:uid(),episodeId:ep.id,autoEpisodeExpense:kind};c.expenses.push(x);changed=true}
+    const title=(kind==="editing"?"Editing":"Marketing")+" Episode: "+(ep.guest||"Unnamed guest");
+    const values={title,amount:50,date:c.startDate||"",category:kind};
+    for(const [key,value] of Object.entries(values)){if(x[key]!==value){x[key]=value;changed=true}}
+   }
+  }
+ }
+ return changed;
+}
+
 function save(){
+ syncEpisodeBudgetExpenses();
  localStorage.setItem("vault03",JSON.stringify(db));
  if(!applyingRemote && cloudUser){setSyncStatus(navigator.onLine?"Changes waiting to sync":"Offline • changes saved on this device");scheduleCloudSync();}
 }
+if(syncEpisodeBudgetExpenses())localStorage.setItem("vault03",JSON.stringify(db));
 function setSyncStatus(label){const el=document.getElementById("syncStatus");if(el)el.textContent=label;}
 function scheduleCloudSync(){clearTimeout(syncTimer);syncTimer=setTimeout(()=>syncNow("push"),900);}
 function cloudPayload(){return {guests:db.guests,organizers:db.organizers,conventions:db.conventions,episodes:db.episodes,checklistTemplate:db.checklistTemplate,settings:db.settings,venues:db.venues,youtubeVideos:db.youtubeVideos};}
@@ -759,7 +811,7 @@ function applyCloudPayload(payload){
  applyingRemote=true;
  db={...db,guests:Array.isArray(payload.guests)?payload.guests:[],organizers:payload.organizers,conventions:payload.conventions,episodes:payload.episodes,checklistTemplate:Array.isArray(payload.checklistTemplate)?payload.checklistTemplate:DEFAULT_CHECKLIST.slice(),settings:payload.settings||db.settings||{theme:"system",youtubeApiKey:""},venues:Array.isArray(payload.venues)?payload.venues.map(v=>({...v,floorPlans:v.floorPlans||[]})):[],youtubeVideos:Array.isArray(payload.youtubeVideos)?payload.youtubeVideos:[]};ensureGuestProfiles();
  const migratedProjects=migrateGuestProjects();
- localStorage.setItem("vault03",JSON.stringify(db));lastCloudPayload=JSON.stringify(cloudPayload());applyingRemote=false;render();
+ syncEpisodeBudgetExpenses();localStorage.setItem("vault03",JSON.stringify(db));lastCloudPayload=JSON.stringify(cloudPayload());applyingRemote=false;render();
  if(migratedProjects&&cloudUser&&navigator.onLine)scheduleCloudSync();
 }
 async function syncNow(mode="both"){
@@ -1110,6 +1162,7 @@ function day(){
  const dayButtons=days.map(d=>`<button type="button" class="${activeDay===d?'active':''}" onclick="window.dayMode='${d}';render()">${d}</button>`).join("");
  return `<section class="hero"><div><div class="eyebrow">Your convention companion</div><h1>Convention Day Mode 🎬</h1><p class="sub">One timeline for stage panels and interview-room appointments.</p></div></section>
  <section class="card"><div class="field"><label>Convention</label><button type="button" class="episode-picker-trigger" onclick="openDayConventionPicker()">${esc(c?.name||"Choose a convention")}<span aria-hidden="true">⌄</span></button></div>
+ <div class="day-venue-card">${(()=>{const venue=(db.venues||[]).find(v=>v.id===c?.venueId);return venue?`<div class="day-venue-top"><div><div class="eyebrow">📍 Convention venue</div><h3>${esc(venue.name)}</h3>${venue.address?`<p class="smalltext">${esc(venue.address)}</p>`:""}</div><div class="day-venue-actions">${venue.address?`<a class="btn secondary small" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(venue.address)}">Directions ↗</a>`:""}<button class="btn secondary small" onclick="go('venues')">Rooms & floor plans →</button></div></div>${(venue.rooms||[]).length?`<div class="day-venue-room-list">${venue.rooms.map(r=>`<span class="day-venue-room"><b>${esc(r.name)}</b>${r.notes?` · ${esc(r.notes)}`:""}</span>`).join("")}</div>`:""}`:`<div class="smalltext">📍 No venue linked yet. Select a venue when editing this convention in Convention Hub.</div>`})()}</div>
  <div class="panel-day-tabs">${dayButtons}</div>
  <section class="convention-poster">
   <div class="sectionhead"><div><div class="eyebrow">Meet the lineup</div><h2>${esc(c?.name||"Convention guests")}</h2><p class="smalltext">Your convention guest preview</p></div><span class="tag">${(c?.guestIds||[]).length} guests</span></div>
