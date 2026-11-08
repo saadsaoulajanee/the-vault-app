@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>The Vault V2.8.3</title>
+<title>The Vault V2.8.9</title>
 <style>
 :root{--ink:#182033;--muted:#778096;--line:#e7eaf2;--paper:#f6f7fb;--card:#fff;--blue:#4169e1;--pink:#ed5a9b;--softblue:#edf1ff;--softpink:#fff0f6;--green:#16866b;--shadow:0 12px 34px #1c2b5010}
 *{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.45 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}button,input,select,textarea{font:inherit}button{cursor:pointer;border:0}button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:3px solid #8ba2ff;outline-offset:2px}
@@ -196,12 +196,12 @@
 .day-picker-wrap{margin:14px 0 16px}
 .day-picker-label{font-size:10px;font-weight:850;letter-spacing:1.3px;color:var(--muted);margin:0 0 7px 2px}
 .panel-day-tabs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:0}
-.panel-day-tabs button.day-toggle{appearance:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-width:0;min-height:58px;padding:9px 12px;border:1.5px solid var(--line);border-radius:12px;background:var(--paper);color:var(--text);font-weight:800;box-shadow:0 1px 2px rgba(0,0,0,.04);transition:background .15s ease,border-color .15s ease,box-shadow .15s ease}
-.panel-day-tabs button.day-toggle .day-toggle-name{font-size:15px;line-height:1.15}
+.panel-day-tabs button.day-toggle{appearance:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-width:0;min-height:58px;padding:9px 12px;border:1.5px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink);font-weight:800;box-shadow:0 1px 2px rgba(0,0,0,.04);transition:background .15s ease,border-color .15s ease,box-shadow .15s ease}
+.panel-day-tabs button.day-toggle .day-toggle-name{display:block;color:inherit;font-size:15px;line-height:1.15}
 .panel-day-tabs button.day-toggle .day-toggle-state{font-size:9px;line-height:1.1;letter-spacing:1.1px;color:var(--muted);font-weight:850}
-.panel-day-tabs button.day-toggle.active{background:var(--accent);color:#fff;border-color:var(--accent);box-shadow:0 3px 9px rgba(0,0,0,.14)}
+.panel-day-tabs button.day-toggle.active{background:var(--ink);color:#fff;border-color:var(--ink);box-shadow:0 3px 9px rgba(0,0,0,.18)}
 .panel-day-tabs button.day-toggle.active .day-toggle-state{color:rgba(255,255,255,.86)}
-.panel-day-tabs button.day-toggle:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.panel-day-tabs button.day-toggle:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
 @media(min-width:700px){.panel-day-tabs button.day-toggle{min-height:54px}}
 
 .panel-day-tabs button{border:1px solid var(--line);background:var(--panel);color:var(--text);border-radius:999px;padding:9px 14px;font-weight:700}
