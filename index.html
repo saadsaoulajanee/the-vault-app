@@ -722,28 +722,40 @@ body[data-theme="dark"] .project-chip,body[data-theme="dark"] .status,body[data-
 }
 
 
-.day-venue-card{padding:14px;border:1px solid var(--line);border-radius:14px;background:var(--paper);margin:12px 0}
-.day-location-card{margin:14px 0;padding:16px}
-.day-location-section h3{margin:5px 0 4px}
-.day-location-divider{height:1px;background:var(--line);margin:14px 0}
-.hotel-room-display{display:inline-flex;flex-direction:column;gap:2px;margin-top:10px;padding:10px 18px;border:1px solid var(--line);border-radius:12px;background:var(--card);min-width:112px}
-.hotel-room-display span{font-size:10px;letter-spacing:1.4px;font-weight:800;color:var(--muted)}
-.hotel-room-display strong{font-size:25px;line-height:1.15;font-weight:850}
-.tiny-directions{display:inline-flex!important;flex:0 0 auto!important;width:auto!important;padding:4px 7px!important;min-height:0!important;font-size:10px!important;line-height:1.15!important;border-radius:7px!important}
-.hotel-directions{margin-top:3px}
 
-.day-venue-top{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
-.day-venue-top h3{margin:5px 0}
-.day-venue-top .smalltext{margin:4px 0}
-.day-venue-actions{display:flex;flex-wrap:wrap;gap:7px}
+.day-venue-card{padding:14px;border:1px solid var(--line);border-radius:14px;background:var(--paper);margin:10px 0}
+.day-location-card{margin:10px 0 14px;padding:13px 15px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px}
+.day-location-section{min-width:0}
+.day-location-section h3{margin:4px 0 3px;font-size:16px;line-height:1.25}
+.day-location-section .smalltext{margin:3px 0 7px;line-height:1.35}
+.day-location-divider{width:1px;height:100%;background:var(--line);display:none}
+.day-location-section+.day-location-section{border-left:1px solid var(--line);padding-left:14px}
+.day-venue-top{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px}
+.day-venue-top h3{margin:4px 0}
+.day-venue-top .smalltext{margin:3px 0 6px}
+.day-venue-actions{display:flex;align-items:center;flex-wrap:wrap;gap:6px;width:auto!important;margin-top:7px}
 .day-venue-actions a{text-decoration:none}
-.day-venue-room-list{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}
-.day-venue-room{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:7px 10px;font-size:12px}
-@media(max-width:900px){.day-venue-top{align-items:flex-start}.day-venue-actions{width:100%}.day-venue-actions>*{flex:1 1 auto;text-align:center}}
+.day-location-card .btn,
+.day-location-card a.btn,
+.day-location-card button.btn{display:inline-flex!important;align-items:center;justify-content:center;flex:0 0 auto!important;width:auto!important;min-height:0!important;padding:6px 9px!important;font-size:11px!important;line-height:1.2!important;border-radius:8px!important;white-space:nowrap}
+.day-location-card .tiny-directions{padding:5px 7px!important;font-size:10px!important}
+.hotel-directions{margin-top:5px}
+.hotel-room-display{display:inline-flex;flex-direction:row;align-items:center;gap:8px;margin:6px 0 0;padding:6px 11px;border:1px solid var(--line);border-radius:9px;background:var(--card);min-width:0}
+.hotel-room-display span{font-size:9px;letter-spacing:1px;font-weight:800;color:var(--muted)}
+.hotel-room-display strong{font-size:20px;line-height:1;font-weight:850}
+.day-venue-room-list{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.day-venue-room{background:var(--card);border:1px solid var(--line);border-radius:9px;padding:5px 8px;font-size:11px}
+@media(max-width:640px){
+ .day-location-card{grid-template-columns:minmax(0,1fr);gap:10px;padding:12px}
+ .day-location-section+.day-location-section{border-left:0;border-top:1px solid var(--line);padding:10px 0 0}
+ .day-venue-top{align-items:flex-start}
+ .day-venue-actions{width:auto!important;flex:0 1 auto!important}
+ .day-location-card .day-venue-actions>*{flex:0 0 auto!important}
+}
 </style>
 </head>
 <body><div class="app">
-<header class="top"><div class="brand"><div class="logo">✦</div><div>The Vault <span class="muted" style="font-weight:600;font-size:13px">V2.8.3</span></div></div><div class="topright"><span class="pill" id="syncStatus">Offline-first • not signed in</span><button class="btn secondary small" id="quickNotesBtn" onclick="openQuickNotes()">📝 Quick notes</button><button class="btn secondary small" id="themeBtn" title="Switch theme">☾</button><button class="btn secondary small" id="exportBtn">Export backup</button><button class="btn secondary small" id="importBtn">Import backup</button><button class="btn secondary small" id="cloudBtn">Account & sync</button><input id="importFile" type="file" accept="application/json,.json" hidden></div></header>
+<header class="top"><div class="brand"><div class="logo">✦</div><div>The Vault <span class="muted" style="font-weight:600;font-size:13px">V2.8.6</span></div></div><div class="topright"><span class="pill" id="syncStatus">Offline-first • not signed in</span><button class="btn secondary small" id="quickNotesBtn" onclick="openQuickNotes()">📝 Quick notes</button><button class="btn secondary small" id="themeBtn" title="Switch theme">☾</button><button class="btn secondary small" id="exportBtn">Export backup</button><button class="btn secondary small" id="importBtn">Import backup</button><button class="btn secondary small" id="cloudBtn">Account & sync</button><input id="importFile" type="file" accept="application/json,.json" hidden></div></header>
 <nav class="nav" id="nav">
 <button class="active" data-view="home">⌂ Dashboard</button><button data-view="episodes">▣ Episodes</button><button data-view="guests">👤 Guests</button><button data-view="interview">☷ Interview</button><button data-view="hub">✧ Convention Hub</button><button data-view="day">🎬 Convention Day</button><button data-view="kpis">📊 KPIs</button><button data-view="budget">💶 Budget</button><button data-view="venues">📍 Venues</button>
 </nav>
