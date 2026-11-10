@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>The Vault V4.0.0</title>
+<title>The Vault V4.0.1</title>
 <style>
 :root{--ink:#182033;--muted:#778096;--line:#e7eaf2;--paper:#f6f7fb;--card:#fff;--blue:#4169e1;--pink:#ed5a9b;--softblue:#edf1ff;--softpink:#fff0f6;--green:#16866b;--shadow:0 12px 34px #1c2b5010}
 *{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.45 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}button,input,select,textarea{font:inherit}button{cursor:pointer;border:0}button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:3px solid #8ba2ff;outline-offset:2px}
@@ -1041,10 +1041,26 @@ body[data-theme="dark"] .panel-day-tabs button.day-toggle.active .day-toggle-sta
 .focus-remaining{color:var(--blue);font-size:12px;font-weight:800}
 @media(max-width:500px){.interview-focus-timer{flex-direction:column;align-items:stretch}.interview-focus-timer-buttons{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}.interview-focus-timer-buttons button{font-size:11px;padding:7px 6px}.interview-focus-header img,.interview-focus-avatar{width:52px;height:52px;flex-basis:52px}}
 
+
+/* V4.0.1: compact responsive tools and expenses */
+.vault-hidden-tools{display:none!important}
+.vault-tools-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:6px 0 8px}
+.vault-tools-actions .btn{min-height:50px;justify-content:flex-start;text-align:left;white-space:normal}
+.budget-expenses{gap:7px}
+.budget-expense{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;min-height:66px}
+.budget-expense-main{flex:1 1 auto;min-width:0}
+.budget-expense-main b{font-size:14px;line-height:1.3}
+.budget-expense-main .smalltext{margin-top:4px;font-size:11px;line-height:1.4}
+.budget-expense-controls{display:flex;align-items:center;gap:9px;flex:0 0 auto}
+.budget-expense-amount{font-size:15px;font-weight:800;white-space:nowrap}
+.expense-auto-label{display:inline-block;margin-left:4px;padding:1px 6px;border-radius:5px;background:var(--softblue);color:var(--blue);font-weight:800;font-size:10px;vertical-align:baseline}
+.expense-delete-btn{border:0;border-radius:8px;background:var(--panel);color:var(--muted);font-size:19px;font-weight:700;width:31px;height:31px;cursor:pointer;flex-shrink:0}
+.expense-delete-btn:hover{background:#ffeded;color:#b9344e}
+@media(max-width:700px){.vault-tools-actions{grid-template-columns:1fr}.budget-expense{grid-template-columns:none!important;padding:10px 12px;gap:8px}.budget-expense-main b{font-size:13px}.budget-expense-amount{font-size:14px}.budget-expense .btn{grid-column:auto!important}}
 </style>
 </head>
 <body><div class="app">
-<header class="top"><div class="brand"><div class="logo">✦</div><div>The Vault <span class="muted" style="font-weight:600;font-size:13px">V4.0.0</span></div></div><div class="topright"><span class="pill" id="syncStatus">Offline-first • not signed in</span><button class="btn secondary small" id="searchVaultBtn" onclick="openVaultSearch()" aria-label="Search The Vault">⌕ Search</button><button class="btn secondary small" id="quickNotesBtn" onclick="openQuickNotes()">📝 Notes</button><button class="btn secondary small" id="themeBtn" title="Switch theme">☾</button><details class="header-tools"><summary class="btn secondary small">⚙ Tools</summary><div class="header-tools-menu"><button class="btn secondary small" id="exportBtn">Export backup</button><button class="btn secondary small" id="importBtn">Import backup</button><button class="btn secondary small" id="cloudBtn">Account & sync</button><button class="btn secondary small" onclick="openVaultSafetyBackups()">Restore local backup</button></div></details><input id="importFile" type="file" accept="application/json,.json" hidden></div></header>
+<header class="top"><div class="brand"><div class="logo">✦</div><div>The Vault <span class="muted" style="font-weight:600;font-size:13px">V4.0.1</span></div></div><div class="topright"><span class="pill" id="syncStatus">Offline-first • not signed in</span><button class="btn secondary small" id="searchVaultBtn" onclick="openVaultSearch()" aria-label="Search The Vault">⌕ Search</button><button class="btn secondary small" id="quickNotesBtn" onclick="openQuickNotes()">📝 Notes</button><button class="btn secondary small" id="themeBtn" title="Switch theme">☾</button><button type="button" class="btn secondary small" id="vaultToolsBtn" onclick="openVaultTools()">⚙ Tools</button><div class="vault-hidden-tools" hidden><button id="exportBtn">Export backup</button><button id="importBtn">Import backup</button><button id="cloudBtn">Account & sync</button></div><input id="importFile" type="file" accept="application/json,.json" hidden></div></header>
 <nav class="nav" id="nav">
 <button class="active" data-view="home">⌂ Dashboard</button><button data-view="episodes">▣ Episodes</button><button data-view="guests">👤 Guests</button><button data-view="interview">☷ Interview</button><button data-view="hub">✧ Convention Hub</button><button data-view="day">🎬 Convention Day</button><button data-view="kpis">📊 KPIs</button><button data-view="budget">💶 Budget</button><button data-view="venues">📍 Venues</button>
 </nav>
@@ -1483,9 +1499,21 @@ function addFilmographyQuestion(episodeId,question){
  save();render();
 }
 
+function closestInterviewConventionId(){
+ const conventions=db.conventions||[];if(!conventions.length)return "";
+ const today=new Date();today.setHours(0,0,0,0);const now=today.getTime();
+ const dateValue=v=>{if(!v)return NaN;const d=new Date(String(v).slice(0,10)+"T00:00:00");return d.getTime()};
+ return conventions.slice().sort((a,b)=>{
+  const score=c=>{const start=dateValue(c.startDate),end=dateValue(c.endDate)||start;
+   if(!Number.isFinite(start))return [Infinity,2];
+   const lo=Math.min(start,Number.isFinite(end)?end:start),hi=Math.max(start,Number.isFinite(end)?end:start);
+   return [now<lo?lo-now:now>hi?now-hi:0,hi<now?1:0];};
+  const x=score(a),y=score(b);return x[0]-y[0]||x[1]-y[1]||String(a.name||"").localeCompare(String(b.name||""));
+ })[0].id;
+}
 function interview(){
  const conventions=db.conventions;
- if(!window.interviewConvention || !conventions.some(c=>c.id===window.interviewConvention))window.interviewConvention=conventions[0]?.id||"";
+ if(!window.interviewConvention || !conventions.some(c=>c.id===window.interviewConvention))window.interviewConvention=closestInterviewConventionId();
  const convention=conv(window.interviewConvention);
  const available=db.episodes.filter(e=>e.conventionId===window.interviewConvention);
  if(!available.some(e=>e.id===activeEpisode))activeEpisode=available[0]?.id||null;
@@ -1810,7 +1838,7 @@ function budgetView(){
   <div class="budget-limit-row"><div class="field"><label>Budget limit (€)</label><input type="number" min="0" step=".01" value="${budget||""}" placeholder="e.g. 500" onchange="setBudget('${c.id}',this.value)"></div><div class="budget-remaining-tile"><span>Budget status</span><strong>${budget?(remaining<0?"Over budget":remaining===0?"Exactly on budget":"On track"):"Not set"}</strong></div></div>
  </section>
  <section class="card budget-card" style="margin-top:14px"><div class="sectionhead"><div><h2>Expenses</h2><div class="smalltext">Your costs for this convention</div></div><button class="btn secondary small" onclick="addExpense('${c.id}')">＋ Add</button></div>
- <div class="budget-expenses">${rows.slice().sort((a,b)=>(b.date||"").localeCompare(a.date||"")).map(x=>`<div class="budget-expense"><div class="budget-expense-main"><b>${esc(x.title)}</b><div class="smalltext">${esc(x.category||"Other")} · ${esc(x.date||"")}${x.autoEpisodeExpense?" · Automatically calculated":""}</div></div><div class="budget-expense-amount">${money(x.amount)}</div>${x.autoEpisodeExpense?'<span class="tag">Auto</span>':`<button class="btn danger small" aria-label="Delete expense" onclick="removeExpense('${c.id}','${x.id}')">×</button>`}</div>`).join("")||'<div class="empty">No expenses recorded yet. Add your first one above.</div>'}</div></section>`;
+ <div class="budget-expenses">${rows.slice().sort((a,b)=>(b.date||"").localeCompare(a.date||"")).map(x=>`<div class="budget-expense ${x.autoEpisodeExpense?'is-automatic':''}"><div class="budget-expense-main"><b>${esc(x.title)}</b><div class="smalltext">${esc(x.category||"Other")}${x.date?' · '+esc(x.date):''}${x.autoEpisodeExpense?' <span class="expense-auto-label">Auto</span>':''}</div></div><div class="budget-expense-controls"><strong class="budget-expense-amount">${money(x.amount)}</strong>${x.autoEpisodeExpense?'':`<button class="expense-delete-btn" title="Delete expense" aria-label="Delete expense" onclick="removeExpense('${c.id}','${x.id}')">×</button>`}</div></div>`).join("")||'<div class="empty">No expenses recorded yet. Add your first one above.</div>'}</div></section>`;
 }
 function selectBudgetConvention(id){window.budgetConventionId=id;render()}
 
@@ -1886,7 +1914,10 @@ function normalizeQuestion(s){return String(s||"").toLowerCase().normalize("NFD"
 function questionSimilarity(a,b){let A=new Set(normalizeQuestion(a).split(" ").filter(x=>x.length>2)),B=new Set(normalizeQuestion(b).split(" ").filter(x=>x.length>2));if(!A.size||!B.size)return 0;let n=[...A].filter(x=>B.has(x)).length;return n/(A.size+B.size-n)}
 function detectDuplicateQuestions(){let rows=[...document.querySelectorAll("#editquestions .qrow")].map(r=>r.querySelector('[aria-label="Question"]')?.value.trim()).filter(Boolean),prior=db.episodes.filter(e=>e.id!==editing).flatMap(e=>(e.questions||[]).map(q=>({text:q.text,ep:epTitle(e)}))),hits=[];rows.forEach(q=>prior.forEach(p=>{let s=questionSimilarity(q,p.text);if(normalizeQuestion(q)===normalizeQuestion(p.text)||s>=.55)hits.push({q,p,s})}));showModal("Duplicate question check",hits.length?hits.slice(0,30).map(x=>`<div class="expense-row"><div><b>${esc(x.q)}</b><div class="smalltext">Similar to "${esc(x.p.text)}" · ${esc(x.p.ep)}</div></div><span class="tag">${Math.round(x.s*100)}%</span></div>`).join(""):'<div class="empty">No likely duplicates found.</div>')}
 
-function openScheduledInterview(episodeId){const episode=db.episodes.find(e=>String(e.id)===String(episodeId));if(!episode)return;activeEpisode=episode.id;window.interviewConvention=episode.conventionId||"";view="interview";render()} function openVaultMoreMenu(){
+function openScheduledInterview(episodeId){const episode=db.episodes.find(e=>String(e.id)===String(episodeId));if(!episode)return;activeEpisode=episode.id;window.interviewConvention=episode.conventionId||"";view="interview";render()} function openVaultTools(){
+ showModal("Tools & backups",`<div class="vault-tools-actions"><button class="btn secondary" onclick="closeModal();document.getElementById('exportBtn').click()">↧ Export backup</button><button class="btn secondary" onclick="closeModal();document.getElementById('importBtn').click()">↥ Import backup</button><button class="btn secondary" onclick="closeModal();document.getElementById('cloudBtn').click()">☁ Account & sync</button><button class="btn secondary" onclick="closeModal();openVaultSafetyBackups()">↶ Restore local backup</button></div>`);
+}
+function openVaultMoreMenu(){
  showModal("Navigate The Vault",`<div class="vault-more-links">${[["episodes","▣ Episodes"],["guests","👤 Guests"],["kpis","📊 KPIs"],["budget","💶 Budget"],["venues","📍 Venues"]].map(([id,name])=>`<button class="btn secondary" onclick="closeModal();go('${id}')">${name}</button>`).join("")}</div><div class="vault-more-links"><button class="btn secondary" onclick="closeModal();openVaultSearch()">⌕ Search everything</button><button class="btn secondary" onclick="closeModal();openQuickNotes()">📝 Quick notes</button><button class="btn secondary" onclick="closeModal();openVaultSafetyBackups()">Safety backups</button></div>`);
 }
 function openVaultSearch(){
@@ -1905,7 +1936,7 @@ function drawVaultSearchResults(term){
  if(results.length>60)el.insertAdjacentHTML('beforeend',`<p class="smalltext">Showing the first 60 of ${results.length} matches. Try a more specific search.</p>`);
 }
 function openVaultSearchResult(kind,id){closeModal();if(kind==='guest')return editGuest(id);if(kind==='convention')return editConvention(id);if(kind==='episode')return openEpisode(id);if(kind==='question')return openScheduledInterview(id);}
-function go(v){view=v;render()}
+function go(v){if(v==="interview"&&view!=="interview"){window.interviewConvention=closestInterviewConventionId();activeEpisode=null;}view=v;render()}
 function bind(){let tb=document.getElementById("themeBtn");if(tb)tb.onclick=cycleTheme;document.querySelectorAll("#nav button").forEach(b=>b.onclick=()=>{if(b.dataset.view==="day")window.dayConvention=nextConventionId();go(b.dataset.view)});if(view==="episodes"&&episodesMode==="kanban")setupKanbanDrag()}
 function changeEpisodeStatus(id,status){let e=db.episodes.find(x=>x.id===id);if(!e)return;e.status=Number(status);if(e.status===10)e.date="";save();render()}
 function setupKanbanDrag(){
