@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>The Vault V3.1.0</title>
+<title>The Vault V4.0.0</title>
 <style>
 :root{--ink:#182033;--muted:#778096;--line:#e7eaf2;--paper:#f6f7fb;--card:#fff;--blue:#4169e1;--pink:#ed5a9b;--softblue:#edf1ff;--softpink:#fff0f6;--green:#16866b;--shadow:0 12px 34px #1c2b5010}
 *{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.45 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}button,input,select,textarea{font:inherit}button{cursor:pointer;border:0}button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:3px solid #8ba2ff;outline-offset:2px}
@@ -850,7 +850,8 @@ body[data-theme="dark"] .project-chip,body[data-theme="dark"] .status,body[data-
 .day-task-label{display:flex;align-items:center;gap:8px;flex:1;min-width:0;cursor:pointer}
 .day-task-delete{flex:0 0 auto;border:0;border-radius:8px;background:var(--panel);color:var(--muted);font-size:18px;line-height:1;width:28px;height:28px;cursor:pointer}
 .day-task-delete:active{background:var(--danger-bg);color:var(--danger)}
-\n
+
+
 .convention-hub-merged-card{cursor:pointer;transition:transform .16s ease,border-color .16s ease;position:relative}
 .convention-hub-merged-card:focus-visible{outline:3px solid var(--blue);outline-offset:3px}
 .convention-hub-merged-card:active{transform:scale(.995)}
@@ -859,13 +860,195 @@ body[data-theme="dark"] .project-chip,body[data-theme="dark"] .status,body[data-
 .convention-card-hint{margin-left:auto;color:var(--muted);font-size:11px}
 @media(max-width:650px){.convention-card-actions{gap:6px}.convention-card-actions .btn{padding:8px 10px;font-size:12px}.convention-card-hint{width:100%;margin:0;text-align:right}}
 
+
+
+/* V4 refined interface / shared design tokens */
+:root{--panel:#f0f2f9;--text:var(--ink);--accent:var(--blue);--danger:#b63d52;--danger-bg:#fff0f2;--radius-md:12px;--radius-lg:16px;--tap-size:42px}
+body[data-theme="dark"]{--panel:#222d40;--text:var(--ink);--accent:var(--blue);--danger-bg:#452b36;--danger:#ff9ca9}
+body{line-height:1.43}
+.app{max-width:1320px}
+.hero{margin:5px 0 16px;gap:12px}
+.hero h1{font-size:clamp(25px,3.6vw,33px);line-height:1.15}
+.hero .sub{font-size:13px}
+.card{border-radius:var(--radius-lg);padding:15px;box-shadow:0 4px 17px rgba(22,32,57,.045)}
+.sectionhead{gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.sectionhead h2{margin:0;font-size:18px}
+.btn{border-radius:10px;min-height:38px;transition:background .15s,filter .15s}
+.btn:hover{filter:brightness(.98)}
+.btn:active{transform:translateY(1px)}
+.btn.small{min-height:34px}
+button:focus-visible,summary:focus-visible,[role="button"]:focus-visible{outline:2px solid var(--blue);outline-offset:3px}
+:where(input,select,textarea){accent-color:var(--blue)}
+[hidden]{display:none!important}
+.tag{white-space:normal}
+/* compact top navigation & utilities */
+.top{margin-bottom:12px;gap:12px}
+.topright{gap:7px;flex-wrap:wrap}
+.topright .btn{white-space:nowrap}
+.header-tools{position:relative}
+.header-tools summary{display:flex;align-items:center;list-style:none;cursor:pointer;white-space:nowrap}
+.header-tools summary::-webkit-details-marker{display:none}
+.header-tools-menu{position:absolute;z-index:19;top:calc(100% + 8px);right:0;min-width:198px;display:grid;gap:5px;padding:8px;border-radius:12px;background:var(--card);border:1px solid var(--line);box-shadow:0 14px 32px rgba(10,20,36,.17)}
+.header-tools-menu .btn{width:100%;text-align:left}
+.nav{gap:4px;margin-bottom:15px}
+.nav button{padding:9px 12px;font-size:13px;border-radius:10px}
+.vault-mobile-nav{display:none}
+.vault-more-links{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0 16px}
+.vault-more-links .btn{text-align:left}
+.vault-backup-row{display:flex;align-items:center;justify-content:space-between;gap:10px;border-bottom:1px solid var(--line);padding:12px 0}
+.vault-search-results{max-height:65vh;overflow-y:auto;display:grid;gap:5px}
+.vault-search-result{display:flex;justify-content:space-between;align-items:center;gap:14px;width:100%;text-align:left;background:var(--panel);border-radius:10px;padding:10px 12px;color:var(--ink)}
+.vault-search-result span:first-child{min-width:0}
+.vault-search-result b{display:block;font-size:13px;overflow-wrap:anywhere}
+.vault-search-result small{display:block;font-size:11px;color:var(--muted);margin-top:2px}
+/* convention hub */
+.hub-filter-bar{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0 14px}
+.hub-filter-bar button,.kpi-tabs button{padding:9px 13px;border:1px solid var(--line);border-radius:11px;background:var(--card);color:var(--ink);font-size:13px;font-weight:750}
+.hub-filter-bar button.active,.kpi-tabs button.active{background:var(--ink);border-color:var(--ink);color:var(--card)}
+.convention-overview{gap:12px}
+.convention-hub-merged-card{padding:15px}
+.convention-hub-merged-card .sectionhead h3{margin:0}
+.convention-hub-merged-card .convention-countdown{margin:6px 0}
+.convention-guest-preview{display:flex;align-items:center;gap:0;min-height:36px;margin:8px 0 6px}
+.convention-guest-preview img,.convention-guest-preview>span:not(.preview-more){width:34px;height:34px;min-width:34px;border:2px solid var(--card);border-radius:50%;object-fit:cover;background:var(--softblue);color:var(--ink);display:grid;place-items:center;font-size:9px;font-weight:800;margin-right:-7px}
+.convention-guest-preview .preview-more{font-size:10px;font-weight:800;margin-left:14px;color:var(--blue)}
+.convention-guest-preview small{font-size:11px;color:var(--muted);margin-left:auto}
+.convention-card-list{margin:6px 0}
+.convention-card-list summary{font-size:11px;color:var(--blue);cursor:pointer}
+.convention-card-actions{margin-top:8px;padding-top:9px;gap:6px}
+.convention-card-actions .btn{min-height:34px}
+.hub-empty{grid-column:1/-1;width:100%}
+/* guest progressive directory */
+.guest-directory-toolbar{display:flex;align-items:center;flex-wrap:wrap;gap:9px;margin-bottom:15px}
+.guest-directory-toolbar input,.guest-directory-toolbar select{flex:1 1 180px;min-width:0;min-height:43px;border:1px solid var(--line);border-radius:11px;padding:9px 12px;background:var(--card);color:var(--ink)}
+.guest-directory-toolbar .vault-select-wrap{flex:0 1 230px}
+.guest-directory-toolbar .smalltext{margin-left:auto}
+.guest-directory-card{content-visibility:auto;contain-intrinsic-size:auto 230px;min-width:0}
+.guest-directory-card .guest-head{margin-bottom:7px}
+.guest-directory-card .guest-conventions{margin:7px 0}
+.load-more-wrap{text-align:center;margin:14px 0 20px}
+/* prep list / editing controls */
+.task-list-compact{grid-template-columns:1fr!important}
+.day-task-row{gap:7px;padding:6px 8px;min-height:37px}
+.day-task-label{flex:1;min-width:0}
+.task-inline-actions{display:flex;align-items:center;gap:2px;flex:none}
+.task-inline-actions button{height:28px;min-width:25px;padding:0 4px;border-radius:7px;background:var(--panel);color:var(--muted);font-size:14px}
+.task-inline-actions button:disabled{opacity:.25}
+.task-inline-actions .remove{color:var(--danger)}
+.task-actions{display:flex;align-items:center;flex-wrap:wrap;gap:6px}
+.setup-reminder-grid input{width:100%;min-width:0;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:9px;padding:7px;font-size:18px;font-weight:800}
+.day-contact-section{border:1px solid var(--line);border-radius:12px;margin:9px 0 14px;padding:9px 12px;background:var(--panel)}
+.day-contact-section summary{font-size:12px;font-weight:800;cursor:pointer}
+.day-contact-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:10px}
+.day-contact-card{padding:10px;border-radius:10px;background:var(--card);border:1px solid var(--line)}
+.day-contact-card b,.day-contact-card small{display:block}
+.day-contact-card small{color:var(--muted);font-size:11px}
+.day-contact-actions{display:flex;gap:5px;margin-top:8px}
+.day-contact-actions .btn{display:inline-flex;width:auto!important;flex:0 0 auto}
+/* interview + shortlist */
+.question-library-actions,.idea-actions{display:flex;align-items:center;flex-wrap:wrap;gap:5px}
+.question-library-actions .btn{font-size:11px;padding:6px 8px}
+.filmography-idea{gap:8px;padding:8px 0}
+.shortlist-entry{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line);font-size:13px}
+.shortlist-entry>span{flex:1;min-width:0;overflow-wrap:anywhere}
+.shortlist-entry-tools{display:flex;gap:4px;flex-wrap:wrap}
+/* KPI panels */
+.kpi-tabs{display:flex;gap:7px;flex-wrap:wrap;margin:0 0 15px}
+.kpi-panel[hidden]{display:none!important}
+/* focus mode */
+.focus-mode .modal{width:min(650px,100%);background:var(--card)}
+.focus-header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.focus-header h2{margin:0}
+.focus-event{padding:16px;border:1px solid var(--line);border-radius:13px;background:var(--panel);margin:9px 0;display:grid;gap:6px}
+.focus-event strong{font-size:clamp(19px,3vw,26px);line-height:1.2}
+.focus-event .btn{justify-self:start}
+.focus-other-events{margin-top:18px;border-top:1px solid var(--line);padding-top:12px}
+.focus-other-events summary{font-size:13px;font-weight:800;cursor:pointer}
+.focus-event-line{display:grid;grid-template-columns:60px 1fr;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);font-size:13px}
+@media(min-width:701px) and (max-width:1100px){
+ .nav{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:thin}
+ .nav button{flex:0 0 auto;white-space:nowrap}
+}
+@media(max-width:900px){
+ .topright{display:flex!important;grid-template-columns:none!important;width:auto!important;align-items:center!important;justify-content:flex-start}
+ .topright .btn{width:auto!important;min-height:38px!important;padding:8px 10px!important}
+ .header-tools-menu .btn{width:100%!important}
+ .top{align-items:flex-start}
+}
+@media(max-width:700px){
+ .app{padding:11px 12px calc(105px + env(safe-area-inset-bottom))}
+ .top{margin-bottom:9px}
+ .topright{gap:5px!important}
+ .topright #quickNotesBtn{display:none}
+ .topright #searchVaultBtn{min-width:0}
+ .brand{font-size:18px}
+ .logo{width:35px;height:35px;font-size:18px}
+ #nav{display:none!important}
+ .vault-mobile-nav{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:2px;position:fixed;z-index:15;left:0;right:0;bottom:0;padding:6px 8px calc(7px + env(safe-area-inset-bottom));background:var(--card);border-top:1px solid var(--line);box-shadow:0 -4px 22px rgba(15,25,45,.09)}
+ .vault-mobile-nav button{color:var(--muted);background:transparent;border-radius:9px;font-size:20px;display:grid;place-items:center;gap:1px;padding:4px 2px;min-height:49px}
+ .vault-mobile-nav button span{font-size:9px;font-weight:700;white-space:nowrap}
+ .vault-mobile-nav button.active{color:var(--blue);background:var(--softblue)}
+ .card{padding:12px;border-radius:14px}
+ .hero{margin:5px 0 12px}
+ .hero h1{font-size:25px}
+ .hero .sub{font-size:12px}
+ .day-contact-grid{grid-template-columns:1fr}
+ .shortlist-entry{align-items:flex-start;flex-direction:column}
+ .guest-directory-toolbar .vault-select-wrap{flex:1 1 100%}
+ .guest-directory-toolbar input{flex:1 1 100%}
+ .convention-card-hint{display:none}
+}
+@media(max-width:380px){
+ .vault-mobile-nav button span{font-size:8px}
+ .task-inline-actions button{min-width:23px}
+}
+
+
+/* V4: resolve the legacy grid-based tablet header and dark selected day contrast */
+.hub-utilities{display:flex;align-items:center;justify-content:flex-end;margin:-5px 0 12px}
+body[data-theme="dark"] .panel-day-tabs button.day-toggle.active{background:var(--blue)!important;border-color:var(--blue)!important;color:#132039!important}
+body[data-theme="dark"] .panel-day-tabs button.day-toggle.active .day-toggle-state{color:#132039!important;opacity:.8}
+@media(max-width:900px){
+ .topright{display:flex!important;flex-wrap:nowrap!important;grid-template-columns:none!important;grid-template-rows:none!important;align-items:center!important;width:100%!important;justify-content:flex-end!important;gap:7px!important;min-width:0!important}
+ .topright #quickNotesBtn{grid-column:auto!important;grid-row:auto!important;order:0!important;width:auto!important;min-height:38px!important;white-space:nowrap!important;padding:8px 10px!important;font-size:12px!important}
+ .topright #themeBtn{grid-column:auto!important;grid-row:auto!important;order:0!important;width:auto!important}
+ .topright .btn{width:auto!important;white-space:nowrap!important;min-height:38px!important;padding:8px 10px!important}
+ .header-tools{flex:0 0 auto}
+ .header-tools-menu .btn{width:100%!important;min-width:175px!important;justify-content:flex-start!important}
+}
+@media(max-width:700px){
+ .topright{justify-content:flex-start!important;flex-wrap:nowrap!important}
+ .topright #quickNotesBtn{display:none!important}
+ .topright .btn{font-size:12px!important}
+ .header-tools summary{white-space:nowrap}
+}
+
+
+/* Distraction-free interview mode */
+.interview-top-actions{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.interview-focus-mode .modal{width:min(800px,100%);background:var(--card);max-height:95dvh}
+.interview-focus-header{display:flex;gap:12px;align-items:center;margin:0 0 14px}
+.interview-focus-header img,.interview-focus-avatar{width:65px;height:65px;flex:0 0 65px;object-fit:cover;border-radius:13px;background:var(--softblue);display:grid;place-items:center;font-size:24px;font-weight:900}
+.interview-focus-header h2{margin:0 0 4px;font-size:20px}
+.interview-focus-timer{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px;border-radius:12px;background:var(--panel);position:sticky;top:0;z-index:1}
+.interview-focus-timer strong{font-size:clamp(22px,4vw,32px);font-variant-numeric:tabular-nums}
+.interview-focus-timer-buttons{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.interview-focus-questions{display:grid;gap:8px;margin:15px 0}
+.interview-focus-question{display:flex;align-items:flex-start;gap:12px;padding:14px;border:1px solid var(--line);border-radius:12px;font-size:clamp(15px,2vw,19px);line-height:1.4;background:var(--card);cursor:pointer}
+.interview-focus-question input{height:23px;width:23px;margin:2px 0 0;flex:0 0 23px}
+.interview-focus-question.is-done{color:var(--muted);background:var(--panel)}
+.interview-focus-question.is-done span{text-decoration:line-through}
+.focus-remaining{color:var(--blue);font-size:12px;font-weight:800}
+@media(max-width:500px){.interview-focus-timer{flex-direction:column;align-items:stretch}.interview-focus-timer-buttons{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}.interview-focus-timer-buttons button{font-size:11px;padding:7px 6px}.interview-focus-header img,.interview-focus-avatar{width:52px;height:52px;flex-basis:52px}}
+
 </style>
 </head>
 <body><div class="app">
-<header class="top"><div class="brand"><div class="logo">✦</div><div>The Vault <span class="muted" style="font-weight:600;font-size:13px">V3.1.0</span></div></div><div class="topright"><span class="pill" id="syncStatus">Offline-first • not signed in</span><button class="btn secondary small" id="quickNotesBtn" onclick="openQuickNotes()">📝 Quick notes</button><button class="btn secondary small" id="themeBtn" title="Switch theme">☾</button><button class="btn secondary small" id="exportBtn">Export backup</button><button class="btn secondary small" id="importBtn">Import backup</button><button class="btn secondary small" id="cloudBtn">Account & sync</button><input id="importFile" type="file" accept="application/json,.json" hidden></div></header>
+<header class="top"><div class="brand"><div class="logo">✦</div><div>The Vault <span class="muted" style="font-weight:600;font-size:13px">V4.0.0</span></div></div><div class="topright"><span class="pill" id="syncStatus">Offline-first • not signed in</span><button class="btn secondary small" id="searchVaultBtn" onclick="openVaultSearch()" aria-label="Search The Vault">⌕ Search</button><button class="btn secondary small" id="quickNotesBtn" onclick="openQuickNotes()">📝 Notes</button><button class="btn secondary small" id="themeBtn" title="Switch theme">☾</button><details class="header-tools"><summary class="btn secondary small">⚙ Tools</summary><div class="header-tools-menu"><button class="btn secondary small" id="exportBtn">Export backup</button><button class="btn secondary small" id="importBtn">Import backup</button><button class="btn secondary small" id="cloudBtn">Account & sync</button><button class="btn secondary small" onclick="openVaultSafetyBackups()">Restore local backup</button></div></details><input id="importFile" type="file" accept="application/json,.json" hidden></div></header>
 <nav class="nav" id="nav">
 <button class="active" data-view="home">⌂ Dashboard</button><button data-view="episodes">▣ Episodes</button><button data-view="guests">👤 Guests</button><button data-view="interview">☷ Interview</button><button data-view="hub">✧ Convention Hub</button><button data-view="day">🎬 Convention Day</button><button data-view="kpis">📊 KPIs</button><button data-view="budget">💶 Budget</button><button data-view="venues">📍 Venues</button>
 </nav>
+<nav class="vault-mobile-nav" id="mobileNav" aria-label="Main navigation"><button data-view="home" onclick="go('home')">⌂<span>Home</span></button><button data-view="hub" onclick="go('hub')">✧<span>Conventions</span></button><button data-view="day" onclick="go('day')">▣<span>Day</span></button><button data-view="interview" onclick="go('interview')">☷<span>Interview</span></button><button onclick="openVaultMoreMenu()">⋯<span>More</span></button></nav>
 <main id="main"></main>
 </div>
 <div class="modalback" id="modalback"><div class="modal"><div class="modalhead"><h2 id="modtitle">Edit</h2><button class="x" id="closemodal">✕</button></div><div id="modbody"></div></div></div>
@@ -883,8 +1066,31 @@ if(!Array.isArray(db.guests))db.guests=[];
 function normalizeGuestName(n){return String(n||"").trim().replace(/\s+/g," ").toLowerCase()}
 function ensureGuestProfiles(){db.episodes.forEach(e=>{if(!e.guest)return;let g=db.guests.find(x=>x.id===e.guestId)||db.guests.find(x=>normalizeGuestName(x.name)===normalizeGuestName(e.guest));if(!g){g={id:uid(),name:e.guest,photo:"",bio:"",notes:"",socials:{}};db.guests.push(g)}e.guestId=g.id})}
 ensureGuestProfiles();
+try{if(!localStorage.getItem("vault_v4_initialized")){preserveVaultSafetyBackup("Before V4 upgrade");localStorage.setItem("vault_v4_initialized","1")}}catch{}
 let view="home",editing=null,activeEpisode=null,inspireOffset=0,inspireSelected=new Set(),episodesMode="gallery";
 let cloudUser=null, cloudChannel=null, syncTimer=null, syncBusy=false, applyingRemote=false, lastCloudPayload=null;
+
+function preserveVaultSafetyBackup(reason="Before important change"){
+ try{const raw=localStorage.getItem("vault03");if(!raw)return;
+ const key="vault_v4_safety_backups",backups=JSON.parse(localStorage.getItem(key)||"[]");
+ if(backups[0]?.content===raw)return;
+ backups.unshift({date:new Date().toISOString(),reason,content:raw});
+ localStorage.setItem(key,JSON.stringify(backups.slice(0,3)));
+ }catch(err){console.warn("Could not preserve a safety backup",err)}
+}
+function openVaultSafetyBackups(){
+ let backups=[];try{backups=JSON.parse(localStorage.getItem("vault_v4_safety_backups")||"[]")}catch{}
+ showModal("Local safety backups",`<p class="smalltext">Up to three snapshots are kept on this device before data replacement. Export a JSON backup for long-term protection.</p>${backups.map((b,i)=>`<div class="vault-backup-row"><div><b>${esc(new Date(b.date).toLocaleString())}</b><div class="smalltext">${esc(b.reason||"Backup")}</div></div><button class="btn secondary small" onclick="restoreVaultSafetyBackup(${i})">Restore</button></div>`).join("")||'<div class="empty">No safety backups yet.</div>'}`);
+}
+function restoreVaultSafetyBackup(index){
+ let backups;try{backups=JSON.parse(localStorage.getItem("vault_v4_safety_backups")||"[]")}catch{return}
+ const item=backups[index];if(!item||!confirm("Restore this snapshot? Your current device state will be preserved first."))return;
+ try{const data=JSON.parse(item.content);if(!Array.isArray(data.episodes)||!Array.isArray(data.conventions))throw Error("Invalid backup");preserveVaultSafetyBackup("Before manual restore");db=data;ensureGuestProfiles();save();closeModal();render()}catch(e){alert("Unable to restore: "+e.message)}
+}
+function safeContactWebsite(url){return safeGuestUrl(url)}
+function validPhone(value){return String(value||"").replace(/[^+0-9 ()-]/g,"")}
+function textInitials(name){return String(name||"?").trim().split(/\s+/).slice(0,2).map(x=>x[0]||"").join("").toUpperCase()}
+function formatTaskCount(items){return (items||[]).filter(t=>t.done).length+"/"+(items||[]).length}
 
 function syncEpisodeBudgetExpenses(){
  const episodes=Array.isArray(db.episodes)?db.episodes:[];
@@ -928,12 +1134,13 @@ function save(){
 }
 if(syncEpisodeBudgetExpenses())localStorage.setItem("vault03",JSON.stringify(db));
 function setSyncStatus(label){const el=document.getElementById("syncStatus");if(el)el.textContent=label;}
-function scheduleCloudSync(){clearTimeout(syncTimer);syncTimer=setTimeout(()=>syncNow("push"),900);}
-function cloudPayload(){return {guests:db.guests,organizers:db.organizers,conventions:db.conventions,episodes:db.episodes,checklistTemplate:db.checklistTemplate,settings:db.settings,venues:db.venues,youtubeVideos:db.youtubeVideos};}
+function scheduleCloudSync(){clearTimeout(syncTimer);syncTimer=setTimeout(()=>syncNow("both"),1200);}
+function cloudPayload(){return {guests:db.guests,organizers:db.organizers,conventions:db.conventions,episodes:db.episodes,checklistTemplate:db.checklistTemplate,settings:db.settings,venues:db.venues,youtubeVideos:db.youtubeVideos,taskTemplates:db.taskTemplates||{}};}
 function applyCloudPayload(payload){
  if(!payload || !Array.isArray(payload.organizers)||!Array.isArray(payload.conventions)||!Array.isArray(payload.episodes))throw new Error("The cloud data format is not valid.");
+ preserveVaultSafetyBackup("Before cloud replacement");
  applyingRemote=true;
- db={...db,guests:Array.isArray(payload.guests)?payload.guests:[],organizers:payload.organizers,conventions:payload.conventions,episodes:payload.episodes,checklistTemplate:Array.isArray(payload.checklistTemplate)?payload.checklistTemplate:DEFAULT_CHECKLIST.slice(),settings:payload.settings||db.settings||{theme:"system",youtubeApiKey:""},venues:Array.isArray(payload.venues)?payload.venues.map(v=>({...v,floorPlans:v.floorPlans||[]})):[],youtubeVideos:Array.isArray(payload.youtubeVideos)?payload.youtubeVideos:[]};ensureGuestProfiles();
+ db={...db,guests:Array.isArray(payload.guests)?payload.guests:[],organizers:payload.organizers,conventions:payload.conventions,episodes:payload.episodes,checklistTemplate:Array.isArray(payload.checklistTemplate)?payload.checklistTemplate:DEFAULT_CHECKLIST.slice(),settings:payload.settings||db.settings||{theme:"system",youtubeApiKey:""},venues:Array.isArray(payload.venues)?payload.venues.map(v=>({...v,floorPlans:v.floorPlans||[]})):[],youtubeVideos:Array.isArray(payload.youtubeVideos)?payload.youtubeVideos:[],taskTemplates:payload.taskTemplates&&typeof payload.taskTemplates==="object"?payload.taskTemplates:(db.taskTemplates||{})};ensureGuestProfiles();
  const migratedProjects=migrateGuestProjects();
  syncEpisodeBudgetExpenses();localStorage.setItem("vault03",JSON.stringify(db));lastCloudPayload=JSON.stringify(cloudPayload());applyingRemote=false;render();
  if(migratedProjects&&cloudUser&&navigator.onLine)scheduleCloudSync();
@@ -1067,7 +1274,31 @@ function createEpisodeGuest(){
   sel.appendChild(opt);sel.value=guest.id;sel.dispatchEvent(new Event("change",{bubbles:true}));
  }
 }
-function guestsView(){return `<section class="hero"><div><div class="eyebrow">Guest directory</div><h1>Guest CRM</h1><p class="sub">Reusable guest profiles connected to every interview appearance.</p></div><button class="btn blue" onclick="addGuest()">＋ Add guest</button></section><div class="guest-grid">${db.guests.slice().sort((a,b)=>a.name.localeCompare(b.name)).map(g=>{let eps=guestEpisodes(g),projects=(g.projects||[]).map(p=>p.title).filter(Boolean),linkedConventions=db.conventions.filter(c=>(c.guestIds||[]).includes(g.id));return `<article class="card"><div class="guest-head">${g.photo&&safeGuestUrl(g.photo)?`<div class="guest-portrait"><img loading="lazy" decoding="async" fetchpriority="low" src="${esc(safeGuestUrl(g.photo))}" alt="" style="object-position:${Number(g.photoX??50)}% ${Number(g.photoY??50)}%;transform:scale(${Number(g.photoZoom??1)});transform-origin:${Number(g.photoX??50)}% ${Number(g.photoY??50)}%"></div>`:`<div class="guest-avatar">✦</div>`}<div><h3>${esc(g.name)}</h3><div class="smalltext">${eps.length} linked episodes</div></div></div>${g.bio?`<p class="smalltext">${esc(g.bio)}</p>`:""}${projects.map(x=>`<span class="tag">${esc(x)}</span> `).join("")}<div class="guest-conventions"><b class="smalltext">Conventions</b><div class="smalltext">${linkedConventions.map(c=>`<span class="tag">${esc(c.name)}</span>`).join(" ")||"Not linked to a convention yet"}</div></div><div class="guest-actions"><button class="btn secondary small" onclick="editGuest('${g.id}')">Open profile</button></div></article>`}).join("")||'<div class="empty">Guest profiles are created automatically when you save episodes.</div>'}</div>`}
+let guestDirectoryQuery="",guestDirectoryProject="all",guestVisibleCount=24;
+function guestDirectoryResults(){
+ const query=guestDirectoryQuery.trim().toLowerCase();return db.guests.slice().sort((a,b)=>String(a.name||"").localeCompare(String(b.name||""))).filter(g=>{
+ const credits=(g.projects||[]).map(p=>String(p.title||"")).join(" ").toLowerCase();
+ return (!query||[g.name,credits].some(x=>String(x||"").toLowerCase().includes(query)))&&(guestDirectoryProject==="all"||credits.includes(guestDirectoryProject.toLowerCase()));
+ });
+}
+function drawGuestDirectory(){
+ const node=document.getElementById("guestGrid"),counter=document.getElementById("guestResultsCount");if(!node)return;
+ const matches=guestDirectoryResults(),visible=matches.slice(0,guestVisibleCount);
+ const history=new Map(),linked=new Map();
+ db.episodes.forEach(e=>{const key=e.guestId||normalizeGuestName(e.guest);history.set(key,(history.get(key)||0)+1)});
+ db.conventions.forEach(c=>(c.guestIds||[]).forEach(id=>{if(!linked.has(id))linked.set(id,[]);linked.get(id).push(c.name)}));
+ node.innerHTML=visible.map(g=>{const epCount=history.get(g.id)||history.get(normalizeGuestName(g.name))||0;const projects=(g.projects||[]).map(p=>p.title).filter(Boolean);const linkedConventions=linked.get(g.id)||[];const src=g.photo&&safeGuestUrl(g.photo);
+ return `<article class="card guest-directory-card"><div class="guest-head">${src?`<div class="guest-portrait"><img loading="lazy" decoding="async" fetchpriority="low" src="${esc(src)}" alt="" style="object-position:${Number(g.photoX??50)}% ${Number(g.photoY??50)}%;transform:scale(${Number(g.photoZoom??1)});transform-origin:${Number(g.photoX??50)}% ${Number(g.photoY??50)}%"></div>`:`<div class="guest-avatar">${esc(textInitials(g.name))}</div>`}<div><h3>${esc(g.name)}</h3><div class="smalltext">${epCount} linked episodes</div></div></div>${projects.slice(0,3).map(x=>`<span class="tag">${esc(x)}</span> `).join("")}${projects.length>3?`<span class="smalltext">+${projects.length-3} more</span>`:""}<div class="guest-conventions smalltext">${linkedConventions.slice(0,2).map(x=>esc(x)).join(" · ")||"No linked convention"}</div><div class="guest-actions"><button class="btn secondary small" onclick="editGuest('${g.id}')">Open profile</button></div></article>`}).join("")||'<div class="empty">No matching guests.</div>';
+ if(counter)counter.textContent=`${Math.min(matches.length,guestVisibleCount)} of ${matches.length} guests`;
+ const more=document.getElementById("guestLoadMore");if(more)more.hidden=matches.length<=guestVisibleCount;
+}
+function updateGuestDirectory(query){guestDirectoryQuery=query;guestVisibleCount=24;drawGuestDirectory()}
+function setGuestDirectoryProject(value){guestDirectoryProject=value;guestVisibleCount=24;drawGuestDirectory()}
+function moreGuests(){guestVisibleCount+=24;drawGuestDirectory()}
+function guestsView(){
+ const allProjects=[...new Set(db.guests.flatMap(g=>(g.projects||[]).map(p=>String(p.title||"").trim()).filter(Boolean)))].sort((a,b)=>a.localeCompare(b));
+ return `<section class="hero"><div><div class="eyebrow">Guest directory</div><h1>Guest CRM</h1><p class="sub">Profiles, credits and past interviews.</p></div><button class="btn blue" onclick="addGuest()">＋ Add guest</button></section><section class="guest-directory-toolbar"><input type="search" placeholder="Search guests or projects…" aria-label="Search guest directory" value="${esc(guestDirectoryQuery)}" oninput="updateGuestDirectory(this.value)"><select aria-label="Filter by project" onchange="setGuestDirectoryProject(this.value)"><option value="all">All projects</option>${allProjects.map(p=>`<option value="${esc(p)}" ${guestDirectoryProject===p?'selected':''}>${esc(p)}</option>`).join("")}</select><span class="smalltext" id="guestResultsCount"></span></section><div class="guest-grid" id="guestGrid"></div><div class="load-more-wrap"><button class="btn secondary" id="guestLoadMore" onclick="moreGuests()" hidden>Show 24 more guests ↓</button></div>`;
+}
 
 function toDMY(d){if(!d)return "";let m=String(d).match(/^(\d{4})-(\d{2})-(\d{2})$/);return m?`${m[3]}/${m[2]}/${m[1]}`:d}
 function fromDMY(d){let m=String(d||"").trim().match(/^(\d{1,2})[\/.\-](\d{1,2})[\/.\-](\d{4})$/);if(!m)return "";let day=+m[1],month=+m[2],year=+m[3],x=new Date(year,month-1,day);return x.getFullYear()===year&&x.getMonth()===month-1&&x.getDate()===day?`${year}-${String(month).padStart(2,"0")}-${String(day).padStart(2,"0")}`:""}
@@ -1125,7 +1356,7 @@ localStorage.setItem("vault03",JSON.stringify(db));
 function applyTheme(){let p=db.settings?.theme||"system",dark=p==="dark"||(p==="system"&&window.matchMedia?.("(prefers-color-scheme: dark)").matches);document.body.dataset.theme=dark?"dark":"light";let b=document.getElementById("themeBtn");if(b){b.textContent=dark?"☀":"☾";b.title="Theme: "+p+" (tap to change)"}}
 function cycleTheme(){db.settings=db.settings||{};db.settings.theme=({system:"dark",dark:"light",light:"system"})[db.settings.theme||"system"];save();applyTheme()}
 
-function render(){syncEpisodeBudgetExpenses();if(view==="youtube")view="home";document.querySelectorAll("#nav button").forEach(b=>b.classList.toggle("active",b.dataset.view===view));let m=document.getElementById("main");if(view==="home")m.innerHTML=home();if(view==="episodes")m.innerHTML=episodes();if(view==="guests")m.innerHTML=guestsView();if(view==="hub")m.innerHTML=hub();if(view==="interview")m.innerHTML=interview();if(view==="day")m.innerHTML=day();if(view==="kpis")m.innerHTML=kpis();if(view==="budget")m.innerHTML=budgetView();if(view==="venues")m.innerHTML=venuesView();bind();applyTheme();upgradeVaultSelects(document)}
+function render(){if(view==="youtube")view="home";document.querySelectorAll("#mobileNav button[data-view]").forEach(b=>b.classList.toggle("active",b.dataset.view===view));document.querySelectorAll("#nav button").forEach(b=>b.classList.toggle("active",b.dataset.view===view));let m=document.getElementById("main");if(view==="home")m.innerHTML=home();if(view==="episodes")m.innerHTML=episodes();if(view==="guests"){m.innerHTML=guestsView();drawGuestDirectory();}if(view==="hub")m.innerHTML=hub();if(view==="interview")m.innerHTML=interview();if(view==="day")m.innerHTML=day();if(view==="kpis")m.innerHTML=kpis();if(view==="budget")m.innerHTML=budgetView();if(view==="venues")m.innerHTML=venuesView();bind();applyTheme();upgradeVaultSelects(document)}
 function home(){
  let count=n=>db.episodes.filter(e=>e.status===n).length;
  let active=db.episodes.filter(e=>![8,10].includes(e.status));
@@ -1159,7 +1390,14 @@ function conventionCountdown(c){
  if(today<=end)return `<span class="countdown-live">● Convention is happening</span>`;
  let n=Math.floor((today-end)/86400000);return `<span class="countdown-past">Ended ${n} day${n===1?"":"s"} ago</span>`;
 }
-function hub(){return `<section class="hero"><div><div class="eyebrow">Your people & places</div><h1>Convention Command Centre</h1><p class="sub">A control room for every event, guest lineup and interview plan.</p></div></section><div class="convention-overview">${db.conventions.map(c=>{let es=db.episodes.filter(e=>e.conventionId===c.id),done=es.filter(e=>e.status===8).length,cancel=es.filter(e=>e.status===10).length;return `<article class="card convention-overview-card convention-hub-merged-card" data-convention-card="${esc(c.id)}" role="button" tabindex="0" aria-label="Edit convention ${esc(c.name)}" onclick="editConvention('${c.id}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();editConvention('${c.id}')}"><div class="sectionhead"><h3>${esc(c.name)}</h3><span class="tag">${es.length} interviews</span></div><div class="smalltext">${c.startDate&&c.endDate?`${fmt(c.startDate)} – ${fmt(c.endDate)}`:"Dates not set"}</div><div class="convention-countdown">${conventionCountdown(c)}</div><details class="convention-card-list" open onclick="event.stopPropagation()"><summary><b>Guest lineup</b><span class="tag">${(c.guestIds||[]).length} guests</span></summary><div class="convention-scroll-list guest-scroll-list">${(c.guestIds||[]).map(id=>db.guests.find(g=>g.id===id)).filter(Boolean).map(g=>`<div class="convention-list-item">${g.photo&&safeGuestUrl(g.photo)?`<img loading="lazy" decoding="async" fetchpriority="low" src="${esc(safeGuestUrl(g.photo))}" alt="">`:`<span class="mini-avatar">${esc(String(g.name||"?").split(/\\s+/).slice(0,2).map(x=>x[0]||"").join("").toUpperCase())}</span>`}<span>${esc(g.name)}</span></div>`).join("")||'<div class="smalltext">No guests linked yet.</div>'}</div></details><div class="bar"><i style="width:${es.length?done/es.length*100:0}%"></i></div><div class="smalltext">${done} published · ${cancel} cancelled · ${es.length-done-cancel} active</div><div class="convention-card-actions" onclick="event.stopPropagation()"><button class="btn secondary small" onclick="managePanels('${c.id}')">Panels</button><button class="btn secondary small" onclick="window.dayConvention='${c.id}';go('day')">Convention Day →</button><button class="btn danger small" onclick="delConvention('${c.id}')">Delete</button><span class="convention-card-hint">Tap the card to edit</span></div></article>`}).join("")||'<div class="empty">Add your first convention to get started.</div>'}</div><div class="split"><section class="card"><div class="sectionhead"><h2>Organizers</h2><button class="btn blue small" onclick="editOrganizer()">＋ Add</button></div>${db.organizers.map(o=>`<div class="episode organizer-entry"><div class="epbody"><b>${esc(o.name)}</b><div class="epmeta">${(o.contacts||[]).length} saved contact${(o.contacts||[]).length===1?"":"s"}</div>${(o.contacts||[]).length?`<details class="organizer-contact-preview"><summary>View organizer contacts</summary>${o.contacts.map(c=>`<div class="organizer-contact-summary"><b>${esc(c.name||c.role||"Contact")}</b>${c.role?` · ${esc(c.role)}`:""}${c.phone?`<div>${esc(c.phone)}</div>`:""}${c.website?`<div><a href="${esc(c.website)}" target="_blank" rel="noopener">Website ↗</a></div>`:""}</div>`).join("")}</details>`:""}</div><div class="epactions"><button class="btn secondary small" onclick="editOrganizer('${o.id}')">Edit</button><button class="btn danger small" onclick="delOrganizer('${o.id}')">Delete</button></div></div>`).join("")||'<div class="empty">Add an organizer to get started.</div>'}</section></div>`}
+let hubFilter="upcoming";
+function setHubFilter(filter){hubFilter=filter;render()}
+function conventionIsPast(c){if(!c.endDate&&!c.startDate)return false;const date=c.endDate||c.startDate;return date<new Date().toISOString().slice(0,10)}
+function hub(){
+ const all=db.conventions||[],upcoming=all.filter(c=>!conventionIsPast(c)),past=all.filter(conventionIsPast);
+ const shown=(hubFilter==="past"?past:hubFilter==="all"?all:upcoming).slice().sort((a,b)=>hubFilter==="past"?String(b.startDate||"").localeCompare(String(a.startDate||"")):String(a.startDate||"9999").localeCompare(String(b.startDate||"9999")));
+ return `<section class="hero"><div><div class="eyebrow">Your people & places</div><h1>Convention Command Centre</h1><p class="sub">Your next events first, older ones safely archived.</p></div><button class="btn blue" onclick="editConvention()">＋ New Convention</button></section><div class="hub-filter-bar" aria-label="Convention filters"><button class="${hubFilter==='upcoming'?'active':''}" onclick="setHubFilter('upcoming')">Upcoming · ${upcoming.length}</button><button class="${hubFilter==='past'?'active':''}" onclick="setHubFilter('past')">Past · ${past.length}</button><button class="${hubFilter==='all'?'active':''}" onclick="setHubFilter('all')">All · ${all.length}</button></div><div class="hub-utilities"><button class="btn secondary small" onclick="editChecklistTemplate()">✎ Edit packing template</button></div><div class="convention-overview">${shown.map(c=>{const es=db.episodes.filter(e=>e.conventionId===c.id),done=es.filter(e=>e.status===8).length,cancel=es.filter(e=>e.status===10).length;const lineup=(c.guestIds||[]).map(id=>db.guests.find(g=>g.id===id)).filter(Boolean);
+ return `<article class="card convention-overview-card convention-hub-merged-card" role="button" tabindex="0" aria-label="Edit ${esc(c.name)}" onclick="editConvention('${c.id}')" onkeydown="if(event.target===this&&(event.key==='Enter'||event.key===' ')){event.preventDefault();editConvention('${c.id}')}"><div class="sectionhead"><h3>${esc(c.name)}</h3><span class="tag">${es.length} interviews</span></div><div class="smalltext">${c.startDate?fmt(c.startDate):'No start date'}${c.endDate?' – '+fmt(c.endDate):''} · ${esc(org(c.organizerId))}</div><div class="convention-countdown">${conventionCountdown(c)}</div><div class="convention-guest-preview" aria-label="Guest lineup preview">${lineup.slice(0,6).map(g=>g.photo&&safeGuestUrl(g.photo)?`<img loading="lazy" decoding="async" fetchpriority="low" src="${esc(safeGuestUrl(g.photo))}" title="${esc(g.name)}" alt="${esc(g.name)}">`:`<span title="${esc(g.name)}">${esc(textInitials(g.name))}</span>`).join("")}${lineup.length>6?`<span class="preview-more">+${lineup.length-6}</span>`:""}<small>${lineup.length} guests</small></div><details class="convention-card-list" onclick="event.stopPropagation()"><summary>Show full guest lineup</summary><div class="convention-scroll-list guest-scroll-list">${lineup.map(g=>`<div class="convention-list-item">${g.photo&&safeGuestUrl(g.photo)?`<img loading="lazy" decoding="async" fetchpriority="low" src="${esc(safeGuestUrl(g.photo))}" alt="">`:`<span class="mini-avatar">${esc(textInitials(g.name))}</span>`}<span>${esc(g.name)}</span></div>`).join("")||'<div class="smalltext">No linked guests yet.</div>'}</div></details><div class="bar"><i style="width:${es.length?done/es.length*100:0}%"></i></div><div class="smalltext">${done} published · ${cancel} cancelled · ${es.length-done-cancel} active</div><div class="convention-card-actions" onclick="event.stopPropagation()"><button class="btn secondary small" onclick="managePanels('${c.id}')">Panels</button><button class="btn secondary small" onclick="window.dayConvention='${c.id}';go('day')">Convention Day →</button><button class="btn danger small" onclick="delConvention('${c.id}')">Delete</button><span class="convention-card-hint">Tap card to edit</span></div></article>`}).join("")||`<section class="card empty hub-empty">${hubFilter==='upcoming'?'No upcoming conventions. Select Past to view your history, or create a new convention.':hubFilter==='past'?'No previous conventions yet.':'No conventions yet.'}</section>`}</div><div class="split"><section class="card"><div class="sectionhead"><h2>Organizers</h2><button class="btn blue small" onclick="editOrganizer()">＋ Add</button></div>${db.organizers.map(o=>`<div class="episode organizer-entry"><div class="epbody"><b>${esc(o.name)}</b><div class="epmeta">${(o.contacts||[]).length} saved contact${(o.contacts||[]).length===1?"":"s"}</div>${(o.contacts||[]).length?`<details class="organizer-contact-preview"><summary>View organizer contacts</summary>${o.contacts.map(c=>`<div class="organizer-contact-summary"><b>${esc(c.name||c.role||"Contact")}</b>${c.role?` · ${esc(c.role)}`:""}${c.phone?`<div>${esc(c.phone)}</div>`:""}${c.website?`<div><a href="${esc(c.website)}" target="_blank" rel="noopener">Website ↗</a></div>`:""}</div>`).join("")}</details>`:""}</div><div class="epactions"><button class="btn secondary small" onclick="editOrganizer('${o.id}')">Edit</button><button class="btn danger small" onclick="delOrganizer('${o.id}')">Delete</button></div></div>`).join("")||'<div class="empty">Add an organizer to get started.</div>'}</section></div>`}
 function openInterviewConventionPicker(){
  const items=db.conventions;
  if(!items.length){showModal("Choose a convention",'<div class="empty">Add a convention in Convention Hub first.</div>');return;}
@@ -1216,8 +1454,27 @@ function renderFilmographyIdeas(episodeId,guestId){
  const guest=db.guests.find(g=>g.id===guestId),select=document.getElementById("filmographyProject"),host=document.getElementById("filmographyIdeas");
  if(!guest||!select||!host)return;
  const projects=(guest.projects||[]).filter(p=>p.title&&p.title.trim()),project=projects[Number(select.value)]||projects[0];
- host.innerHTML=filmographyQuestionIdeas(project,guest.name).map(q=>`<div class="filmography-idea"><span>${esc(q)}</span><button class="btn blue small" onclick='addFilmographyQuestion("${episodeId}",${JSON.stringify(q).replace(/</g,"\\u003c")})'>＋ Add</button></div>`).join("");
+ host.innerHTML=filmographyQuestionIdeas(project,guest.name).map((q,i)=>`<div class="filmography-idea"><span>${esc(q)}</span><div class="idea-actions"><button type="button" class="btn secondary small" onclick="pickFilmographyQuestion('${episodeId}','${guestId}',${i},'shortlist')">☆ Shortlist</button><button type="button" class="btn blue small" onclick="pickFilmographyQuestion('${episodeId}','${guestId}',${i},'add')">＋ Add</button></div></div>`).join("");
 }
+function pickFilmographyQuestion(episodeId,guestId,index,action){
+ const guest=db.guests.find(g=>g.id===guestId),sel=document.getElementById('filmographyProject');if(!guest||!sel)return;
+ const project=(guest.projects||[]).filter(p=>p.title&&p.title.trim())[Number(sel.value)];if(!project)return;
+ const question=filmographyQuestionIdeas(project,guest.name)[index];if(!question)return;
+ if(action==='add'){addFilmographyQuestion(episodeId,question);return}
+ const episode=db.episodes.find(e=>e.id===episodeId);if(!episode)return;
+ episode.questionShortlist=Array.isArray(episode.questionShortlist)?episode.questionShortlist:[];
+ if(episode.questionShortlist.some(q=>q.text.toLowerCase()===question.toLowerCase())||(episode.questions||[]).some(q=>q.text.toLowerCase()===question.toLowerCase())){alert('Already saved in your shortlist or interview.');return}
+ episode.questionShortlist.push({id:uid(),text:question});save();
+ const badge=document.getElementById('questionShortlistCount');if(badge)badge.textContent=episode.questionShortlist.length;
+}
+function openInterviewShortlist(episodeId){
+ const episode=db.episodes.find(e=>e.id===episodeId);if(!episode)return;
+ episode.questionShortlist=Array.isArray(episode.questionShortlist)?episode.questionShortlist:[];
+ showModal('☆ Question shortlist',`<p class="smalltext">Save ideas before choosing the final interview questions. Move them into the interview when ready.</p><div class="shortlist-entries">${episode.questionShortlist.map((q,i)=>`<div class="shortlist-entry"><span>${esc(q.text)}</span><div class="shortlist-entry-tools"><button class="btn secondary small" onclick="moveInterviewShortlist('${episodeId}',${i},-1)" ${i===0?'disabled':''}>↑</button><button class="btn secondary small" onclick="moveInterviewShortlist('${episodeId}',${i},1)" ${i===episode.questionShortlist.length-1?'disabled':''}>↓</button><button class="btn blue small" onclick="acceptInterviewShortlist('${episodeId}',${i})">＋ Use</button><button class="btn danger small" onclick="deleteInterviewShortlist('${episodeId}',${i})">×</button></div></div>`).join('')||'<div class="empty">No shortlisted ideas yet. Open the filmography generator to shortlist questions.</div>'}</div><button class="btn secondary small" onclick="closeModal()">Done</button>`);
+}
+function moveInterviewShortlist(eid,index,direction){const e=db.episodes.find(x=>x.id===eid);if(!e?.questionShortlist)return;const i=index+direction;if(i<0||i>=e.questionShortlist.length)return;[e.questionShortlist[index],e.questionShortlist[i]]=[e.questionShortlist[i],e.questionShortlist[index]];save();openInterviewShortlist(eid)}
+function deleteInterviewShortlist(eid,index){const e=db.episodes.find(x=>x.id===eid);if(!e?.questionShortlist?.[index])return;e.questionShortlist.splice(index,1);save();openInterviewShortlist(eid)}
+function acceptInterviewShortlist(eid,index){const e=db.episodes.find(x=>x.id===eid);if(!e?.questionShortlist?.[index])return;const q=e.questionShortlist[index];e.questions=e.questions||[];if(!e.questions.some(x=>String(x.text||'').trim().toLowerCase()===q.text.trim().toLowerCase()))e.questions.push({id:uid(),text:q.text,asked:false});e.questionShortlist.splice(index,1);save();closeModal();render()}
 function addFilmographyQuestion(episodeId,question){
  const episode=db.episodes.find(e=>String(e.id)===String(episodeId));if(!episode)return;
  episode.questions=Array.isArray(episode.questions)?episode.questions:[];
@@ -1237,7 +1494,7 @@ function interview(){
  return `<section class="hero"><div><div class="eyebrow">Live interview workspace</div><h1>Questions, in your flow.</h1><p class="sub">Choose a convention first, then select the guest you are interviewing.</p></div></section>
  <section class="card interview-controls"><div class="field"><label>1. Convention</label><button type="button" class="episode-picker-trigger" onclick="openInterviewConventionPicker()">${esc(convention?.name||"Choose a convention")}<span>⌄</span></button></div>
  <div class="field"><label>2. Guest interview</label><button type="button" class="episode-picker-trigger" ${available.length?'':'disabled'} onclick="openInterviewGuestPicker()">${esc(e?`${e.guest||"Untitled guest"} · Episode ${e.status===10?"X":e.number}`:available.length?"Choose a guest":"No guest interviews for this convention")}<span>⌄</span></button></div></section>
- ${!convention?'<div class="empty">Create a convention in Convention Hub to get started.</div>':!e?'<div class="empty">Add an episode and link it to this convention to prepare an interview.</div>':`<section class="card"><div class="sectionhead"><div><h2>${e.status===10?"✕ ":""}${esc(epTitle(e))}</h2>${e.status===10?'<span class="tag">Cancelled</span>':""}<span class="smalltext">${e.questions.filter(q=>q.asked).length} of ${e.questions.length} asked</span></div><button class="btn secondary small" onclick="openEpisode('${e.id}')">Edit episode</button></div><div class="bar"><i style="width:${e.questions.length?100*e.questions.filter(q=>q.asked).length/e.questions.length:0}%"></i></div><div class="interview-focus-row"><section class="interview-timer-panel"><div class="interview-timer-readout"><span class="eyebrow">Interview timer</span><strong id="interviewElapsed">00:00:00</strong><small id="interviewTimerState">Ready when you are</small></div><div class="interview-timer-controls"><button class="btn blue small" id="interviewTimerStart" onclick="startInterviewTimer('${e.id}')">▶ Start</button><button class="btn secondary small" onclick="pauseInterviewTimer('${e.id}')">Ⅱ Pause</button><button class="btn secondary small" onclick="resetInterviewTimer('${e.id}')">↺ Reset</button></div></section>${(()=>{const photo=guest?.photo&&safeGuestUrl(guest.photo);return `<div class="interview-guest-photo">${photo?`<img src="${esc(photo)}" alt="${esc(guest?.name||e.guest||'Guest')}" style="object-position:${Number(guest.photoX??50)}% ${Number(guest.photoY??50)}%;transform:scale(${Number(guest.photoZoom??1)});transform-origin:${Number(guest.photoX??50)}% ${Number(guest.photoY??50)}%">`:`<span>${esc(String(e.guest||"?").trim().split(/\s+/).slice(0,2).map(x=>x[0]||"").join("").toUpperCase()||"✦")}</span>`}</div>`})()}</div><div class="sectionhead"><h3>Question favorites</h3><button class="btn secondary small" onclick="openFavoriteQuestions('${e.id}')">★ Saved questions</button></div>${(guest?.projects||[]).filter(p=>p.title&&p.title.trim()).length?`<div class="project-strip-label">Guest projects</div><div class="project-strip">${guest.projects.filter(p=>p.title&&p.title.trim()).map(p=>`<span class="project-chip"><strong>${esc(p.title)}</strong> · ${esc(p.type||"Other")}${p.characterName?` · ${esc(p.characterName)}`:""}</span>`).join("")}</div><div class="filmography-generator-launch"><button class="btn secondary small" type="button" onclick="toggleFilmographyLab('${e.id}','${guest.id}')">✨ Generate questions from filmography</button><span class="smalltext">Uses the guest's saved projects and character details.</span></div><div id="filmographyLab"></div>`:""}${e.questions.map(q=>`<div class="interview-question-row"><label class="qrow"><input type="checkbox" ${q.asked?'checked':''} onchange="toggleAsked('${e.id}','${q.id}',this.checked)"><span class="qtext ${q.asked?'done':''}">${esc(q.text)}</span></label><button class="favorite-question-btn ${q.favorite?'active':''}" title="Save question to favorites" onclick="toggleFavoriteQuestion('${e.id}','${q.id}')">${q.favorite?"★":"☆"}</button></div>`).join("")||'<div class="empty">No questions yet. Add them in the episode editor.</div>'}</section>`}${thumbnailArchive()}`
+ ${!convention?'<div class="empty">Create a convention in Convention Hub to get started.</div>':!e?'<div class="empty">Add an episode and link it to this convention to prepare an interview.</div>':`<section class="card"><div class="sectionhead"><div><h2>${e.status===10?"✕ ":""}${esc(epTitle(e))}</h2>${e.status===10?'<span class="tag">Cancelled</span>':""}<span class="smalltext">${e.questions.filter(q=>q.asked).length} of ${e.questions.length} asked</span></div><div class="interview-top-actions"><button class="btn blue small" onclick="openInterviewFocusMode('${e.id}')">◎ Focus questions</button><button class="btn secondary small" onclick="openEpisode('${e.id}')">Edit episode</button></div></div><div class="bar"><i style="width:${e.questions.length?100*e.questions.filter(q=>q.asked).length/e.questions.length:0}%"></i></div><div class="interview-focus-row"><section class="interview-timer-panel"><div class="interview-timer-readout"><span class="eyebrow">Interview timer</span><strong id="interviewElapsed">00:00:00</strong><small id="interviewTimerState">Ready when you are</small></div><div class="interview-timer-controls"><button class="btn blue small" id="interviewTimerStart" onclick="startInterviewTimer('${e.id}')">▶ Start</button><button class="btn secondary small" onclick="pauseInterviewTimer('${e.id}')">Ⅱ Pause</button><button class="btn secondary small" onclick="resetInterviewTimer('${e.id}')">↺ Reset</button></div></section>${(()=>{const photo=guest?.photo&&safeGuestUrl(guest.photo);return `<div class="interview-guest-photo">${photo?`<img src="${esc(photo)}" alt="${esc(guest?.name||e.guest||'Guest')}" style="object-position:${Number(guest.photoX??50)}% ${Number(guest.photoY??50)}%;transform:scale(${Number(guest.photoZoom??1)});transform-origin:${Number(guest.photoX??50)}% ${Number(guest.photoY??50)}%">`:`<span>${esc(String(e.guest||"?").trim().split(/\s+/).slice(0,2).map(x=>x[0]||"").join("").toUpperCase()||"✦")}</span>`}</div>`})()}</div><div class="sectionhead"><h3>Question library</h3><div class="question-library-actions"><button class="btn secondary small" onclick="openInterviewShortlist('${e.id}')">☆ Shortlist <span id="questionShortlistCount">${(e.questionShortlist||[]).length}</span></button><button class="btn secondary small" onclick="openFavoriteQuestions('${e.id}')">★ Saved questions</button></div></div>${(guest?.projects||[]).filter(p=>p.title&&p.title.trim()).length?`<div class="project-strip-label">Guest projects</div><div class="project-strip">${guest.projects.filter(p=>p.title&&p.title.trim()).map(p=>`<span class="project-chip"><strong>${esc(p.title)}</strong> · ${esc(p.type||"Other")}${p.characterName?` · ${esc(p.characterName)}`:""}</span>`).join("")}</div><div class="filmography-generator-launch"><button class="btn secondary small" type="button" onclick="toggleFilmographyLab('${e.id}','${guest.id}')">✨ Generate questions from filmography</button><span class="smalltext">Uses the guest's saved projects and character details.</span></div><div id="filmographyLab"></div>`:""}${e.questions.map(q=>`<div class="interview-question-row"><label class="qrow"><input type="checkbox" ${q.asked?'checked':''} onchange="toggleAsked('${e.id}','${q.id}',this.checked)"><span class="qtext ${q.asked?'done':''}">${esc(q.text)}</span></label><button class="favorite-question-btn ${q.favorite?'active':''}" title="Save question to favorites" onclick="toggleFavoriteQuestion('${e.id}','${q.id}')">${q.favorite?"★":"☆"}</button></div>`).join("")||'<div class="empty">No questions yet. Add them in the episode editor.</div>'}</section>`}${thumbnailArchive()}`
 }
 function thumbnailArchive(){
  let items=db.episodes.filter(e=>e.thumbnailUrl&&/^https?:\/\//i.test(e.thumbnailUrl));
@@ -1345,36 +1602,61 @@ const DEFAULT_SETUP_TASKS=[
 ];
 function ensureDayChecklistData(c){
  if(!c)return;
- if(!Array.isArray(c.preConTasks))c.preConTasks=DEFAULT_PRECON_TASKS.map(text=>({text,done:false}));
- if(!Array.isArray(c.setupTasks))c.setupTasks=DEFAULT_SETUP_TASKS.map(text=>({text,done:false}));
- if(!Array.isArray(c.setupConfig))c.setupConfig={tripodHeight:"115–125 cm",tripodTilt:"0°–5°"};
+ if(!Array.isArray(c.preConTasks))c.preConTasks=(db.taskTemplates?.preCon||DEFAULT_PRECON_TASKS).map(text=>({text,done:false}));
+ if(!Array.isArray(c.setupTasks))c.setupTasks=(db.taskTemplates?.setup||DEFAULT_SETUP_TASKS).map(text=>({text,done:false}));
+ if(!c.setupConfig||typeof c.setupConfig!=="object"||Array.isArray(c.setupConfig))c.setupConfig={tripodHeight:"115–125 cm",tripodTilt:"0°–5°"};
 }
 function setDayWorkspaceTab(tab){window.dayWorkspaceTab=tab;render()}
+function updateDayTaskUI(list,c){
+ const tasks=list==='preCon'?c.preConTasks:c.setupTasks;
+ const progress=document.querySelector(`[data-task-progress="${list}"]`);
+ if(progress)progress.textContent=formatTaskCount(tasks);
+ const meter=document.querySelector(`[data-task-meter="${list}"] i`);
+ if(meter)meter.style.width=(tasks.length?100*tasks.filter(t=>t.done).length/tasks.length:0)+'%';
+}
 function toggleConventionTask(conventionId,list,index,checked){
  const c=conv(conventionId);if(!c)return;ensureDayChecklistData(c);
- const tasks=list==="preCon"?c.preConTasks:c.setupTasks;
- if(tasks[index])tasks[index].done=!!checked;
- save();
- const count=document.getElementById(list+"TaskProgress");
- if(count)count.textContent=tasks.filter(x=>x.done).length+" / "+tasks.length+" completed";
+ const tasks=list==="preCon"?c.preConTasks:c.setupTasks;if(!tasks[index])return;
+ tasks[index].done=!!checked;save();updateDayTaskUI(list,c);
+ const row=document.querySelector(`[data-task-list="${list}"] [data-task-index="${index}"]`);
+ if(row)row.classList.toggle('is-done',!!checked);
 }
 function deleteConventionTask(conventionId,list,index){
  const c=conv(conventionId);if(!c)return;ensureDayChecklistData(c);
- const tasks=list==="preCon"?c.preConTasks:c.setupTasks;
- if(!Array.isArray(tasks)||!tasks[index])return;
+ const tasks=list==="preCon"?c.preConTasks:c.setupTasks;if(!tasks[index])return;
  tasks.splice(index,1);save();render();
 }
 function addConventionTask(conventionId,list){
  const c=conv(conventionId);if(!c)return;ensureDayChecklistData(c);
- const label=list==="preCon"?"pre-convention task":"setup action";
- const text=prompt("Add a "+label+":");if(!text||!text.trim())return;
- (list==="preCon"?c.preConTasks:c.setupTasks).push({text:text.trim(),done:false});
- save();render();
+ const value=prompt("New "+(list==='preCon'?'pre-convention task':'setup action')+":");if(!value?.trim())return;
+ (list==='preCon'?c.preConTasks:c.setupTasks).push({text:value.trim(),done:false});save();render();
+}
+function editConventionTask(conventionId,list,index){
+ const c=conv(conventionId);if(!c)return;ensureDayChecklistData(c);const tasks=list==='preCon'?c.preConTasks:c.setupTasks;
+ if(!tasks[index])return;const updated=prompt('Edit task:',tasks[index].text);
+ if(updated===null||!updated.trim())return;tasks[index].text=updated.trim();save();render();
+}
+function moveConventionTask(conventionId,list,index,step){
+ const c=conv(conventionId);if(!c)return;ensureDayChecklistData(c);const tasks=list==='preCon'?c.preConTasks:c.setupTasks;
+ const next=index+step;if(!tasks[index]||next<0||next>=tasks.length)return;
+ [tasks[index],tasks[next]]=[tasks[next],tasks[index]];save();render();
+}
+function saveConventionTaskTemplate(conventionId,list){
+ const c=conv(conventionId);if(!c)return;ensureDayChecklistData(c);
+ if(!confirm('Use these '+(list==='preCon'?'pre-convention':'setup')+' tasks as the default for NEW conventions? Existing convention tasks will not be changed.'))return;
+ db.taskTemplates=db.taskTemplates||{};
+ db.taskTemplates[list]=(list==='preCon'?c.preConTasks:c.setupTasks).map(t=>t.text);save();alert('Template saved for new conventions.');
 }
 function updateConventionSetupConfig(conventionId,key,value){
  const c=conv(conventionId);if(!c)return;ensureDayChecklistData(c);
- c.setupConfig[key]=value;save();
+ if(!['tripodHeight','tripodTilt'].includes(key))return;
+ c.setupConfig[key]=value.trim();save();
 }
+function conventionTaskRows(c,conventionId,list){
+ const tasks=list==='preCon'?c.preConTasks:c.setupTasks;
+ return `<div class="day-checklist task-list-compact" data-task-list="${list}">${tasks.map((item,i)=>`<div class="day-check-row day-task-row ${item.done?'is-done':''}" data-task-index="${i}"><label class="day-task-label"><input type="checkbox" ${item.done?'checked':''} onchange="toggleConventionTask('${conventionId}','${list}',${i},this.checked)"><span>${esc(item.text)}</span></label><div class="task-inline-actions"><button title="Move up" aria-label="Move task up" type="button" onclick="moveConventionTask('${conventionId}','${list}',${i},-1)" ${i===0?'disabled':''}>↑</button><button title="Move down" aria-label="Move task down" type="button" onclick="moveConventionTask('${conventionId}','${list}',${i},1)" ${i===tasks.length-1?'disabled':''}>↓</button><button title="Edit task" aria-label="Edit task" type="button" onclick="editConventionTask('${conventionId}','${list}',${i})">✎</button><button title="Delete task" aria-label="Delete task" type="button" class="remove" onclick="deleteConventionTask('${conventionId}','${list}',${i})">×</button></div></div>`).join('')||'<p class="smalltext">No tasks. Add your first one below.</p>'}</div>`;
+}
+
 function dayPreparationWorkspace(c,selected){
  if(!c)return "";
  ensureDayChecklistData(c);
@@ -1388,18 +1670,18 @@ function dayPreparationWorkspace(c,selected){
    <button type="button" role="tab" aria-selected="${tab==="setup"}" class="${tab==="setup"?"active":""}" onclick="setDayWorkspaceTab('setup')">🎥 Interview Set-up</button>
   </div>
   ${tab==="precon"?`<div class="day-workspace-panel">
-   <div class="sectionhead"><div><h3>Packing checklist</h3><p class="smalltext">Your existing convention packing template.</p></div><span class="tag">${packing.filter(x=>x.done).length}/${packing.length}</span></div>
+   <div class="sectionhead"><div><h3>Packing checklist</h3><p class="smalltext">Your existing convention packing template.</p></div><span class="tag" id="packingTaskProgress">${packing.filter(x=>x.done).length}/${packing.length}</span></div>
    <div class="day-checklist">${packing.map((item,i)=>`<label class="day-check-row"><input type="checkbox" ${item.done?"checked":""} onchange="togglePackingItem('${selected}',${i},this.checked)"><span>${esc(item.text)}</span></label>`).join("")||'<p class="smalltext">No packing items yet. Add items through the checklist template in Convention Hub.</p>'}</div>
-   <div class="sectionhead day-task-heading"><div><h3>Before you leave</h3><p class="smalltext">Tasks to complete before travelling to the convention.</p></div><span class="tag">${preDone}/${c.preConTasks.length}</span></div>
-   <div class="day-checklist">${c.preConTasks.map((item,i)=>`<div class="day-check-row day-task-row ${item.done?"is-done":""}"><label class="day-task-label"><input type="checkbox" ${item.done?"checked":""} onchange="toggleConventionTask('${selected}','preCon',${i},this.checked)"><span>${esc(item.text)}</span></label><button type="button" class="day-task-delete" title="Delete task" aria-label="Delete ${esc(item.text)}" onclick="deleteConventionTask('${selected}','preCon',${i})">×</button></div>`).join("")}</div>
-   <button class="btn secondary small" onclick="addConventionTask('${selected}','preCon')">＋ Add pre-con task</button>
+   <div class="sectionhead day-task-heading"><div><h3>Before you leave</h3><p class="smalltext">Tasks to complete before travelling to the convention.</p></div><span class="tag" data-task-progress="preCon">${preDone}/${c.preConTasks.length}</span></div>
+   ${conventionTaskRows(c,selected,'preCon')}
+   <div class="task-actions"><button class="btn secondary small" onclick="addConventionTask('${selected}','preCon')">＋ Add task</button><button class="btn secondary small" onclick="saveConventionTaskTemplate('${selected}','preCon')">Save as default template</button></div>
   </div>`:`<div class="day-workspace-panel">
-   <div class="sectionhead"><div><h3>Interview set-up checklist</h3><p class="smalltext">Run through this before your first interview and whenever you rebuild the setup.</p></div><span class="tag">${setupDone}/${c.setupTasks.length}</span></div>
-   <div class="day-checklist">${c.setupTasks.map((item,i)=>`<label class="day-check-row ${item.done?"is-done":""}"><input type="checkbox" ${item.done?"checked":""} onchange="toggleConventionTask('${selected}','setup',${i},this.checked)"><span>${esc(item.text)}</span></label>`).join("")}</div>
-   <button class="btn secondary small" onclick="addConventionTask('${selected}','setup')">＋ Add setup action</button>
+   <div class="sectionhead"><div><h3>Interview set-up checklist</h3><p class="smalltext">Run through this before your first interview and whenever you rebuild the setup.</p></div><span class="tag" data-task-progress="setup">${setupDone}/${c.setupTasks.length}</span></div>
+   ${conventionTaskRows(c,selected,'setup')}
+   <div class="task-actions"><button class="btn secondary small" onclick="addConventionTask('${selected}','setup')">＋ Add setup action</button><button class="btn secondary small" onclick="saveConventionTaskTemplate('${selected}','setup')">Save as default template</button></div>
    <div class="setup-reminders"><div class="eyebrow">📐 Camera & tripod reminders</div><div class="setup-reminder-grid">
-    <div class="setup-reminder"><span>Tripod height</span><strong>115–125 cm</strong><small>Starting range for seated interviews</small></div>
-    <div class="setup-reminder"><span>Tripod tilt</span><strong>0°–5°</strong><small>Keep the camera close to level</small></div>
+    <div class="setup-reminder"><span>Tripod height</span><input aria-label="Tripod height" type="text" value="${esc(c.setupConfig.tripodHeight||'115–125 cm')}" onchange="updateConventionSetupConfig('${selected}','tripodHeight',this.value)"><small>Starting range for seated interviews</small></div>
+    <div class="setup-reminder"><span>Tripod tilt</span><input aria-label="Tripod tilt" type="text" value="${esc(c.setupConfig.tripodTilt||'0°–5°')}" onchange="updateConventionSetupConfig('${selected}','tripodTilt',this.value)"><small>Keep the camera close to level</small></div>
    </div><p class="smalltext">Use these as your baseline reminders, then fine-tune framing for chair height, lens and camera angle.</p></div>
   </div>`}
  </section>`;
@@ -1408,18 +1690,41 @@ function togglePackingItem(conventionId,index,checked){
  const c=conv(conventionId);if(!c)return;
  if(!Array.isArray(c.checklist))c.checklist=[];
  c.checklist[index]=!!checked;save();
+ const progress=document.getElementById('packingTaskProgress');if(progress)progress.textContent=c.checklist.filter(Boolean).length+'/'+(db.checklistTemplate||[]).length;
 }
 
+function dayScheduleData(conventionId,dayName){
+ const c=conv(conventionId);
+ const interviews=db.episodes.filter(e=>e.conventionId===conventionId&&e.time&&e.status!==10&&e.interviewDay===dayName).map(e=>({kind:"Interview",time:e.time,endTime:addMinutesToTime(e.time,interviewDurationMinutes(e.duration)),title:e.guest||"Guest interview",detail:"",room:e.room||"",guests:[e.guest].filter(Boolean),id:e.id}));
+ const panels=(c?.panels||[]).filter(p=>p.day===dayName&&p.time).map(p=>({kind:"Panel",time:p.time,endTime:addMinutesToTime(p.time,30),title:p.title||"Panel",detail:"",room:p.room||"",guests:(p.guestIds||[]).map(id=>db.guests.find(g=>g.id===id)?.name).filter(Boolean),id:p.id}));
+ const extras=(c?.events||[]).filter(x=>x.date===plannerDate(c,dayName)).map(x=>({kind:x.kind||"Activity",time:x.time||"",endTime:addMinutesToTime(x.time||"00:00",Number(x.duration)||30),title:x.title,detail:x.notes||"",room:x.room||"",guests:[],id:x.id}));
+ const schedule=[...interviews,...panels,...extras].sort((a,b)=>a.time.localeCompare(b.time)||a.kind.localeCompare(b.kind));
+ return schedule;
+}
+function conventionDayContacts(c){
+ const organizer=db.organizers.find(o=>o.id===c?.organizerId),contacts=organizer?.contacts||[];
+ if(!contacts.length)return '';
+ return `<details class="day-contact-section"><summary>☎ ${esc(organizer.name)} · ${contacts.length} contact${contacts.length===1?'':'s'}</summary><div class="day-contact-grid">${contacts.map(p=>{const tel=validPhone(p.phone),url=safeContactWebsite(p.website);return `<div class="day-contact-card"><b>${esc(p.name||'Contact')}</b><small>${esc(p.role||'')}</small><div class="day-contact-actions">${tel?`<a class="btn secondary small" href="tel:${esc(tel)}">☎ Call</a>`:''}${url?`<a class="btn secondary small" href="${esc(url)}" rel="noopener" target="_blank">↗ Website</a>`:''}</div></div>`}).join('')}</div></details>`;
+}
+function localISODate(d){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
+function openDayFocusMode(cid,dayName){
+ const c=conv(cid),items=dayScheduleData(cid,dayName);if(!c)return;
+ const today=new Date(),targetDate=plannerDate(c,dayName),dayIsToday=targetDate===localISODate(today),minutes=today.getHours()*60+today.getMinutes();
+ const getMin=(value)=>{if(!value)return 0;const [h,m]=value.split(':').map(Number);return h*60+m};
+ let current=null,next=null;
+ if(dayIsToday){current=items.find(x=>getMin(x.time)<=minutes&&getMin(x.endTime||x.time)>minutes)||null;next=items.find(x=>getMin(x.time)>minutes)||null}
+ else next=items[0]||null;
+ const card=(item,label)=>`<div class="focus-event"><span class="eyebrow">${label}</span><strong>${esc(item.title)}</strong><div>${esc(item.time)}${item.endTime?' – '+esc(item.endTime):''} · ${esc(item.kind)}</div>${item.room?`<div class="smalltext">📍 ${esc(item.room)}</div>`:''}<div class="smalltext">${esc((item.guests||[]).join(', '))}</div>${dayIsToday?`<div class="focus-remaining">${label==='HAPPENING NOW'?Math.max(0,getMin(item.endTime||item.time)-minutes)+' minutes remaining':Math.max(0,getMin(item.time)-minutes)+' minutes until start'}</div>`:''}${item.kind==='Interview'?`<button class="btn blue small" onclick="closeModal();openScheduledInterview('${item.id}')">Open questions →</button>`:''}</div>`;
+ showModal('◎ Convention focus mode',`<div class="focus-header"><h2>${esc(c.name)}</h2><span class="tag">${esc(dayName)} · ${fmt(targetDate)}</span></div>${current?card(current,'HAPPENING NOW'):''}${next?card(next,dayIsToday?'UP NEXT':'FIRST EVENT'):''}${!current&&!next?'<div class="empty">No upcoming events for this day.</div>':''}<details class="focus-other-events"><summary>Full day schedule · ${items.length} events</summary>${items.map(x=>`<div class="focus-event-line"><b>${esc(x.time)}</b><span>${esc(x.title)}</span></div>`).join('')}</details>`);
+ document.getElementById('modalback').classList.add('focus-mode');
+}
 function day(){
  const conventions=db.conventions;
  const selected=window.dayConvention||conventions[0]?.id||"";
  const c=conv(selected);
  const days=["Saturday","Sunday"];
  const activeDay=window.dayMode||"Saturday";
- const interviews=db.episodes.filter(e=>e.conventionId===selected&&e.time&&e.status!==10&&e.interviewDay===activeDay).map(e=>({kind:"Interview",time:e.time,endTime:addMinutesToTime(e.time,interviewDurationMinutes(e.duration)),title:e.guest||"Guest interview",detail:"",guests:[e.guest].filter(Boolean),id:e.id}));
- const panels=(c?.panels||[]).filter(p=>p.day===activeDay&&p.time).map(p=>({kind:"Panel",time:p.time,endTime:addMinutesToTime(p.time,30),title:p.title||"Panel",detail:"",guests:(p.guestIds||[]).map(id=>db.guests.find(g=>g.id===id)?.name).filter(Boolean),id:p.id}));
- const extras=(c?.events||[]).filter(x=>x.date===plannerDate(c,activeDay)).map(x=>({kind:x.kind||"Activity",time:x.time||"",endTime:addMinutesToTime(x.time||"00:00",Number(x.duration)||30),title:x.title,detail:x.notes||"",guests:[],id:x.id}));
- const schedule=[...interviews,...panels,...extras].sort((a,b)=>a.time.localeCompare(b.time)||a.kind.localeCompare(b.kind));
+ const schedule=dayScheduleData(selected,activeDay);
  const dayButtons=days.map(d=>`<button type="button" class="day-toggle ${activeDay===d?'active':''}" aria-pressed="${activeDay===d?'true':'false'}" onclick="window.dayMode='${d}';render()"><span class="day-toggle-name">${d}</span><span class="day-toggle-state">${activeDay===d?'SELECTED':'VIEW DAY'}</span></button>`).join("");
  return `<section class="hero"><div><div class="eyebrow">Your convention companion</div><h1>Convention Day Mode 🎬</h1><p class="sub">One timeline for stage panels and interview-room appointments.</p></div></section>
  <section class="card"><div class="field"><label>Convention</label><button type="button" class="episode-picker-trigger" onclick="openDayConventionPicker()">${esc(c?.name||"Choose a convention")}<span aria-hidden="true">⌄</span></button></div>
@@ -1429,14 +1734,15 @@ function day(){
   <div class="convention-poster-guests">${(c?.guestIds||[]).map(id=>db.guests.find(g=>g.id===id)).filter(Boolean).map(g=>{const photo=g.photo&&safeGuestUrl(g.photo);const initials=String(g.name||"?").trim().split(/\\s+/).slice(0,2).map(x=>x[0]||"").join("").toUpperCase();return `<div class="convention-poster-guest"><div class="convention-poster-avatar">${photo?`<img loading="lazy" decoding="async" fetchpriority="low" src="${esc(photo)}" alt="${esc(g.name)}" style="object-position:${Number(g.photoX??50)}% ${Number(g.photoY??50)}%;transform:scale(${Number(g.photoZoom??1)});transform-origin:${Number(g.photoX??50)}% ${Number(g.photoY??50)}%">`:`<span>${esc(initials||"✦")}</span>`}</div><b>${esc(g.name)}</b></div>`}).join("")||'<div class="empty">No guests linked to this convention yet. Add guests in Convention Hub.</div>'}</div>
  </section>
  ${(()=>{const venue=(db.venues||[]).find(v=>v.id===c?.venueId);const hasHotel=[c?.hotelName,c?.hotelAddress,c?.hotelRoom].some(x=>String(x||"").trim());return venue||hasHotel?`<section class="day-venue-card day-location-card">${venue?`<div class="day-location-section"><div class="eyebrow">📍 Convention venue</div><div class="day-venue-top"><div><h3>${esc(venue.name)}</h3>${venue.address?`<p class="smalltext">${esc(venue.address)}</p>`:""}</div><div class="day-venue-actions">${venue.address?`<a class="btn secondary tiny-directions" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(venue.address)}">Directions ↗</a>`:""}<button class="btn secondary small" onclick="go('venues')">Rooms & floor plans →</button></div></div>${(venue.rooms||[]).length?`<div class="day-venue-room-list">${venue.rooms.map(r=>`<span class="day-venue-room"><b>${esc(r.name)}</b>${r.notes?` · ${esc(r.notes)}`:""}</span>`).join("")}</div>`:""}</div>`:""}${venue&&hasHotel?`<div class="day-location-divider"></div>`:""}${hasHotel?`<div class="day-location-section"><div class="eyebrow">🏨 Hotel accommodation</div>${c.hotelName?`<h3>${esc(c.hotelName)}</h3>`:""}${c.hotelAddress?`<p class="smalltext">${esc(c.hotelAddress)}</p><a class="btn secondary tiny-directions hotel-directions" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(c.hotelAddress)}">Hotel directions ↗</a>`:""}${c.hotelRoom?`<div class="hotel-room-display"><span>ROOM</span><strong>${esc(c.hotelRoom)}</strong></div>`:""}</div>`:""}</section>`:""})()}
- <div class="sectionhead"><h2>${activeDay} schedule</h2><div class="row" style="flex:0 1 auto"><button class="btn secondary small" onclick="addPlannerActivity('${selected}')">＋ Add activity</button><span class="tag">${schedule.length} events</span></div></div>
+ ${conventionDayContacts(c)}
+ <div class="sectionhead"><h2>${activeDay} schedule</h2><div class="row" style="flex:0 1 auto"><button class="btn secondary small" onclick="openDayFocusMode('${selected}','${activeDay}')">◎ Focus mode</button><button class="btn secondary small" onclick="addPlannerActivity('${selected}')">＋ Add activity</button><span class="tag">${schedule.length} events</span></div></div>
  ${!selected?'<div class="empty">Add a convention in Convention Hub, then select it here.</div>':schedule.length?schedule.map(item=>`<div class="schedule-item"><div class="schedule-time">${esc(item.time)}${item.endTime?` – ${esc(item.endTime)}`:""}</div><div><div class="schedule-kind">${item.kind}</div><b>${esc(item.title)}</b><div class="schedule-guests">${item.kind==="Panel"?"Guests: ":""}${esc(item.guests.join(", ")||"Guests to be confirmed")}${item.detail?` · ${esc(item.detail)}`:""}</div></div>${item.kind==="Interview"?`<button class="btn secondary small schedule-action" onclick="openScheduledInterview('${item.id}')">Open questions →</button>`:""}</div>`).join(""):'<div class="empty">Nothing scheduled for this day yet. Add panels or set interview times and days.</div>'}
  </section>
  ${dayPreparationWorkspace(c,selected)}
  <section class="card room-overview-card"><div class="sectionhead"><h2>🚪 Room assignments</h2><span class="tag">${(c?.panels||[]).filter(p=>p.room).length+db.episodes.filter(e=>e.conventionId===selected&&e.room).length} assigned</span></div>${(()=>{let rows=[...(c?.panels||[]).filter(p=>p.room).map(p=>({room:p.room,day:p.day,time:p.time,title:p.title,kind:"Panel"})),...db.episodes.filter(e=>e.conventionId===selected&&e.room).map(e=>({room:e.room,day:e.interviewDay,time:e.time,title:e.guest,kind:"Interview"}))];let groups=[...new Set(rows.map(x=>x.room))];return groups.length?groups.map(room=>`<div class="room-group"><b>${esc(room)}</b>${rows.filter(x=>x.room===room).sort((a,b)=>(a.time||"").localeCompare(b.time||"")).map(x=>`<div class="room-assignment"><span>${esc(x.day||"Day TBC")} · ${esc(x.time||"Time TBC")}</span><strong>${esc(x.title)}</strong><small>${x.kind}</small></div>`).join("")}</div>`).join(""):'<div class="empty">Add a room or location to a panel or interview to see assignments here.</div>'})()}</section>${conventionFlights(c)}<section class="card" style="margin-top:16px"><div class="sectionhead"><h2>Convention calendar</h2><span class="tag">Weekend-by-weekend</span></div>${plannerCalendar(c)}</section><div class="grid" style="margin-top:16px"><section class="card wide"><h2>Convention recap</h2><div class="row"><div><span class="smalltext">Published / completed</span><h2>${db.episodes.filter(e=>e.conventionId===selected&&e.status===8).length}</h2></div><div><span class="smalltext">Cancelled</span><h2>${db.episodes.filter(e=>e.conventionId===selected&&e.status===10).length}</h2></div><div><span class="smalltext">Still in progress</span><h2>${db.episodes.filter(e=>e.conventionId===selected&&![8,10].includes(e.status)).length}</h2></div></div></section><section class="card side"><h2>Quick notes</h2><p class="smalltext">Use an episode’s notes field for guest-specific moments and follow-ups. Notes are saved with the episode.</p></section></div>`
 }
 function kpis(){
- const active=db.episodes.filter(e=>e.status!==10),completed=active.filter(e=>e.status===8);
+ const active=db.episodes.filter(e=>e.status!==10&&(e.status===8||isInterviewPlanned(e))),completed=active.filter(e=>e.status===8);
  const projectCounts={},typeCounts={};
  active.forEach(e=>{let g=db.guests.find(x=>x.id===e.guestId)||db.guests.find(x=>normalizeGuestName(x.name)===normalizeGuestName(e.guest));(g?.projects||[]).filter(p=>p.title&&p.title.trim()).forEach(p=>{projectCounts[p.title.trim()]=(projectCounts[p.title.trim()]||0)+1;let t=p.type||"Other";typeCounts[t]=(typeCounts[t]||0)+1})});
  const ranked=Object.entries(projectCounts).sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0])).slice(0,10);
@@ -1464,21 +1770,22 @@ function kpis(){
  const typeEntries=Object.entries(typeCounts).sort((a,b)=>b[1]-a[1]),typeTotal=typeEntries.reduce((n,x)=>n+x[1],0);
  let angle=0,stops=typeEntries.map(([t,n],i)=>{let from=angle;angle+=typeTotal?n/typeTotal*360:0;return `var(--chart-${i%6}) ${from}deg ${angle}deg`}).join(",");
  return `<section class="hero"><div><div class="eyebrow">Your channel at a glance</div><h1>Performance & KPIs</h1><p class="sub">Explore your interview output, guest projects and convention performance.</p></div></section>
- <div class="grid kpi-grid"><div class="card stat"><span>Total interviews</span><strong>${active.length}</strong><span>Excludes cancelled interviews</span></div><div class="card stat"><span>Published interviews</span><strong>${completed.length}</strong><span>Ready for the audience</span></div><div class="card stat"><span>Conventions covered</span><strong>${new Set(active.map(e=>e.conventionId).filter(Boolean)).size}</strong><span>With at least one interview</span></div><div class="card stat"><span>Cancelled interviews</span><strong>${cancelledTotal}</strong><span>Kept in your history</span></div></div>
+ <div class="kpi-tabs" role="tablist" aria-label="KPI sections"><button class="active" role="tab" aria-selected="true" data-target="interviews" onclick="switchKpiTab('interviews')">🎤 Interview performance</button><button role="tab" aria-selected="false" data-target="finances" onclick="switchKpiTab('finances')">💶 Annual finances</button></div><div class="kpi-panel" data-kpi-panel="interviews"><div class="grid kpi-grid"><div class="card stat"><span>Total interviews</span><strong>${active.length}</strong><span>Excludes invited-only and cancelled</span></div><div class="card stat"><span>Published interviews</span><strong>${completed.length}</strong><span>Ready for the audience</span></div><div class="card stat"><span>Conventions covered</span><strong>${new Set(active.map(e=>e.conventionId).filter(Boolean)).size}</strong><span>With at least one planned interview</span></div><div class="card stat"><span>Cancelled interviews</span><strong>${cancelledTotal}</strong><span>Kept in your history</span></div></div></div><div class="kpi-panel" data-kpi-panel="finances" hidden>
  <section class="card kpi-visual-card yearly-budget-kpi"><div class="sectionhead"><div><h2>💶 Annual convention finances</h2><p class="smalltext">All expenses are grouped by the year each convention starts, not by the date an individual expense was entered.</p></div></div>
  ${yearRows.length?`<div class="yearly-budget-summary"><div class="yearly-budget-tile"><span>Total convention expenses</span><strong>${money(yearRows.reduce((s,y)=>s+y.spent,0))}</strong></div><div class="yearly-budget-tile"><span>Combined planned budgets</span><strong>${money(yearRows.reduce((s,y)=>s+y.budget,0))}</strong></div><div class="yearly-budget-tile"><span>Conventions tracked</span><strong>${yearRows.reduce((s,y)=>s+y.conventions,0)}</strong></div></div>
  <div class="yearly-budget-chart">${yearRows.map(y=>`<div class="yearly-budget-year"><div class="yearly-budget-year-head"><b>${y.year}</b><strong>${money(y.spent)}</strong></div><div class="kpi-graph-track"><i style="width:${y.spent/maxYearSpend*100}%"></i></div><small>${y.conventions} convention${y.conventions===1?"":"s"} · ${y.expenseCount} expense${y.expenseCount===1?"":"s"} · Budget ${money(y.budget)}${y.budget?` · ${y.spent<=y.budget?money(y.budget-y.spent)+" remaining":money(y.spent-y.budget)+" over budget"}`:""}</small></div>`).join("")}</div>
  <div class="yearly-budget-details">${yearRows.map(y=>`<details class="yearly-budget-detail"><summary><span>${y.year} breakdown</span><b>${money(y.spent)}</b></summary><div class="yearly-budget-conventions">${y.items.sort((a,b)=>b.spent-a.spent).map(c=>`<div><span>${esc(c.name)}<small>${c.expenseCount} expense${c.expenseCount===1?"":"s"}${c.budget?` · Budget ${money(c.budget)}`:""}</small></span><strong>${money(c.spent)}</strong></div>`).join("")}</div></details>`).join("")}</div>
  ${yearlyCategoryRows.length?`<div class="yearly-category-wrap"><h3>Expense categories across all years</h3><div class="kpi-graph-list">${yearlyCategoryRows.map(([name,value])=>`<div class="kpi-graph-row"><div><b>${esc(name)}</b><small>${money(value)}</small></div><div class="kpi-graph-track"><i style="width:${value/Math.max(1,yearlyCategoryRows[0][1])*100}%"></i></div></div>`).join("")}</div></div>`:""}`:'<div class="empty">Add dated conventions and record expenses in the Budget tab to build your annual financial KPIs.</div>'}
- <p class="smalltext yearly-budget-footnote">Conventions are assigned to a year using their start date. Only expenses recorded against those conventions are included. Conventions without a start date are not assigned to a year.</p></section>
- <section class="card kpi-visual-card"><div class="sectionhead"><div><h2>📈 Interview activity</h2><p class="smalltext">Monthly interview volume. Tap a bar to see its count.</p></div></div>
+ <p class="smalltext yearly-budget-footnote">Conventions are assigned to a year using their start date. Only expenses recorded against those conventions are included. Conventions without a start date are not assigned to a year.</p></section></div><div class="kpi-panel" data-kpi-panel="interviews">
+ <section class="card kpi-visual-card"><div class="sectionhead"><div><h2>📈 Publication schedule</h2><p class="smalltext">Episodes grouped by their planned publication month. Tap a bar to see the count.</p></div></div>
  ${monthRows.length?`<div class="kpi-month-chart">${monthRows.map(([m,n])=>`<button class="kpi-month-bar" title="${m}: ${n} interviews" onclick="alert('${m}: ${n} interviews')"><span>${n}</span><i style="height:${Math.max(8,n/maxMonth*100)}%"></i><small>${m.slice(5)}</small></button>`).join("")}</div><div class="smalltext">Months shown: ${monthRows[0][0]} to ${monthRows[monthRows.length-1][0]}</div>`:'<div class="empty">Add interview dates to build your activity chart.</div>'}</section>
  <div class="split kpi-sections">
  <section class="card kpi-visual-card"><h2>🎬 Top shows & movies</h2><p class="smalltext">Top 10 projects by associated interviews.</p>${ranked.length?`<div class="kpi-graph-list">${ranked.map(([name,n],i)=>`<div class="kpi-graph-row"><div><b>${esc(name)}</b><small>${n} interview${n===1?"":"s"}</small></div><div class="kpi-graph-track"><i style="width:${n/maxProject*100}%;--bar-index:${i%6}"></i></div></div>`).join("")}</div>`:'<div class="empty">Add project credits to guest profiles.</div>'}</section>
  <section class="card kpi-visual-card"><h2>🧩 Project mix</h2><p class="smalltext">Distribution by project type.</p>${typeTotal?`<div class="kpi-donut-wrap"><div class="kpi-donut" style="background:conic-gradient(${stops})"><div><b>${typeTotal}</b><small>credits</small></div></div><div class="kpi-legend">${typeEntries.map(([t,n],i)=>`<div><i style="--legend-index:${i%6}"></i><span>${esc(t)}</span><b>${Math.round(n/typeTotal*100)}%</b></div>`).join("")}</div></div>`:'<div class="empty">Project type statistics will appear here.</div>'}</section></div>
  <section class="card kpi-visual-card"><h2>🏛️ Convention comparison</h2><p class="smalltext">Compare interview volume and published interviews.</p>${conventionCounts.length?`<div class="kpi-graph-list">${conventionCounts.map(c=>`<div class="kpi-graph-row convention-graph-row"><div><b>${esc(c.name)}</b><small>${c.done} published · ${c.total-c.done} not yet published</small></div><div class="kpi-stacked-track"><i style="width:${c.total/maxConvention*100}%"><span style="width:${c.total?c.done/c.total*100:0}%"></span></i></div><strong>${c.total}</strong></div>`).join("")}</div>`:'<div class="empty">Add conventions to compare them.</div>'}</section>
- <div class="grid" style="margin-top:16px"><section class="card stat"><span>Publication rate</span><strong>${publishedRate}%</strong><div class="kpi-progress"><i style="width:${publishedRate}%"></i></div><span>Published / non-cancelled interviews</span></section><section class="card stat"><span>Cancellation rate</span><strong>${cancellationRate}%</strong><div class="kpi-progress cancel"><i style="width:${cancellationRate}%"></i></div><span>Cancelled / all interviews</span></section><section class="card wide"><h2>🌟 Repeat guest appearances</h2>${guestCounts.length?guestCounts.slice(0,10).map(g=>`<div class="kpi-convention"><b>${esc(g.name)}</b><strong>${g.total}</strong></div>`).join(""):'<div class="empty">Guest profiles and episodes will appear here.</div>'}</section></div>`;
+ <div class="grid" style="margin-top:16px"><section class="card stat"><span>Publication rate</span><strong>${publishedRate}%</strong><div class="kpi-progress"><i style="width:${publishedRate}%"></i></div><span>Published / non-cancelled interviews</span></section><section class="card stat"><span>Cancellation rate</span><strong>${cancellationRate}%</strong><div class="kpi-progress cancel"><i style="width:${cancellationRate}%"></i></div><span>Cancelled / all interviews</span></section><section class="card wide"><h2>🌟 Repeat guest appearances</h2>${guestCounts.length?guestCounts.slice(0,10).map(g=>`<div class="kpi-convention"><b>${esc(g.name)}</b><strong>${g.total}</strong></div>`).join(""):'<div class="empty">Guest profiles and episodes will appear here.</div>'}</section></div></div>`;
 }
+function switchKpiTab(tab){document.querySelectorAll('[data-kpi-panel]').forEach(el=>el.hidden=el.dataset.kpiPanel!==tab);document.querySelectorAll('.kpi-tabs button').forEach(b=>{b.classList.toggle('active',b.dataset.target===tab);b.setAttribute('aria-selected',String(b.dataset.target===tab))});}
 
 function money(n){return new Intl.NumberFormat("en-US",{style:"currency",currency:"EUR"}).format(Number(n)||0)}
 function budgetView(){
@@ -1503,7 +1810,7 @@ function budgetView(){
   <div class="budget-limit-row"><div class="field"><label>Budget limit (€)</label><input type="number" min="0" step=".01" value="${budget||""}" placeholder="e.g. 500" onchange="setBudget('${c.id}',this.value)"></div><div class="budget-remaining-tile"><span>Budget status</span><strong>${budget?(remaining<0?"Over budget":remaining===0?"Exactly on budget":"On track"):"Not set"}</strong></div></div>
  </section>
  <section class="card budget-card" style="margin-top:14px"><div class="sectionhead"><div><h2>Expenses</h2><div class="smalltext">Your costs for this convention</div></div><button class="btn secondary small" onclick="addExpense('${c.id}')">＋ Add</button></div>
- <div class="budget-expenses">${rows.slice().sort((a,b)=>(b.date||"").localeCompare(a.date||"")).map(x=>`<div class="budget-expense"><div class="budget-expense-main"><b>${esc(x.title)}</b><div class="smalltext">${esc(x.category||"Other")} · ${esc(x.date||"")}</div></div><div class="budget-expense-amount">${money(x.amount)}</div><button class="btn danger small" aria-label="Delete expense" onclick="removeExpense('${c.id}','${x.id}')">×</button></div>`).join("")||'<div class="empty">No expenses recorded yet. Add your first one above.</div>'}</div></section>`;
+ <div class="budget-expenses">${rows.slice().sort((a,b)=>(b.date||"").localeCompare(a.date||"")).map(x=>`<div class="budget-expense"><div class="budget-expense-main"><b>${esc(x.title)}</b><div class="smalltext">${esc(x.category||"Other")} · ${esc(x.date||"")}${x.autoEpisodeExpense?" · Automatically calculated":""}</div></div><div class="budget-expense-amount">${money(x.amount)}</div>${x.autoEpisodeExpense?'<span class="tag">Auto</span>':`<button class="btn danger small" aria-label="Delete expense" onclick="removeExpense('${c.id}','${x.id}')">×</button>`}</div>`).join("")||'<div class="empty">No expenses recorded yet. Add your first one above.</div>'}</div></section>`;
 }
 function selectBudgetConvention(id){window.budgetConventionId=id;render()}
 
@@ -1579,7 +1886,26 @@ function normalizeQuestion(s){return String(s||"").toLowerCase().normalize("NFD"
 function questionSimilarity(a,b){let A=new Set(normalizeQuestion(a).split(" ").filter(x=>x.length>2)),B=new Set(normalizeQuestion(b).split(" ").filter(x=>x.length>2));if(!A.size||!B.size)return 0;let n=[...A].filter(x=>B.has(x)).length;return n/(A.size+B.size-n)}
 function detectDuplicateQuestions(){let rows=[...document.querySelectorAll("#editquestions .qrow")].map(r=>r.querySelector('[aria-label="Question"]')?.value.trim()).filter(Boolean),prior=db.episodes.filter(e=>e.id!==editing).flatMap(e=>(e.questions||[]).map(q=>({text:q.text,ep:epTitle(e)}))),hits=[];rows.forEach(q=>prior.forEach(p=>{let s=questionSimilarity(q,p.text);if(normalizeQuestion(q)===normalizeQuestion(p.text)||s>=.55)hits.push({q,p,s})}));showModal("Duplicate question check",hits.length?hits.slice(0,30).map(x=>`<div class="expense-row"><div><b>${esc(x.q)}</b><div class="smalltext">Similar to "${esc(x.p.text)}" · ${esc(x.p.ep)}</div></div><span class="tag">${Math.round(x.s*100)}%</span></div>`).join(""):'<div class="empty">No likely duplicates found.</div>')}
 
-function openScheduledInterview(episodeId){const episode=db.episodes.find(e=>String(e.id)===String(episodeId));if(!episode)return;activeEpisode=episode.id;window.interviewConvention=episode.conventionId||"";view="interview";render()} function go(v){view=v;render()}
+function openScheduledInterview(episodeId){const episode=db.episodes.find(e=>String(e.id)===String(episodeId));if(!episode)return;activeEpisode=episode.id;window.interviewConvention=episode.conventionId||"";view="interview";render()} function openVaultMoreMenu(){
+ showModal("Navigate The Vault",`<div class="vault-more-links">${[["episodes","▣ Episodes"],["guests","👤 Guests"],["kpis","📊 KPIs"],["budget","💶 Budget"],["venues","📍 Venues"]].map(([id,name])=>`<button class="btn secondary" onclick="closeModal();go('${id}')">${name}</button>`).join("")}</div><div class="vault-more-links"><button class="btn secondary" onclick="closeModal();openVaultSearch()">⌕ Search everything</button><button class="btn secondary" onclick="closeModal();openQuickNotes()">📝 Quick notes</button><button class="btn secondary" onclick="closeModal();openVaultSafetyBackups()">Safety backups</button></div>`);
+}
+function openVaultSearch(){
+ showModal("Search The Vault",`<div class="field"><label for="vaultGlobalSearch">Guests, episodes, conventions, projects, questions</label><input type="search" id="vaultGlobalSearch" placeholder="Search everything…" oninput="drawVaultSearchResults(this.value)" autocomplete="off" autofocus></div><div id="vaultSearchResults" class="vault-search-results"></div>`);
+ const input=document.getElementById('vaultGlobalSearch');input?.focus();drawVaultSearchResults('');
+}
+function drawVaultSearchResults(term){
+ const el=document.getElementById('vaultSearchResults');if(!el)return;
+ const q=term.trim().toLowerCase();if(!q){el.innerHTML='<div class="empty">Start typing a guest, show, convention or question.</div>';return}
+ const results=[];const match=(...texts)=>texts.some(t=>String(t||'').toLowerCase().includes(q));
+ for(const g of db.guests){if(match(g.name,...(g.projects||[]).map(p=>p.title)))results.push({kind:'guest',id:g.id,title:g.name,subtitle:'Guest profile'});}
+ for(const c of db.conventions){if(match(c.name,org(c.organizerId)))results.push({kind:'convention',id:c.id,title:c.name,subtitle:'Convention'});}
+ for(const e of db.episodes){if(match(e.guest,epTitle(e)))results.push({kind:'episode',id:e.id,title:e.guest||'Interview',subtitle:epTitle(e)});
+ for(const question of e.questions||[]){if(match(question.text))results.push({kind:'question',id:e.id,title:question.text,subtitle:'Question · '+epTitle(e)});}}
+ el.innerHTML=results.slice(0,60).map(r=>`<button type="button" class="vault-search-result" onclick="openVaultSearchResult('${r.kind}','${esc(r.id)}')"><span><b>${esc(r.title)}</b><small>${esc(r.subtitle)}</small></span><span>↗</span></button>`).join('')||'<div class="empty">No results found.</div>';
+ if(results.length>60)el.insertAdjacentHTML('beforeend',`<p class="smalltext">Showing the first 60 of ${results.length} matches. Try a more specific search.</p>`);
+}
+function openVaultSearchResult(kind,id){closeModal();if(kind==='guest')return editGuest(id);if(kind==='convention')return editConvention(id);if(kind==='episode')return openEpisode(id);if(kind==='question')return openScheduledInterview(id);}
+function go(v){view=v;render()}
 function bind(){let tb=document.getElementById("themeBtn");if(tb)tb.onclick=cycleTheme;document.querySelectorAll("#nav button").forEach(b=>b.onclick=()=>{if(b.dataset.view==="day")window.dayConvention=nextConventionId();go(b.dataset.view)});if(view==="episodes"&&episodesMode==="kanban")setupKanbanDrag()}
 function changeEpisodeStatus(id,status){let e=db.episodes.find(x=>x.id===id);if(!e)return;e.status=Number(status);if(e.status===10)e.date="";save();render()}
 function setupKanbanDrag(){
@@ -1613,7 +1939,7 @@ function setupEpisodeStatusFields(){
  if(status){status.addEventListener("change",syncEpisodeStatusFields);status.addEventListener("input",syncEpisodeStatusFields);syncEpisodeStatusFields()}
  if(guestStatus){guestStatus.addEventListener("change",syncInterviewDetails);guestStatus.addEventListener("input",syncInterviewDetails);syncInterviewDetails()}
 }
-function closeModal(){document.getElementById("modalback").classList.remove("show")}
+function closeModal(){const el=document.getElementById("modalback"),wasInterviewFocus=el.classList.contains('interview-focus-mode');el.classList.remove("show","focus-mode","interview-focus-mode");if(wasInterviewFocus)render()}
 document.getElementById("modbody").addEventListener("submit",e=>{if(e.target.id==="guestform"){e.preventDefault();saveGuestForm(e.target)}});
 document.getElementById("closemodal").onclick=closeModal;document.getElementById("modalback").onclick=e=>{if(e.target.id==="modalback")closeModal()};
 function newEpisode(daymode=false){editing=null;let num=nextNum();showModal("Create episode",episodeForm({number:num,guest:"",conventionId:"",date:nextDate(),status:0,questions:[],longLink:"",shorts:[],notes:"",time:"",duration:""}));}
@@ -1674,7 +2000,19 @@ document.addEventListener("submit",e=>{if(e.target.id!=="epform")return;e.preven
 function timerStore(){db.settings=db.settings||{};db.settings.interviewTimers=db.settings.interviewTimers||{};return db.settings.interviewTimers}
 function timerElapsed(t){return (Number(t?.elapsedMs)||0)+(t?.runningSince?Math.max(0,Date.now()-t.runningSince):0)}
 function formatElapsed(ms){let sec=Math.floor(ms/1000),hh=String(Math.floor(sec/3600)).padStart(2,"0"),mm=String(Math.floor(sec%3600/60)).padStart(2,"0"),ss=String(sec%60).padStart(2,"0");return `${hh}:${mm}:${ss}`}
-function paintInterviewTimer(){let id=activeEpisode,t=timerStore()[id]||{},el=document.getElementById("interviewElapsed"),state=document.getElementById("interviewTimerState");if(el)el.textContent=formatElapsed(timerElapsed(t));if(state)state.textContent=t.runningSince?"Timer running":t.elapsedMs?"Paused":"Ready when you are"}
+function openInterviewFocusMode(episodeId){
+ const e=db.episodes.find(x=>x.id===episodeId);if(!e)return;activeEpisode=e.id;
+ const g=db.guests.find(x=>x.id===e.guestId),photo=g?.photo&&safeGuestUrl(g.photo),questions=e.questions||[];
+ showModal('◎ Focus questions',`<div class="interview-focus-header">${photo?`<img src="${esc(photo)}" alt="${esc(e.guest||'Guest')}">`:`<div class="interview-focus-avatar">${esc(textInitials(e.guest))}</div>`}<div><h2>${esc(e.guest||'Interview')}</h2><div class="smalltext">${esc(conv(e.conventionId)?.name||'')} · <span id="focusQuestionProgress">${questions.filter(q=>q.asked).length}/${questions.length}</span> answered</div></div></div><div class="interview-focus-timer"><strong id="interviewFocusElapsed">${formatElapsed(timerElapsed(timerStore()[e.id]||{}))}</strong><div class="interview-focus-timer-buttons"><button class="btn blue small" onclick="startInterviewTimer('${e.id}')">▶ Start</button><button class="btn secondary small" onclick="pauseInterviewTimer('${e.id}')">Ⅱ Pause</button><button class="btn secondary small" onclick="resetInterviewTimer('${e.id}')">↺ Reset</button></div></div><div class="interview-focus-questions">${questions.map((q,i)=>`<label class="interview-focus-question ${q.asked?'is-done':''}" data-focus-question="${i}"><input type="checkbox" ${q.asked?'checked':''} onchange="toggleFocusQuestion('${e.id}',${i},this.checked)"><span>${esc(q.text)}</span></label>`).join('')||'<div class="empty">No questions saved in this interview.</div>'}</div><button class="btn secondary" onclick="closeModal()">Close focus mode</button>`);
+ document.getElementById('modalback').classList.add('interview-focus-mode');paintInterviewTimer();
+}
+function toggleFocusQuestion(episodeId,index,checked){
+ const e=db.episodes.find(x=>x.id===episodeId);if(!e?.questions?.[index])return;
+ e.questions[index].asked=!!checked;save();
+ const count=document.getElementById('focusQuestionProgress');if(count)count.textContent=e.questions.filter(q=>q.asked).length+'/'+e.questions.length;
+ const row=document.querySelector(`[data-focus-question="${index}"]`);if(row)row.classList.toggle('is-done',!!checked);
+}
+function paintInterviewTimer(){let id=activeEpisode,t=timerStore()[id]||{},el=document.getElementById("interviewElapsed"),state=document.getElementById("interviewTimerState");if(el)el.textContent=formatElapsed(timerElapsed(t));const focus=document.getElementById('interviewFocusElapsed');if(focus)focus.textContent=formatElapsed(timerElapsed(t));if(state)state.textContent=t.runningSince?"Timer running":t.elapsedMs?"Paused":"Ready when you are"}
 function startInterviewTimer(id){let all=timerStore(),t=all[id]||{elapsedMs:0};if(!t.runningSince)t.runningSince=Date.now();all[id]=t;save();paintInterviewTimer();if(window.__vaultTimerInterval)clearInterval(window.__vaultTimerInterval);window.__vaultTimerInterval=setInterval(paintInterviewTimer,1000)}
 function pauseInterviewTimer(id){let all=timerStore(),t=all[id]||{elapsedMs:0};if(t.runningSince){t.elapsedMs=timerElapsed(t);delete t.runningSince}all[id]=t;save();paintInterviewTimer();if(window.__vaultTimerInterval){clearInterval(window.__vaultTimerInterval);window.__vaultTimerInterval=null}}
 function resetInterviewTimer(id){if(!confirm("Reset this interview timer to 00:00:00?"))return;timerStore()[id]={elapsedMs:0};save();paintInterviewTimer();if(window.__vaultTimerInterval){clearInterval(window.__vaultTimerInterval);window.__vaultTimerInterval=null}}
@@ -1743,7 +2081,7 @@ function inspireModal(current,pool){let batch=pool.slice(inspireOffset,inspireOf
 function exportBackup(){let blob=new Blob([JSON.stringify(db,null,2)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="the-vault-backup.json";a.click();URL.revokeObjectURL(a.href)}
 document.getElementById("exportBtn").onclick=exportBackup;
 document.getElementById("importBtn").onclick=()=>document.getElementById("importFile").click();
-document.getElementById("importFile").onchange=async e=>{const file=e.target.files?.[0];if(!file)return;try{const incoming=JSON.parse(await file.text());if(!incoming||!Array.isArray(incoming.organizers)||!Array.isArray(incoming.conventions)||!Array.isArray(incoming.episodes))throw new Error("This file does not look like a Vault backup.");if(!confirm("Import this backup and replace the data saved on this device? Export a backup first if you want to keep the current data."))return;db=incoming;if(!Array.isArray(db.checklistTemplate))db.checklistTemplate=DEFAULT_CHECKLIST.slice();save();render();alert("Backup imported.");}catch(err){alert("Could not import backup: "+err.message)}finally{e.target.value=""}};
+document.getElementById("importFile").onchange=async e=>{const file=e.target.files?.[0];if(!file)return;try{const incoming=JSON.parse(await file.text());if(!incoming||!Array.isArray(incoming.organizers)||!Array.isArray(incoming.conventions)||!Array.isArray(incoming.episodes))throw new Error("This file does not look like a Vault backup.");if(!confirm("Import this backup and replace the data saved on this device? Export a backup first if you want to keep the current data."))return;preserveVaultSafetyBackup("Before JSON import");db=incoming;if(!Array.isArray(db.checklistTemplate))db.checklistTemplate=DEFAULT_CHECKLIST.slice();save();render();alert("Backup imported.");}catch(err){alert("Could not import backup: "+err.message)}finally{e.target.value=""}};
 document.getElementById("cloudBtn").onclick=openAccountSync;
 render();
 initializeCloud();
