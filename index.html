@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>The Vault V3.0.8</title>
+<title>The Vault V3.0.2</title>
 <style>
 :root{--ink:#182033;--muted:#778096;--line:#e7eaf2;--paper:#f6f7fb;--card:#fff;--blue:#4169e1;--pink:#ed5a9b;--softblue:#edf1ff;--softpink:#fff0f6;--green:#16866b;--shadow:0 12px 34px #1c2b5010}
 *{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.45 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}button,input,select,textarea{font:inherit}button{cursor:pointer;border:0}button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:3px solid #8ba2ff;outline-offset:2px}
@@ -826,381 +826,29 @@ body[data-theme="dark"] .project-chip,body[data-theme="dark"] .status,body[data-
 @media(max-width:560px){.filmography-idea{align-items:flex-start}.filmography-idea .btn{padding:6px 8px;font-size:11px}.organizer-contact-row{grid-template-columns:1fr 1fr}}
 
 
-/* V3.0.2: keep organizer actions on the same row as the organizer name */
-.organizer-entry {
-  align-items: flex-start;
-  gap: 12px;
-}
-.organizer-entry > .epbody {
-  flex: 1 1 auto;
-  min-width: 0;
-}
-.organizer-entry > .epactions {
-  flex: 0 0 auto;
-  display: flex;
-  flex-direction: row !important;
-  flex-wrap: nowrap;
-  align-items: center !important;
-  justify-content: flex-end;
-  gap: 7px;
-  margin-left: auto;
-}
-.organizer-entry > .epactions .btn {
-  flex: 0 0 auto;
-  white-space: nowrap;
-}
-@media (max-width: 520px) {
-  .organizer-entry {
-    gap: 8px;
-    padding: 11px;
-  }
-  .organizer-entry > .epactions {
-    gap: 5px;
-  }
-  .organizer-entry > .epactions .btn {
-    padding: 6px 8px;
-    font-size: 11px;
-  }
-}
-
-
-/* V3.0.3: keep convention actions beside each convention name */
-.convention-entry {
-  align-items: flex-start;
-  gap: 12px;
-}
-.convention-entry > .epbody {
-  flex: 1 1 auto;
-  min-width: 0;
-}
-.convention-entry > .epactions {
-  flex: 0 0 auto;
-  display: flex;
-  flex-direction: row !important;
-  flex-wrap: nowrap;
-  align-items: center !important;
-  justify-content: flex-end;
-  gap: 6px;
-  margin-left: auto;
-}
-.convention-entry > .epactions .btn {
-  flex: 0 0 auto;
-  white-space: nowrap;
-}
-@media (max-width: 620px) {
-  .convention-entry {
-    gap: 7px;
-    padding: 10px;
-  }
-  .convention-entry > .epactions {
-    gap: 4px;
-  }
-  .convention-entry > .epactions .btn {
-    padding: 5px 6px;
-    font-size: 10px;
-  }
-}
-
-
-
-/* V3.0.4: final layout overrides for organizer and convention cards */
-.organizer-entry,
-.convention-entry {
-  display: flex !important;
-  flex-direction: row !important;
-  align-items: center !important;
-  gap: 10px;
-}
-.organizer-entry > .epbody,
-.convention-entry > .epbody {
-  order: 0 !important;
-  flex: 1 1 auto;
-  min-width: 0;
-}
-.organizer-entry > .epactions,
-.convention-entry > .epactions {
-  order: 1 !important;
-  display: flex !important;
-  flex-direction: row !important;
-  flex-wrap: nowrap !important;
-  align-items: center !important;
-  justify-content: flex-end;
-  gap: 6px;
-  margin-left: auto;
-  flex: 0 0 auto;
-}
-.organizer-entry > .epactions .btn,
-.convention-entry > .epactions .btn {
-  flex: 0 0 auto;
-  white-space: nowrap;
-}
-@media (max-width: 620px) {
-  .organizer-entry,
-  .convention-entry {
-    gap: 6px;
-    padding: 9px;
-  }
-  .organizer-entry > .epactions,
-  .convention-entry > .epactions {
-    gap: 4px;
-  }
-  .organizer-entry > .epactions .btn,
-  .convention-entry > .epactions .btn {
-    padding: 6px 7px;
-    font-size: 10px;
-  }
-}
-
-
-
-/* V3.0.5: structural header row for organizer and convention actions */
-.organizer-entry,
-.convention-entry {
-  display: block !important;
-  min-width: 0;
-}
-.organizer-entry > .epbody,
-.convention-entry > .epbody {
-  display: block;
-  width: 100%;
-  min-width: 0;
-}
-.entry-title-row {
-  display: flex !important;
-  flex-direction: row !important;
-  flex-wrap: nowrap !important;
-  align-items: center !important;
-  justify-content: space-between !important;
-  gap: 10px;
-  width: 100%;
-  min-width: 0;
-}
-.entry-title-row > b {
-  flex: 1 1 auto;
-  min-width: 0;
-  overflow-wrap: anywhere;
-}
-.entry-title-row > .epactions {
-  display: flex !important;
-  flex-direction: row !important;
-  flex-wrap: nowrap !important;
-  align-items: center !important;
-  justify-content: flex-end !important;
-  gap: 6px;
-  flex: 0 0 auto !important;
-  margin: 0 !important;
-}
-.entry-title-row > .epactions .btn {
-  flex: 0 0 auto !important;
-  white-space: nowrap !important;
-}
-.organizer-entry .epmeta,
-.convention-entry .epmeta {
-  margin-top: 5px;
-}
-@media (max-width: 700px) {
-  .entry-title-row { gap: 6px; }
-  .entry-title-row > .epactions { gap: 4px; }
-  .entry-title-row > .epactions .btn {
-    padding: 6px 7px !important;
-    font-size: 10px !important;
-  }
-}
-
-
-
-/* V3.0.6: responsive action placement, with higher-specificity overrides */
-.split .episode.organizer-entry,
-.split .episode.convention-entry {
-  display: block !important;
-  width: 100%;
-  min-width: 0;
-}
-.split .episode.organizer-entry > .epbody,
-.split .episode.convention-entry > .epbody {
-  display: block !important;
-  width: 100%;
-  min-width: 0;
-}
-.split .episode.organizer-entry .entry-title-row,
-.split .episode.convention-entry .entry-title-row {
-  display: flex !important;
-  flex-direction: row !important;
-  flex-wrap: wrap !important;
-  align-items: center !important;
-  justify-content: space-between !important;
-  gap: 8px;
-  width: 100%;
-}
-.split .episode.organizer-entry .entry-title-row > b,
-.split .episode.convention-entry .entry-title-row > b {
-  flex: 1 1 180px;
-  min-width: 0;
-  overflow-wrap: anywhere;
-}
-.split .episode.organizer-entry .entry-title-row > .epactions,
-.split .episode.convention-entry .entry-title-row > .epactions {
-  display: flex !important;
-  flex-direction: row !important;
-  flex-wrap: wrap !important;
-  align-items: center !important;
-  justify-content: flex-end !important;
-  gap: 6px;
-  margin: 0 !important;
-  min-width: 0;
-  flex: 0 1 auto !important;
-}
-.split .episode.organizer-entry .entry-title-row > .epactions .btn,
-.split .episode.convention-entry .entry-title-row > .epactions .btn {
-  flex: 0 0 auto !important;
-  white-space: nowrap !important;
-  min-width: max-content;
-}
-@media (max-width: 760px) {
-  .split .episode.organizer-entry .entry-title-row {
-    display: grid !important;
-    grid-template-columns: minmax(0, 1fr) auto !important;
-    gap: 8px;
-  }
-  .split .episode.organizer-entry .entry-title-row > b {
-    min-width: 0;
-    font-size: 15px;
-  }
-  .split .episode.organizer-entry .entry-title-row > .epactions {
-    flex-wrap: nowrap !important;
-    gap: 5px;
-  }
-  .split .episode.organizer-entry .entry-title-row > .epactions .btn {
-    padding: 6px 8px !important;
-    font-size: 11px !important;
-  }
-  .split .episode.convention-entry .entry-title-row {
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: stretch !important;
-    gap: 8px;
-  }
-  .split .episode.convention-entry .entry-title-row > b {
-    flex: none;
-    width: 100%;
-    font-size: 15px;
-  }
-  .split .episode.convention-entry .entry-title-row > .epactions {
-    justify-content: flex-start !important;
-    flex-wrap: wrap !important;
-    width: 100%;
-    gap: 6px;
-  }
-  .split .episode.convention-entry .entry-title-row > .epactions .btn {
-    padding: 7px 9px !important;
-    font-size: 12px !important;
-  }
-}
-
-
-
-/* V3.0.7: keep card titles and action buttons on one shared line */
-.split .episode.organizer-entry .entry-title-row,
-.split .episode.convention-entry .entry-title-row {
-  display: flex !important;
-  flex-direction: row !important;
-  flex-wrap: nowrap !important;
-  align-items: center !important;
-  justify-content: space-between !important;
-  gap: 10px !important;
-  width: 100% !important;
-  min-width: 0 !important;
-}
-.split .episode.organizer-entry .entry-title-row > b,
-.split .episode.convention-entry .entry-title-row > b {
-  display: block !important;
-  flex: 1 1 0% !important;
-  min-width: 0 !important;
-  overflow-wrap: anywhere;
-  font-size: 15px !important;
-  line-height: 1.25;
-}
-.split .episode.organizer-entry .entry-title-row > .epactions,
-.split .episode.convention-entry .entry-title-row > .epactions {
-  display: flex !important;
-  flex-direction: row !important;
-  flex-wrap: nowrap !important;
-  align-items: center !important;
-  justify-content: flex-end !important;
-  gap: 5px !important;
-  flex: 0 0 auto !important;
-  width: auto !important;
-  margin: 0 0 0 auto !important;
-}
-.split .episode.organizer-entry .entry-title-row > .epactions .btn,
-.split .episode.convention-entry .entry-title-row > .epactions .btn {
-  display: inline-flex !important;
-  flex: 0 0 auto !important;
-  width: auto !important;
-  min-width: 0 !important;
-  padding: 7px 9px !important;
-  font-size: 11px !important;
-  line-height: 1.2 !important;
-  white-space: nowrap !important;
-}
-.split .episode.organizer-entry .epmeta,
-.split .episode.convention-entry .epmeta {
-  margin-top: 6px !important;
-}
-@media (max-width: 760px) {
-  .split .episode.organizer-entry .entry-title-row,
-  .split .episode.convention-entry .entry-title-row {
-    flex-direction: row !important;
-    flex-wrap: nowrap !important;
-    align-items: center !important;
-  }
-  .split .episode.organizer-entry .entry-title-row > b,
-  .split .episode.convention-entry .entry-title-row > b {
-    font-size: 14px !important;
-  }
-  .split .episode.organizer-entry .entry-title-row > .epactions,
-  .split .episode.convention-entry .entry-title-row > .epactions {
-    flex-wrap: nowrap !important;
-    gap: 4px !important;
-  }
-  .split .episode.organizer-entry .entry-title-row > .epactions .btn,
-  .split .episode.convention-entry .entry-title-row > .epactions .btn {
-    padding: 6px 7px !important;
-    font-size: 10px !important;
-  }
-}
-
-
-
-/* V3.0.8: vertically center card titles against their action buttons */
-.split .episode.organizer-entry .entry-title-row,
-.split .episode.convention-entry .entry-title-row {
-  align-items: center !important;
-  min-height: 42px;
-}
-.split .episode.organizer-entry .entry-title-row > b,
-.split .episode.convention-entry .entry-title-row > b {
-  align-self: center !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  line-height: 1.25 !important;
-  transform: none !important;
-}
-.split .episode.organizer-entry .entry-title-row > .epactions,
-.split .episode.convention-entry .entry-title-row > .epactions {
-  align-self: center !important;
-  margin-top: 0 !important;
-  margin-bottom: 0 !important;
-}
-.split .episode.organizer-entry > .epbody,
-.split .episode.convention-entry > .epbody {
-  align-self: center !important;
-}
+.day-workspace{margin-top:16px}
+.day-workspace-tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:5px;border-radius:14px;background:var(--panel);margin:12px 0 16px}
+.day-workspace-tabs button{border:1px solid transparent;border-radius:10px;padding:12px 10px;background:transparent;color:var(--ink);font:inherit;font-size:13px;font-weight:800;cursor:pointer;min-width:0}
+.day-workspace-tabs button.active{background:var(--card);border-color:var(--line);box-shadow:0 2px 8px rgba(20,30,60,.09);color:var(--blue)}
+.day-workspace-panel{min-width:0}
+.day-task-heading{margin-top:22px;padding-top:16px;border-top:1px solid var(--line)}
+.day-checklist{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin:10px 0 14px}
+.day-check-row{display:flex;align-items:flex-start;gap:9px;padding:10px 11px;border:1px solid var(--line);border-radius:10px;background:var(--card);font-size:13px;line-height:1.35;min-width:0}
+.day-check-row input{flex:0 0 auto;margin-top:2px;accent-color:var(--blue);width:17px;height:17px}
+.day-check-row span{min-width:0;overflow-wrap:anywhere}
+.day-check-row.is-done span{text-decoration:line-through;color:var(--muted)}
+.setup-reminders{margin-top:20px;padding:14px;border:1px solid var(--line);border-radius:13px;background:var(--panel)}
+.setup-reminder-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.setup-reminder{display:flex;flex-direction:column;gap:4px;padding:13px;border-radius:11px;background:var(--card);border:1px solid var(--line)}
+.setup-reminder span{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:800}
+.setup-reminder strong{font-size:24px;line-height:1.15;font-variant-numeric:tabular-nums}
+.setup-reminder small{font-size:11px;color:var(--muted)}
+@media(max-width:650px){.day-checklist{grid-template-columns:1fr}.day-workspace-tabs button{font-size:12px;padding:11px 6px}.setup-reminder strong{font-size:21px}}
 
 </style>
 </head>
 <body><div class="app">
-<header class="top"><div class="brand"><div class="logo">✦</div><div>The Vault <span class="muted" style="font-weight:600;font-size:13px">V3.0.8</span></div></div><div class="topright"><span class="pill" id="syncStatus">Offline-first • not signed in</span><button class="btn secondary small" id="quickNotesBtn" onclick="openQuickNotes()">📝 Quick notes</button><button class="btn secondary small" id="themeBtn" title="Switch theme">☾</button><button class="btn secondary small" id="exportBtn">Export backup</button><button class="btn secondary small" id="importBtn">Import backup</button><button class="btn secondary small" id="cloudBtn">Account & sync</button><input id="importFile" type="file" accept="application/json,.json" hidden></div></header>
+<header class="top"><div class="brand"><div class="logo">✦</div><div>The Vault <span class="muted" style="font-weight:600;font-size:13px">V3.0.2</span></div></div><div class="topright"><span class="pill" id="syncStatus">Offline-first • not signed in</span><button class="btn secondary small" id="quickNotesBtn" onclick="openQuickNotes()">📝 Quick notes</button><button class="btn secondary small" id="themeBtn" title="Switch theme">☾</button><button class="btn secondary small" id="exportBtn">Export backup</button><button class="btn secondary small" id="importBtn">Import backup</button><button class="btn secondary small" id="cloudBtn">Account & sync</button><input id="importFile" type="file" accept="application/json,.json" hidden></div></header>
 <nav class="nav" id="nav">
 <button class="active" data-view="home">⌂ Dashboard</button><button data-view="episodes">▣ Episodes</button><button data-view="guests">👤 Guests</button><button data-view="interview">☷ Interview</button><button data-view="hub">✧ Convention Hub</button><button data-view="day">🎬 Convention Day</button><button data-view="kpis">📊 KPIs</button><button data-view="budget">💶 Budget</button><button data-view="venues">📍 Venues</button>
 </nav>
@@ -1476,7 +1124,7 @@ function home(){
  <div class="card stat"><span>Published</span><strong>${count(8)}</strong><span>Out in the world 🎉</span></div>
  <div class="card stat"><span>Guest profiles</span><strong>${db.guests.length}</strong><span>Reusable guest records</span></div>
  <section class="card wide"><div class="sectionhead"><h2>Needs your attention</h2><span class="tag">${active.length} active</span></div><div class="stack">${attention.map(episodeCard).join("")||'<div class="empty">Nothing urgent in the production queue.</div>'}</div></section>
- <section class="card side"><h2>Upcoming conventions</h2>${upcoming.map(c=>`<div class="episode convention-entry"><div class="epbody"><b>${esc(c.name)}</b><div class="epmeta">${fmt(c.startDate)}</div></div><button class="btn secondary small" onclick="window.dayConvention='${c.id}';go('day')">Open</button></div>`).join("")||'<div class="empty">No future dates recorded.</div>'}</section>
+ <section class="card side"><h2>Upcoming conventions</h2>${upcoming.map(c=>`<div class="episode"><div class="epbody"><b>${esc(c.name)}</b><div class="epmeta">${fmt(c.startDate)}</div></div><button class="btn secondary small" onclick="window.dayConvention='${c.id}';go('day')">Open</button></div>`).join("")||'<div class="empty">No future dates recorded.</div>'}</section>
  <section class="card wide"><div class="sectionhead"><h2>Pick up where you left off</h2><button class="btn secondary small" onclick="go('episodes')">All episodes →</button></div><div class="stack">${db.episodes.slice().sort((a,b)=>(b.number||0)-(a.number||0)).slice(0,5).map(episodeCard).join("")||'<div class="empty">Your first episode is waiting to be added.</div>'}</div></section>
  <section class="card side"><h2>Quick launch</h2><div class="stack"><button class="btn blue" onclick="go('interview')">☷ Interview questions</button><button class="btn secondary" onclick="go('guests')">👤 Guest CRM</button><button class="btn secondary" onclick="go('hub')">✧ Convention Command Centre</button><button class="btn secondary" onclick="go('day')">🎬 Convention Day Mode</button><button class="btn secondary" onclick="go('kpis')">📊 Performance & KPIs</button></div><p class="smalltext" style="margin-top:15px">Your changes save automatically on this device. Export a backup before major updates.</p></section>
  </div>`;
@@ -1497,7 +1145,7 @@ function conventionCountdown(c){
  if(today<=end)return `<span class="countdown-live">● Convention is happening</span>`;
  let n=Math.floor((today-end)/86400000);return `<span class="countdown-past">Ended ${n} day${n===1?"":"s"} ago</span>`;
 }
-function hub(){return `<section class="hero"><div><div class="eyebrow">Your people & places</div><h1>Convention Command Centre</h1><p class="sub">A control room for every event, guest lineup and interview plan.</p></div></section><div class="convention-overview">${db.conventions.map(c=>{let es=db.episodes.filter(e=>e.conventionId===c.id),done=es.filter(e=>e.status===8).length,cancel=es.filter(e=>e.status===10).length;return `<article class="card convention-overview-card" data-convention-card="${esc(c.id)}"><div class="sectionhead"><h3>${esc(c.name)}</h3><span class="tag">${es.length} interviews</span></div><div class="smalltext">${c.startDate&&c.endDate?`${fmt(c.startDate)} – ${fmt(c.endDate)}`:"Dates not set"}</div><div class="convention-countdown">${conventionCountdown(c)}</div><details class="convention-card-list" open><summary><b>Guest lineup</b><span class="tag">${(c.guestIds||[]).length} guests</span></summary><div class="convention-scroll-list guest-scroll-list">${(c.guestIds||[]).map(id=>db.guests.find(g=>g.id===id)).filter(Boolean).map(g=>`<div class="convention-list-item">${g.photo&&safeGuestUrl(g.photo)?`<img loading="lazy" decoding="async" fetchpriority="low" src="${esc(safeGuestUrl(g.photo))}" alt="">`:`<span class="mini-avatar">${esc(String(g.name||"?").split(/\\s+/).slice(0,2).map(x=>x[0]||"").join("").toUpperCase())}</span>`}<span>${esc(g.name)}</span></div>`).join("")||'<div class="smalltext">No guests linked yet.</div>'}</div></details><div class="bar"><i style="width:${es.length?done/es.length*100:0}%"></i></div><div class="smalltext">${done} published · ${cancel} cancelled · ${es.length-done-cancel} active</div><button class="btn secondary small" style="margin-top:10px" onclick="window.dayConvention='${c.id}';go('day')">Open Convention Day →</button></article>`}).join("")}</div><div class="split"><section class="card"><div class="sectionhead"><h2>Organizers</h2><button class="btn blue small" onclick="editOrganizer()">＋ Add</button></div>${db.organizers.map(o=>`<div class="episode organizer-entry"><div class="epbody"><div class="entry-title-row"><b>${esc(o.name)}</b><div class="epactions"><button class="btn secondary small" onclick="editOrganizer('${o.id}')">Edit</button><button class="btn danger small" onclick="delOrganizer('${o.id}')">Delete</button></div></div><div class="epmeta">${(o.contacts||[]).length} saved contact${(o.contacts||[]).length===1?"":"s"}</div>${(o.contacts||[]).length?`<details class="organizer-contact-preview"><summary>View organizer contacts</summary>${o.contacts.map(c=>`<div class="organizer-contact-summary"><b>${esc(c.name||c.role||"Contact")}</b>${c.role?` · ${esc(c.role)}`:""}${c.email?`<div><a href="mailto:${esc(c.email)}">${esc(c.email)}</a></div>`:""}${c.phone?`<div>${esc(c.phone)}</div>`:""}${c.website?`<div><a href="${esc(c.website)}" target="_blank" rel="noopener">Website ↗</a></div>`:""}</div>`).join("")}</details>`:""}</div></div>`).join("")||'<div class="empty">Add an organizer to get started.</div>'}</section><section class="card"><div class="sectionhead"><h2>Conventions</h2><div><button class="btn secondary small" onclick="editChecklistTemplate()">Edit checklist</button> <button class="btn blue small" onclick="editConvention()">＋ Add</button></div></div>${db.conventions.map(c=>`<div class="episode convention-entry"><div class="epbody"><div class="entry-title-row"><b>${esc(c.name)}</b><div class="epactions"><button class="btn secondary small" onclick="managePanels('${c.id}')">Panels</button><button class="btn secondary small" onclick="duplicateConvention('${c.id}')">Copy</button><button class="btn secondary small" onclick="editConvention('${c.id}')">Edit</button><button class="btn danger small" onclick="delConvention('${c.id}')">Delete</button></div></div><div class="epmeta">${esc(org(c.organizerId))}${c.startDate&&c.endDate?` · ${esc(fmt(c.startDate))} – ${esc(fmt(c.endDate))}`:" · Dates not set"}</div></div></div>`).join("")||'<div class="empty">Add a convention to get started.</div>'}</section></div>`}
+function hub(){return `<section class="hero"><div><div class="eyebrow">Your people & places</div><h1>Convention Command Centre</h1><p class="sub">A control room for every event, guest lineup and interview plan.</p></div></section><div class="convention-overview">${db.conventions.map(c=>{let es=db.episodes.filter(e=>e.conventionId===c.id),done=es.filter(e=>e.status===8).length,cancel=es.filter(e=>e.status===10).length;return `<article class="card convention-overview-card" data-convention-card="${esc(c.id)}"><div class="sectionhead"><h3>${esc(c.name)}</h3><span class="tag">${es.length} interviews</span></div><div class="smalltext">${c.startDate&&c.endDate?`${fmt(c.startDate)} – ${fmt(c.endDate)}`:"Dates not set"}</div><div class="convention-countdown">${conventionCountdown(c)}</div><details class="convention-card-list" open><summary><b>Guest lineup</b><span class="tag">${(c.guestIds||[]).length} guests</span></summary><div class="convention-scroll-list guest-scroll-list">${(c.guestIds||[]).map(id=>db.guests.find(g=>g.id===id)).filter(Boolean).map(g=>`<div class="convention-list-item">${g.photo&&safeGuestUrl(g.photo)?`<img loading="lazy" decoding="async" fetchpriority="low" src="${esc(safeGuestUrl(g.photo))}" alt="">`:`<span class="mini-avatar">${esc(String(g.name||"?").split(/\\s+/).slice(0,2).map(x=>x[0]||"").join("").toUpperCase())}</span>`}<span>${esc(g.name)}</span></div>`).join("")||'<div class="smalltext">No guests linked yet.</div>'}</div></details><div class="bar"><i style="width:${es.length?done/es.length*100:0}%"></i></div><div class="smalltext">${done} published · ${cancel} cancelled · ${es.length-done-cancel} active</div><button class="btn secondary small" style="margin-top:10px" onclick="window.dayConvention='${c.id}';go('day')">Open Convention Day →</button></article>`}).join("")}</div><div class="split"><section class="card"><div class="sectionhead"><h2>Organizers</h2><button class="btn blue small" onclick="editOrganizer()">＋ Add</button></div>${db.organizers.map(o=>`<div class="episode organizer-entry"><div class="epbody"><b>${esc(o.name)}</b><div class="epmeta">${(o.contacts||[]).length} saved contact${(o.contacts||[]).length===1?"":"s"}</div>${(o.contacts||[]).length?`<details class="organizer-contact-preview"><summary>View organizer contacts</summary>${o.contacts.map(c=>`<div class="organizer-contact-summary"><b>${esc(c.name||c.role||"Contact")}</b>${c.role?` · ${esc(c.role)}`:""}${c.email?`<div><a href="mailto:${esc(c.email)}">${esc(c.email)}</a></div>`:""}${c.phone?`<div>${esc(c.phone)}</div>`:""}${c.website?`<div><a href="${esc(c.website)}" target="_blank" rel="noopener">Website ↗</a></div>`:""}</div>`).join("")}</details>`:""}</div><div class="epactions"><button class="btn secondary small" onclick="editOrganizer('${o.id}')">Edit</button><button class="btn danger small" onclick="delOrganizer('${o.id}')">Delete</button></div></div>`).join("")||'<div class="empty">Add an organizer to get started.</div>'}</section><section class="card"><div class="sectionhead"><h2>Conventions</h2><div><button class="btn secondary small" onclick="editChecklistTemplate()">Edit checklist</button> <button class="btn blue small" onclick="editConvention()">＋ Add</button></div></div>${db.conventions.map(c=>`<div class="episode"><div class="epbody"><b>${esc(c.name)}</b><div class="epmeta">${esc(org(c.organizerId))}${c.startDate&&c.endDate?` · ${esc(fmt(c.startDate))} – ${esc(fmt(c.endDate))}`:" · Dates not set"}</div></div><div class="epactions"><button class="btn secondary small" onclick="managePanels('${c.id}')">Panels</button><button class="btn secondary small" onclick="duplicateConvention('${c.id}')">Copy</button><button class="btn secondary small" onclick="editConvention('${c.id}')">Edit</button><button class="btn danger small" onclick="delConvention('${c.id}')">Delete</button></div></div>`).join("")||'<div class="empty">Add a convention to get started.</div>'}</section></div>`}
 function openInterviewConventionPicker(){
  const items=db.conventions;
  if(!items.length){showModal("Choose a convention",'<div class="empty">Add a convention in Convention Hub first.</div>');return;}
@@ -1660,6 +1308,88 @@ async function refreshFlightStatus(conventionId,leg){
 }
 
 
+
+const DEFAULT_PRECON_TASKS=[
+ "Confirm press accreditation and interview schedule",
+ "Download tickets, confirmations and convention information",
+ "Confirm hotel booking and travel arrangements",
+ "Prepare guest research and interview questions",
+ "Check weather and plan outfits",
+ "Charge camera batteries, power banks and audio equipment",
+ "Clear and format memory cards after verifying backups",
+ "Pack chargers, cables, adapters and backup storage"
+];
+const DEFAULT_SETUP_TASKS=[
+ "Set up all three cameras and confirm recording media",
+ "Set camera framing: host, guest and two-shot",
+ "Set focus and exposure on every camera",
+ "Match white balance and color settings across cameras",
+ "Set up microphones and check audio levels",
+ "Record a short test clip and check picture and sound",
+ "Check battery/power and remaining card capacity",
+ "Confirm all cameras are recording before starting"
+];
+function ensureDayChecklistData(c){
+ if(!c)return;
+ if(!Array.isArray(c.preConTasks))c.preConTasks=DEFAULT_PRECON_TASKS.map(text=>({text,done:false}));
+ if(!Array.isArray(c.setupTasks))c.setupTasks=DEFAULT_SETUP_TASKS.map(text=>({text,done:false}));
+ if(!Array.isArray(c.setupConfig))c.setupConfig={tripodHeight:"115–125 cm",tripodTilt:"0°–5°"};
+}
+function setDayWorkspaceTab(tab){window.dayWorkspaceTab=tab;render()}
+function toggleConventionTask(conventionId,list,index,checked){
+ const c=conv(conventionId);if(!c)return;ensureDayChecklistData(c);
+ const tasks=list==="preCon"?c.preConTasks:c.setupTasks;
+ if(tasks[index])tasks[index].done=!!checked;
+ save();
+ const count=document.getElementById(list+"TaskProgress");
+ if(count)count.textContent=tasks.filter(x=>x.done).length+" / "+tasks.length+" completed";
+}
+function addConventionTask(conventionId,list){
+ const c=conv(conventionId);if(!c)return;ensureDayChecklistData(c);
+ const label=list==="preCon"?"pre-convention task":"setup action";
+ const text=prompt("Add a "+label+":");if(!text||!text.trim())return;
+ (list==="preCon"?c.preConTasks:c.setupTasks).push({text:text.trim(),done:false});
+ save();render();
+}
+function updateConventionSetupConfig(conventionId,key,value){
+ const c=conv(conventionId);if(!c)return;ensureDayChecklistData(c);
+ c.setupConfig[key]=value;save();
+}
+function dayPreparationWorkspace(c,selected){
+ if(!c)return "";
+ ensureDayChecklistData(c);
+ const tab=window.dayWorkspaceTab||"precon";
+ const preDone=c.preConTasks.filter(x=>x.done).length,setupDone=c.setupTasks.filter(x=>x.done).length;
+ const packing=(db.checklistTemplate||[]).map((item,i)=>({text:item,done:!!c.checklist?.[i]}));
+ return `<section class="day-workspace card">
+  <div class="sectionhead"><div><div class="eyebrow">Convention preparation</div><h2>Get convention-ready</h2><p class="smalltext">Your checklists are saved separately for each convention.</p></div></div>
+  <div class="day-workspace-tabs" role="tablist" aria-label="Convention preparation">
+   <button type="button" role="tab" aria-selected="${tab==="precon"}" class="${tab==="precon"?"active":""}" onclick="setDayWorkspaceTab('precon')">🧳 Pre-Con Check</button>
+   <button type="button" role="tab" aria-selected="${tab==="setup"}" class="${tab==="setup"?"active":""}" onclick="setDayWorkspaceTab('setup')">🎥 Interview Set-up</button>
+  </div>
+  ${tab==="precon"?`<div class="day-workspace-panel">
+   <div class="sectionhead"><div><h3>Packing checklist</h3><p class="smalltext">Your existing convention packing template.</p></div><span class="tag">${packing.filter(x=>x.done).length}/${packing.length}</span></div>
+   <div class="day-checklist">${packing.map((item,i)=>`<label class="day-check-row"><input type="checkbox" ${item.done?"checked":""} onchange="togglePackingItem('${selected}',${i},this.checked)"><span>${esc(item.text)}</span></label>`).join("")||'<p class="smalltext">No packing items yet. Add items through the checklist template in Convention Hub.</p>'}</div>
+   <div class="sectionhead day-task-heading"><div><h3>Before you leave</h3><p class="smalltext">Tasks to complete before travelling to the convention.</p></div><span class="tag">${preDone}/${c.preConTasks.length}</span></div>
+   <div class="day-checklist">${c.preConTasks.map((item,i)=>`<label class="day-check-row ${item.done?"is-done":""}"><input type="checkbox" ${item.done?"checked":""} onchange="toggleConventionTask('${selected}','preCon',${i},this.checked)"><span>${esc(item.text)}</span></label>`).join("")}</div>
+   <button class="btn secondary small" onclick="addConventionTask('${selected}','preCon')">＋ Add pre-con task</button>
+  </div>`:`<div class="day-workspace-panel">
+   <div class="sectionhead"><div><h3>Interview set-up checklist</h3><p class="smalltext">Run through this before your first interview and whenever you rebuild the setup.</p></div><span class="tag">${setupDone}/${c.setupTasks.length}</span></div>
+   <div class="day-checklist">${c.setupTasks.map((item,i)=>`<label class="day-check-row ${item.done?"is-done":""}"><input type="checkbox" ${item.done?"checked":""} onchange="toggleConventionTask('${selected}','setup',${i},this.checked)"><span>${esc(item.text)}</span></label>`).join("")}</div>
+   <button class="btn secondary small" onclick="addConventionTask('${selected}','setup')">＋ Add setup action</button>
+   <div class="setup-reminders"><div class="eyebrow">📐 Camera & tripod reminders</div><div class="setup-reminder-grid">
+    <div class="setup-reminder"><span>Tripod height</span><strong>115–125 cm</strong><small>Starting range for seated interviews</small></div>
+    <div class="setup-reminder"><span>Tripod tilt</span><strong>0°–5°</strong><small>Keep the camera close to level</small></div>
+   </div><p class="smalltext">Use these as your baseline reminders, then fine-tune framing for chair height, lens and camera angle.</p></div>
+  </div>`}
+ </section>`;
+}
+function togglePackingItem(conventionId,index,checked){
+ const c=conv(conventionId);if(!c)return;
+ if(!Array.isArray(c.checklist))c.checklist=[];
+ c.checklist[index]=!!checked;save();
+}
+
 function day(){
  const conventions=db.conventions;
  const selected=window.dayConvention||conventions[0]?.id||"";
@@ -1682,6 +1412,7 @@ function day(){
  <div class="sectionhead"><h2>${activeDay} schedule</h2><div class="row" style="flex:0 1 auto"><button class="btn secondary small" onclick="addPlannerActivity('${selected}')">＋ Add activity</button><span class="tag">${schedule.length} events</span></div></div>
  ${!selected?'<div class="empty">Add a convention in Convention Hub, then select it here.</div>':schedule.length?schedule.map(item=>`<div class="schedule-item"><div class="schedule-time">${esc(item.time)}${item.endTime?` – ${esc(item.endTime)}`:""}</div><div><div class="schedule-kind">${item.kind}</div><b>${esc(item.title)}</b><div class="schedule-guests">${item.kind==="Panel"?"Guests: ":""}${esc(item.guests.join(", ")||"Guests to be confirmed")}${item.detail?` · ${esc(item.detail)}`:""}</div></div>${item.kind==="Interview"?`<button class="btn secondary small schedule-action" onclick="openScheduledInterview('${item.id}')">Open questions →</button>`:""}</div>`).join(""):'<div class="empty">Nothing scheduled for this day yet. Add panels or set interview times and days.</div>'}
  </section>
+ ${dayPreparationWorkspace(c,selected)}
  <section class="card room-overview-card"><div class="sectionhead"><h2>🚪 Room assignments</h2><span class="tag">${(c?.panels||[]).filter(p=>p.room).length+db.episodes.filter(e=>e.conventionId===selected&&e.room).length} assigned</span></div>${(()=>{let rows=[...(c?.panels||[]).filter(p=>p.room).map(p=>({room:p.room,day:p.day,time:p.time,title:p.title,kind:"Panel"})),...db.episodes.filter(e=>e.conventionId===selected&&e.room).map(e=>({room:e.room,day:e.interviewDay,time:e.time,title:e.guest,kind:"Interview"}))];let groups=[...new Set(rows.map(x=>x.room))];return groups.length?groups.map(room=>`<div class="room-group"><b>${esc(room)}</b>${rows.filter(x=>x.room===room).sort((a,b)=>(a.time||"").localeCompare(b.time||"")).map(x=>`<div class="room-assignment"><span>${esc(x.day||"Day TBC")} · ${esc(x.time||"Time TBC")}</span><strong>${esc(x.title)}</strong><small>${x.kind}</small></div>`).join("")}</div>`).join(""):'<div class="empty">Add a room or location to a panel or interview to see assignments here.</div>'})()}</section>${conventionFlights(c)}<section class="card" style="margin-top:16px"><div class="sectionhead"><h2>Convention calendar</h2><span class="tag">Weekend-by-weekend</span></div>${plannerCalendar(c)}</section><div class="grid" style="margin-top:16px"><section class="card wide"><h2>Convention recap</h2><div class="row"><div><span class="smalltext">Published / completed</span><h2>${db.episodes.filter(e=>e.conventionId===selected&&e.status===8).length}</h2></div><div><span class="smalltext">Cancelled</span><h2>${db.episodes.filter(e=>e.conventionId===selected&&e.status===10).length}</h2></div><div><span class="smalltext">Still in progress</span><h2>${db.episodes.filter(e=>e.conventionId===selected&&![8,10].includes(e.status)).length}</h2></div></div></section><section class="card side"><h2>Quick notes</h2><p class="smalltext">Use an episode’s notes field for guest-specific moments and follow-ups. Notes are saved with the episode.</p></section></div>`
 }
 function kpis(){
