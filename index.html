@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>The Vault V4.0.1</title>
+<title>The Vault V4.0.2</title>
 <style>
 :root{--ink:#182033;--muted:#778096;--line:#e7eaf2;--paper:#f6f7fb;--card:#fff;--blue:#4169e1;--pink:#ed5a9b;--softblue:#edf1ff;--softpink:#fff0f6;--green:#16866b;--shadow:0 12px 34px #1c2b5010}
 *{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.45 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}button,input,select,textarea{font:inherit}button{cursor:pointer;border:0}button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:3px solid #8ba2ff;outline-offset:2px}
@@ -1057,10 +1057,20 @@ body[data-theme="dark"] .panel-day-tabs button.day-toggle.active .day-toggle-sta
 .expense-delete-btn{border:0;border-radius:8px;background:var(--panel);color:var(--muted);font-size:19px;font-weight:700;width:31px;height:31px;cursor:pointer;flex-shrink:0}
 .expense-delete-btn:hover{background:#ffeded;color:#b9344e}
 @media(max-width:700px){.vault-tools-actions{grid-template-columns:1fr}.budget-expense{grid-template-columns:none!important;padding:10px 12px;gap:8px}.budget-expense-main b{font-size:13px}.budget-expense-amount{font-size:14px}.budget-expense .btn{grid-column:auto!important}}
+
+/* V4.0.2: Progressive convention chooser */
+.day-selector-groups{display:grid;gap:10px;min-width:0}
+.day-selector-heading{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:8px 0 4px;color:var(--ink);font-size:13px}
+.day-selector-groups .episode-picker-option{text-align:left;display:flex;flex-direction:column;align-items:flex-start;gap:3px}
+.day-picker-option-title{font-weight:800;line-height:1.3}
+.day-selector-groups .episode-picker-option small{font-size:11px;font-weight:500;color:var(--muted)}
+.day-past-toggle{display:block;width:100%;text-align:left!important;margin-top:9px;padding:10px 12px!important}
+#dayPastList,#dayUndatedList{min-width:0}
+
 </style>
 </head>
 <body><div class="app">
-<header class="top"><div class="brand"><div class="logo">✦</div><div>The Vault <span class="muted" style="font-weight:600;font-size:13px">V4.0.1</span></div></div><div class="topright"><span class="pill" id="syncStatus">Offline-first • not signed in</span><button class="btn secondary small" id="searchVaultBtn" onclick="openVaultSearch()" aria-label="Search The Vault">⌕ Search</button><button class="btn secondary small" id="quickNotesBtn" onclick="openQuickNotes()">📝 Notes</button><button class="btn secondary small" id="themeBtn" title="Switch theme">☾</button><button type="button" class="btn secondary small" id="vaultToolsBtn" onclick="openVaultTools()">⚙ Tools</button><div class="vault-hidden-tools" hidden><button id="exportBtn">Export backup</button><button id="importBtn">Import backup</button><button id="cloudBtn">Account & sync</button></div><input id="importFile" type="file" accept="application/json,.json" hidden></div></header>
+<header class="top"><div class="brand"><div class="logo">✦</div><div>The Vault <span class="muted" style="font-weight:600;font-size:13px">V4.0.2</span></div></div><div class="topright"><span class="pill" id="syncStatus">Offline-first • not signed in</span><button class="btn secondary small" id="searchVaultBtn" onclick="openVaultSearch()" aria-label="Search The Vault">⌕ Search</button><button class="btn secondary small" id="quickNotesBtn" onclick="openQuickNotes()">📝 Notes</button><button class="btn secondary small" id="themeBtn" title="Switch theme">☾</button><button type="button" class="btn secondary small" id="vaultToolsBtn" onclick="openVaultTools()">⚙ Tools</button><div class="vault-hidden-tools" hidden><button id="exportBtn">Export backup</button><button id="importBtn">Import backup</button><button id="cloudBtn">Account & sync</button></div><input id="importFile" type="file" accept="application/json,.json" hidden></div></header>
 <nav class="nav" id="nav">
 <button class="active" data-view="home">⌂ Dashboard</button><button data-view="episodes">▣ Episodes</button><button data-view="guests">👤 Guests</button><button data-view="interview">☷ Interview</button><button data-view="hub">✧ Convention Hub</button><button data-view="day">🎬 Convention Day</button><button data-view="kpis">📊 KPIs</button><button data-view="budget">💶 Budget</button><button data-view="venues">📍 Venues</button>
 </nav>
@@ -1143,23 +1153,110 @@ function syncEpisodeBudgetExpenses(){
  }
  return changed;
 }
+const VAULT_PREP_SHADOW_KEY="vault_day_preparation_v402";
+const VAULT_PREP_FIELDS={checklist:"_packingUpdatedAt",preConTasks:"_preConUpdatedAt",setupTasks:"_setupTasksUpdatedAt",setupConfig:"_setupConfigUpdatedAt"};
+function readPreparationShadow(){try{const x=JSON.parse(localStorage.getItem(VAULT_PREP_SHADOW_KEY)||"{}");return x&&typeof x==="object"?x:{}}catch{return {}}}
+function writePreparationShadow(shadow){try{localStorage.setItem(VAULT_PREP_SHADOW_KEY,JSON.stringify(shadow))}catch(err){console.warn("Could not preserve the preparation backup",err)}}
+function isMeaningfulPreparation(c,field){
+ const value=c?.[field];
+ if(field==="checklist")return Array.isArray(value)&&value.some(Boolean);
+ if(field==="preConTasks"||field==="setupTasks"){
+  if(!Array.isArray(value))return false;
+  const defaults=(field==="preConTasks"?(db.taskTemplates?.preCon||DEFAULT_PRECON_TASKS):(db.taskTemplates?.setup||DEFAULT_SETUP_TASKS));
+  return value.some(x=>x?.done)||JSON.stringify(value.map(x=>x?.text))!==JSON.stringify(defaults);
+ }
+ if(field==="setupConfig")return !!value&&(value.tripodHeight!=="115–125 cm"||value.tripodTilt!=="0°–5°");
+ return false;
+}
+function recordPreparationChanges(){
+ // Compare with the previously saved document: all existing edit/check/add/remove paths are covered.
+ let previous={};try{previous=JSON.parse(localStorage.getItem("vault03")||"{}")||{}}catch{}
+ const prevById=new Map((previous.conventions||[]).map(c=>[String(c.id),c]));
+ const shadow=readPreparationShadow();shadow.conventions=shadow.conventions||{};
+ let updated=false;
+ for(const c of db.conventions||[]){
+  const old=prevById.get(String(c.id));
+  const entry=shadow.conventions[c.id]||{};
+  for(const [field,timeField] of Object.entries(VAULT_PREP_FIELDS)){
+   if(!Object.prototype.hasOwnProperty.call(c,field))continue;
+   if(JSON.stringify(c[field])===JSON.stringify(old?.[field]))continue;
+   const now=Date.now();c[timeField]=now;
+   entry[field]={updatedAt:now,value:JSON.parse(JSON.stringify(c[field]))};
+   updated=true;
+  }
+  if(Object.keys(entry).length)shadow.conventions[c.id]=entry;
+ }
+ if(JSON.stringify(previous.checklistTemplate)!==JSON.stringify(db.checklistTemplate)){
+  const now=Date.now();db._checklistTemplateUpdatedAt=now;
+  shadow.packingTemplate={updatedAt:now,value:[...(db.checklistTemplate||[])]};updated=true;
+ }
+ if(updated)writePreparationShadow(shadow);
+}
+function initializePreparationSafety(){
+ // One-time migration for users who edited preparation lists before this version.
+ const shadow=readPreparationShadow();
+ if(shadow.migrated402){
+  // Also recover local preparation edits if an older data snapshot was restored before startup.
+  if(mergeNewerLocalPreparation(db)){
+   try{localStorage.setItem("vault03",JSON.stringify(db))}catch(err){console.warn("Could not recover locally backed-up preparation",err)}
+  }
+  return;
+ }
+ shadow.conventions=shadow.conventions||{};
+ let changed=false;
+ for(const c of db.conventions||[]){
+  const entry=shadow.conventions[c.id]||{};
+  for(const [field,timeField] of Object.entries(VAULT_PREP_FIELDS)){
+   if(!Object.prototype.hasOwnProperty.call(c,field)||!isMeaningfulPreparation(c,field))continue;
+   const when=Number(c[timeField])||Date.now();c[timeField]=when;
+   entry[field]={updatedAt:when,value:JSON.parse(JSON.stringify(c[field]))};changed=true;
+  }
+  if(Object.keys(entry).length)shadow.conventions[c.id]=entry;
+ }
+ if(Array.isArray(db.checklistTemplate)&&JSON.stringify(db.checklistTemplate)!==JSON.stringify(DEFAULT_CHECKLIST)){
+  const when=Number(db._checklistTemplateUpdatedAt)||Date.now();db._checklistTemplateUpdatedAt=when;
+  shadow.packingTemplate={updatedAt:when,value:[...db.checklistTemplate]};changed=true;
+ }
+ shadow.migrated402=true;writePreparationShadow(shadow);
+ if(changed){try{localStorage.setItem("vault03",JSON.stringify(db))}catch(err){console.warn("Could not migrate preparation timestamps",err)}}
+}
+function mergeNewerLocalPreparation(incoming){
+ const shadow=readPreparationShadow();let restored=false;
+ for(const c of incoming.conventions||[]){
+  const entry=shadow.conventions?.[c.id];if(!entry)continue;
+  for(const [field,timeField] of Object.entries(VAULT_PREP_FIELDS)){
+   const safe=entry[field];if(!safe||!Number.isFinite(Number(safe.updatedAt)))continue;
+   if(Number(safe.updatedAt)>Number(c[timeField]||0)){
+    c[field]=JSON.parse(JSON.stringify(safe.value));c[timeField]=Number(safe.updatedAt);restored=true;
+   }
+  }
+ }
+ if(shadow.packingTemplate&&Number(shadow.packingTemplate.updatedAt)>Number(incoming._checklistTemplateUpdatedAt||0)){
+  incoming.checklistTemplate=[...shadow.packingTemplate.value];
+  incoming._checklistTemplateUpdatedAt=Number(shadow.packingTemplate.updatedAt);restored=true;
+ }
+ return restored;
+}
 function save(){
  syncEpisodeBudgetExpenses();
- localStorage.setItem("vault03",JSON.stringify(db));
+ if(!applyingRemote)recordPreparationChanges();
+ try{localStorage.setItem("vault03",JSON.stringify(db))}
+ catch(err){console.error("Local save failed",err);alert("The Vault could not save your changes on this device. Please export a backup and free browser storage before continuing.");return}
  if(!applyingRemote && cloudUser){setSyncStatus(navigator.onLine?"Changes waiting to sync":"Offline • changes saved on this device");scheduleCloudSync();}
 }
 if(syncEpisodeBudgetExpenses())localStorage.setItem("vault03",JSON.stringify(db));
 function setSyncStatus(label){const el=document.getElementById("syncStatus");if(el)el.textContent=label;}
 function scheduleCloudSync(){clearTimeout(syncTimer);syncTimer=setTimeout(()=>syncNow("both"),1200);}
-function cloudPayload(){return {guests:db.guests,organizers:db.organizers,conventions:db.conventions,episodes:db.episodes,checklistTemplate:db.checklistTemplate,settings:db.settings,venues:db.venues,youtubeVideos:db.youtubeVideos,taskTemplates:db.taskTemplates||{}};}
+function cloudPayload(){return {guests:db.guests,organizers:db.organizers,conventions:db.conventions,episodes:db.episodes,checklistTemplate:db.checklistTemplate,settings:db.settings,venues:db.venues,youtubeVideos:db.youtubeVideos,taskTemplates:db.taskTemplates||{},_checklistTemplateUpdatedAt:db._checklistTemplateUpdatedAt||0};}
 function applyCloudPayload(payload){
  if(!payload || !Array.isArray(payload.organizers)||!Array.isArray(payload.conventions)||!Array.isArray(payload.episodes))throw new Error("The cloud data format is not valid.");
+ const incomingCloudSnapshot=JSON.stringify(payload);
  preserveVaultSafetyBackup("Before cloud replacement");
  applyingRemote=true;
- db={...db,guests:Array.isArray(payload.guests)?payload.guests:[],organizers:payload.organizers,conventions:payload.conventions,episodes:payload.episodes,checklistTemplate:Array.isArray(payload.checklistTemplate)?payload.checklistTemplate:DEFAULT_CHECKLIST.slice(),settings:payload.settings||db.settings||{theme:"system",youtubeApiKey:""},venues:Array.isArray(payload.venues)?payload.venues.map(v=>({...v,floorPlans:v.floorPlans||[]})):[],youtubeVideos:Array.isArray(payload.youtubeVideos)?payload.youtubeVideos:[],taskTemplates:payload.taskTemplates&&typeof payload.taskTemplates==="object"?payload.taskTemplates:(db.taskTemplates||{})};ensureGuestProfiles();
+ db={...db,guests:Array.isArray(payload.guests)?payload.guests:[],organizers:payload.organizers,conventions:payload.conventions,episodes:payload.episodes,checklistTemplate:Array.isArray(payload.checklistTemplate)?payload.checklistTemplate:DEFAULT_CHECKLIST.slice(),settings:payload.settings||db.settings||{theme:"system",youtubeApiKey:""},venues:Array.isArray(payload.venues)?payload.venues.map(v=>({...v,floorPlans:v.floorPlans||[]})):[],youtubeVideos:Array.isArray(payload.youtubeVideos)?payload.youtubeVideos:[],taskTemplates:payload.taskTemplates&&typeof payload.taskTemplates==="object"?payload.taskTemplates:(db.taskTemplates||{}),_checklistTemplateUpdatedAt:Number(payload._checklistTemplateUpdatedAt)||0};const prepRestored=mergeNewerLocalPreparation(db);ensureGuestProfiles();
  const migratedProjects=migrateGuestProjects();
- syncEpisodeBudgetExpenses();localStorage.setItem("vault03",JSON.stringify(db));lastCloudPayload=JSON.stringify(cloudPayload());applyingRemote=false;render();
- if(migratedProjects&&cloudUser&&navigator.onLine)scheduleCloudSync();
+ syncEpisodeBudgetExpenses();localStorage.setItem("vault03",JSON.stringify(db));lastCloudPayload=incomingCloudSnapshot;applyingRemote=false;render();
+ if((migratedProjects||prepRestored)&&cloudUser&&navigator.onLine)scheduleCloudSync();
 }
 async function syncNow(mode="both"){
  if(!cloudUser||!supabaseClient||!navigator.onLine)return;
@@ -1385,7 +1482,7 @@ function home(){
  <div class="card stat"><span>Published</span><strong>${count(8)}</strong><span>Out in the world 🎉</span></div>
  <div class="card stat"><span>Guest profiles</span><strong>${db.guests.length}</strong><span>Reusable guest records</span></div>
  <section class="card wide"><div class="sectionhead"><h2>Needs your attention</h2><span class="tag">${active.length} active</span></div><div class="stack">${attention.map(episodeCard).join("")||'<div class="empty">Nothing urgent in the production queue.</div>'}</div></section>
- <section class="card side"><h2>Upcoming conventions</h2>${upcoming.map(c=>`<div class="episode"><div class="epbody"><b>${esc(c.name)}</b><div class="epmeta">${fmt(c.startDate)}</div></div><button class="btn secondary small" onclick="window.dayConvention='${c.id}';go('day')">Open</button></div>`).join("")||'<div class="empty">No future dates recorded.</div>'}</section>
+ <section class="card side"><h2>Upcoming conventions</h2>${upcoming.map(c=>`<div class="episode"><div class="epbody"><b>${esc(c.name)}</b><div class="epmeta">${fmt(c.startDate)}</div></div><button class="btn secondary small" onclick="goToConventionDay('${c.id}')">Open</button></div>`).join("")||'<div class="empty">No future dates recorded.</div>'}</section>
  <section class="card wide"><div class="sectionhead"><h2>Pick up where you left off</h2><button class="btn secondary small" onclick="go('episodes')">All episodes →</button></div><div class="stack">${db.episodes.slice().sort((a,b)=>(b.number||0)-(a.number||0)).slice(0,5).map(episodeCard).join("")||'<div class="empty">Your first episode is waiting to be added.</div>'}</div></section>
  <section class="card side"><h2>Quick launch</h2><div class="stack"><button class="btn blue" onclick="go('interview')">☷ Interview questions</button><button class="btn secondary" onclick="go('guests')">👤 Guest CRM</button><button class="btn secondary" onclick="go('hub')">✧ Convention Command Centre</button><button class="btn secondary" onclick="go('day')">🎬 Convention Day Mode</button><button class="btn secondary" onclick="go('kpis')">📊 Performance & KPIs</button></div><p class="smalltext" style="margin-top:15px">Your changes save automatically on this device. Export a backup before major updates.</p></section>
  </div>`;
@@ -1413,7 +1510,7 @@ function hub(){
  const all=db.conventions||[],upcoming=all.filter(c=>!conventionIsPast(c)),past=all.filter(conventionIsPast);
  const shown=(hubFilter==="past"?past:hubFilter==="all"?all:upcoming).slice().sort((a,b)=>hubFilter==="past"?String(b.startDate||"").localeCompare(String(a.startDate||"")):String(a.startDate||"9999").localeCompare(String(b.startDate||"9999")));
  return `<section class="hero"><div><div class="eyebrow">Your people & places</div><h1>Convention Command Centre</h1><p class="sub">Your next events first, older ones safely archived.</p></div><button class="btn blue" onclick="editConvention()">＋ New Convention</button></section><div class="hub-filter-bar" aria-label="Convention filters"><button class="${hubFilter==='upcoming'?'active':''}" onclick="setHubFilter('upcoming')">Upcoming · ${upcoming.length}</button><button class="${hubFilter==='past'?'active':''}" onclick="setHubFilter('past')">Past · ${past.length}</button><button class="${hubFilter==='all'?'active':''}" onclick="setHubFilter('all')">All · ${all.length}</button></div><div class="hub-utilities"><button class="btn secondary small" onclick="editChecklistTemplate()">✎ Edit packing template</button></div><div class="convention-overview">${shown.map(c=>{const es=db.episodes.filter(e=>e.conventionId===c.id),done=es.filter(e=>e.status===8).length,cancel=es.filter(e=>e.status===10).length;const lineup=(c.guestIds||[]).map(id=>db.guests.find(g=>g.id===id)).filter(Boolean);
- return `<article class="card convention-overview-card convention-hub-merged-card" role="button" tabindex="0" aria-label="Edit ${esc(c.name)}" onclick="editConvention('${c.id}')" onkeydown="if(event.target===this&&(event.key==='Enter'||event.key===' ')){event.preventDefault();editConvention('${c.id}')}"><div class="sectionhead"><h3>${esc(c.name)}</h3><span class="tag">${es.length} interviews</span></div><div class="smalltext">${c.startDate?fmt(c.startDate):'No start date'}${c.endDate?' – '+fmt(c.endDate):''} · ${esc(org(c.organizerId))}</div><div class="convention-countdown">${conventionCountdown(c)}</div><div class="convention-guest-preview" aria-label="Guest lineup preview">${lineup.slice(0,6).map(g=>g.photo&&safeGuestUrl(g.photo)?`<img loading="lazy" decoding="async" fetchpriority="low" src="${esc(safeGuestUrl(g.photo))}" title="${esc(g.name)}" alt="${esc(g.name)}">`:`<span title="${esc(g.name)}">${esc(textInitials(g.name))}</span>`).join("")}${lineup.length>6?`<span class="preview-more">+${lineup.length-6}</span>`:""}<small>${lineup.length} guests</small></div><details class="convention-card-list" onclick="event.stopPropagation()"><summary>Show full guest lineup</summary><div class="convention-scroll-list guest-scroll-list">${lineup.map(g=>`<div class="convention-list-item">${g.photo&&safeGuestUrl(g.photo)?`<img loading="lazy" decoding="async" fetchpriority="low" src="${esc(safeGuestUrl(g.photo))}" alt="">`:`<span class="mini-avatar">${esc(textInitials(g.name))}</span>`}<span>${esc(g.name)}</span></div>`).join("")||'<div class="smalltext">No linked guests yet.</div>'}</div></details><div class="bar"><i style="width:${es.length?done/es.length*100:0}%"></i></div><div class="smalltext">${done} published · ${cancel} cancelled · ${es.length-done-cancel} active</div><div class="convention-card-actions" onclick="event.stopPropagation()"><button class="btn secondary small" onclick="managePanels('${c.id}')">Panels</button><button class="btn secondary small" onclick="window.dayConvention='${c.id}';go('day')">Convention Day →</button><button class="btn danger small" onclick="delConvention('${c.id}')">Delete</button><span class="convention-card-hint">Tap card to edit</span></div></article>`}).join("")||`<section class="card empty hub-empty">${hubFilter==='upcoming'?'No upcoming conventions. Select Past to view your history, or create a new convention.':hubFilter==='past'?'No previous conventions yet.':'No conventions yet.'}</section>`}</div><div class="split"><section class="card"><div class="sectionhead"><h2>Organizers</h2><button class="btn blue small" onclick="editOrganizer()">＋ Add</button></div>${db.organizers.map(o=>`<div class="episode organizer-entry"><div class="epbody"><b>${esc(o.name)}</b><div class="epmeta">${(o.contacts||[]).length} saved contact${(o.contacts||[]).length===1?"":"s"}</div>${(o.contacts||[]).length?`<details class="organizer-contact-preview"><summary>View organizer contacts</summary>${o.contacts.map(c=>`<div class="organizer-contact-summary"><b>${esc(c.name||c.role||"Contact")}</b>${c.role?` · ${esc(c.role)}`:""}${c.phone?`<div>${esc(c.phone)}</div>`:""}${c.website?`<div><a href="${esc(c.website)}" target="_blank" rel="noopener">Website ↗</a></div>`:""}</div>`).join("")}</details>`:""}</div><div class="epactions"><button class="btn secondary small" onclick="editOrganizer('${o.id}')">Edit</button><button class="btn danger small" onclick="delOrganizer('${o.id}')">Delete</button></div></div>`).join("")||'<div class="empty">Add an organizer to get started.</div>'}</section></div>`}
+ return `<article class="card convention-overview-card convention-hub-merged-card" role="button" tabindex="0" aria-label="Edit ${esc(c.name)}" onclick="editConvention('${c.id}')" onkeydown="if(event.target===this&&(event.key==='Enter'||event.key===' ')){event.preventDefault();editConvention('${c.id}')}"><div class="sectionhead"><h3>${esc(c.name)}</h3><span class="tag">${es.length} interviews</span></div><div class="smalltext">${c.startDate?fmt(c.startDate):'No start date'}${c.endDate?' – '+fmt(c.endDate):''} · ${esc(org(c.organizerId))}</div><div class="convention-countdown">${conventionCountdown(c)}</div><div class="convention-guest-preview" aria-label="Guest lineup preview">${lineup.slice(0,6).map(g=>g.photo&&safeGuestUrl(g.photo)?`<img loading="lazy" decoding="async" fetchpriority="low" src="${esc(safeGuestUrl(g.photo))}" title="${esc(g.name)}" alt="${esc(g.name)}">`:`<span title="${esc(g.name)}">${esc(textInitials(g.name))}</span>`).join("")}${lineup.length>6?`<span class="preview-more">+${lineup.length-6}</span>`:""}<small>${lineup.length} guests</small></div><details class="convention-card-list" onclick="event.stopPropagation()"><summary>Show full guest lineup</summary><div class="convention-scroll-list guest-scroll-list">${lineup.map(g=>`<div class="convention-list-item">${g.photo&&safeGuestUrl(g.photo)?`<img loading="lazy" decoding="async" fetchpriority="low" src="${esc(safeGuestUrl(g.photo))}" alt="">`:`<span class="mini-avatar">${esc(textInitials(g.name))}</span>`}<span>${esc(g.name)}</span></div>`).join("")||'<div class="smalltext">No linked guests yet.</div>'}</div></details><div class="bar"><i style="width:${es.length?done/es.length*100:0}%"></i></div><div class="smalltext">${done} published · ${cancel} cancelled · ${es.length-done-cancel} active</div><div class="convention-card-actions" onclick="event.stopPropagation()"><button class="btn secondary small" onclick="managePanels('${c.id}')">Panels</button><button class="btn secondary small" onclick="goToConventionDay('${c.id}')">Convention Day →</button><button class="btn danger small" onclick="delConvention('${c.id}')">Delete</button><span class="convention-card-hint">Tap card to edit</span></div></article>`}).join("")||`<section class="card empty hub-empty">${hubFilter==='upcoming'?'No upcoming conventions. Select Past to view your history, or create a new convention.':hubFilter==='past'?'No previous conventions yet.':'No conventions yet.'}</section>`}</div><div class="split"><section class="card"><div class="sectionhead"><h2>Organizers</h2><button class="btn blue small" onclick="editOrganizer()">＋ Add</button></div>${db.organizers.map(o=>`<div class="episode organizer-entry"><div class="epbody"><b>${esc(o.name)}</b><div class="epmeta">${(o.contacts||[]).length} saved contact${(o.contacts||[]).length===1?"":"s"}</div>${(o.contacts||[]).length?`<details class="organizer-contact-preview"><summary>View organizer contacts</summary>${o.contacts.map(c=>`<div class="organizer-contact-summary"><b>${esc(c.name||c.role||"Contact")}</b>${c.role?` · ${esc(c.role)}`:""}${c.phone?`<div>${esc(c.phone)}</div>`:""}${c.website?`<div><a href="${esc(c.website)}" target="_blank" rel="noopener">Website ↗</a></div>`:""}</div>`).join("")}</details>`:""}</div><div class="epactions"><button class="btn secondary small" onclick="editOrganizer('${o.id}')">Edit</button><button class="btn danger small" onclick="delOrganizer('${o.id}')">Delete</button></div></div>`).join("")||'<div class="empty">Add an organizer to get started.</div>'}</section></div>`}
 function openInterviewConventionPicker(){
  const items=db.conventions;
  if(!items.length){showModal("Choose a convention",'<div class="empty">Add a convention in Convention Hub first.</div>');return;}
@@ -1528,7 +1625,27 @@ function thumbnailArchive(){
  let items=db.episodes.filter(e=>e.thumbnailUrl&&/^https?:\/\//i.test(e.thumbnailUrl));
  return `<section class="card thumbnail-archive"><div class="sectionhead"><div><h2>🖼️ Thumbnail archive</h2><p class="smalltext">Your interview artwork in one place.</p></div><span class="tag">${items.length} thumbnails</span></div>${items.length?`<div class="thumbnail-archive-grid">${items.map(e=>`<a class="thumbnail-archive-item" href="${esc(e.thumbnailUrl)}" target="_blank" rel="noopener"><img src="${esc(e.thumbnailUrl)}" alt="${esc(e.guest||"Interview")} thumbnail" loading="lazy"><b>${esc(e.guest||"Untitled interview")}</b><small>${esc(conv(e.conventionId)?.name||"Convention not set")}</small></a>`).join("")}</div>`:'<div class="empty">Add a thumbnail image URL in an episode to build your archive.</div>'}</section>`;
 }
-function openDayConventionPicker(){const conventions=db.conventions;if(!conventions.length){showModal('Choose a convention','<div class="empty">Add a convention in Convention Hub first.</div>');return}showModal('Choose a convention',`<div class="episode-picker-list">${conventions.map(x=>`<button type="button" class="episode-picker-option ${x.id===window.dayConvention?'selected':''}" onclick="window.dayConvention='${x.id}';closeModal();render()">${esc(x.name)}</button>`).join('')}</div>`)}
+function dayPickerOption(c,subtitle=""){
+ return `<button type="button" class="episode-picker-option ${c.id===window.dayConvention?'selected':''}" onclick="selectDayConvention('${c.id}')"><span class="day-picker-option-title">${esc(c.name)}</span><small>${esc(subtitle||(c.startDate?fmt(c.startDate)+(c.endDate&&c.endDate!==c.startDate?" – "+fmt(c.endDate):""):"Date not set"))}</small></button>`;
+}
+function openDayConventionPicker(){
+ const groups=conventionDateGroups(),count=db.conventions.length;
+ if(!count){showModal("Choose a convention",'<div class="empty">Add a convention in Convention Hub first.</div>');return}
+ showModal("Choose a convention",`<div class="day-selector-groups"><div class="day-selector-heading"><b>Upcoming & ongoing</b><span class="tag">${groups.upcoming.length}</span></div><div class="episode-picker-list">${groups.upcoming.map(c=>dayPickerOption(c)).join("")||'<div class="empty">No upcoming conventions scheduled.</div>'}</div>${groups.past.length?`<button type="button" class="btn secondary day-past-toggle" id="dayPastToggle" onclick="revealPastDayConventions()">⌄ Show ${groups.past.length} past convention${groups.past.length===1?'':'s'}</button><div id="dayPastList"></div>`:""}${groups.undated.length?`<button type="button" class="btn secondary day-past-toggle" id="dayUndatedToggle" onclick="revealUndatedDayConventions()">⌄ Show ${groups.undated.length} undated convention${groups.undated.length===1?'':'s'}</button><div id="dayUndatedList"></div>`:""}</div>`);
+}
+function revealPastDayConventions(){
+ const host=document.getElementById("dayPastList"),btn=document.getElementById("dayPastToggle");if(!host||!btn)return;
+ if(host.innerHTML){host.innerHTML="";btn.textContent="⌄ Show past conventions";return}
+ host.innerHTML=`<div class="day-selector-heading"><b>Past conventions</b></div><div class="episode-picker-list">${conventionDateGroups().past.map(c=>dayPickerOption(c)).join("")}</div>`;
+ btn.textContent="⌃ Hide past conventions";
+}
+function revealUndatedDayConventions(){
+ const host=document.getElementById("dayUndatedList"),btn=document.getElementById("dayUndatedToggle");if(!host||!btn)return;
+ if(host.innerHTML){host.innerHTML="";btn.textContent="⌄ Show undated conventions";return}
+ host.innerHTML=`<div class="day-selector-heading"><b>Without dates</b></div><div class="episode-picker-list">${conventionDateGroups().undated.map(c=>dayPickerOption(c)).join("")}</div>`;
+ btn.textContent="⌃ Hide undated conventions";
+}
+
 function interviewDurationMinutes(value){
  if(value===null||value===undefined||String(value).trim()==="")return 15;
  const raw=String(value).trim();
@@ -1543,13 +1660,28 @@ function addMinutesToTime(time,minutes){
  const [h,m]=time.split(":").map(Number),total=h*60+m+minutes;
  return `${String(Math.floor((total%(24*60))/60)).padStart(2,"0")}:${String(total%60).padStart(2,"0")}`;
 }
-function nextConventionId(){
- const today=new Date();today.setHours(0,0,0,0);
- const upcoming=db.conventions.filter(c=>c.startDate).map(c=>({c,d:new Date(c.startDate+"T00:00:00")})).filter(x=>!Number.isNaN(x.d.getTime())&&x.d>=today).sort((a,b)=>a.d-b.d);
- if(upcoming.length)return upcoming[0].c.id;
- const dated=db.conventions.filter(c=>c.startDate).slice().sort((a,b)=>b.startDate.localeCompare(a.startDate));
- return dated[0]?.id||db.conventions[0]?.id||"";
+function conventionDateGroups(){
+ const today=localISODate(new Date());
+ const isDate=d=>typeof d==="string"&&/^\d{4}-\d{2}-\d{2}$/.test(d)&&!Number.isNaN(new Date(d+"T12:00:00").getTime());
+ const upcoming=[],past=[],undated=[];
+ (db.conventions||[]).forEach(c=>{
+  if(!isDate(c.startDate)){undated.push(c);return}
+  const end=isDate(c.endDate)&&c.endDate>=c.startDate?c.endDate:c.startDate;
+  if(end>=today)upcoming.push(c);else past.push(c);
+ });
+ upcoming.sort((a,b)=>{
+  const as=a.startDate<=today,bs=b.startDate<=today;
+  if(as!==bs)return as?-1:1;
+  return as?((a.endDate||a.startDate).localeCompare(b.endDate||b.startDate)||a.startDate.localeCompare(b.startDate)):(a.startDate.localeCompare(b.startDate)||a.name.localeCompare(b.name));
+ });
+ past.sort((a,b)=>(b.endDate||b.startDate).localeCompare(a.endDate||a.startDate));
+ undated.sort((a,b)=>String(a.name||"").localeCompare(String(b.name||"")));
+ return {upcoming,past,undated};
 }
+function nextConventionId(){return conventionDateGroups().upcoming[0]?.id||""}
+function goToConventionDay(id){window.dayConvention=id;view="day";render()}
+function selectDayConvention(id){if(!db.conventions.some(c=>c.id===id))return;window.dayConvention=id;closeModal();render()}
+
 
 function plannerDate(c,day){return day==="Sunday"?addPlannerDays(c?.startDate,1):c?.startDate||""}
 function addPlannerDays(date,n){if(!date)return "";let d=new Date(date+"T12:00:00");d.setDate(d.getDate()+n);return d.toISOString().slice(0,10)}
@@ -1748,7 +1880,7 @@ function openDayFocusMode(cid,dayName){
 }
 function day(){
  const conventions=db.conventions;
- const selected=window.dayConvention||conventions[0]?.id||"";
+ const selected=db.conventions.some(c=>c.id===window.dayConvention)?window.dayConvention:nextConventionId();
  const c=conv(selected);
  const days=["Saturday","Sunday"];
  const activeDay=window.dayMode||"Saturday";
@@ -1936,7 +2068,7 @@ function drawVaultSearchResults(term){
  if(results.length>60)el.insertAdjacentHTML('beforeend',`<p class="smalltext">Showing the first 60 of ${results.length} matches. Try a more specific search.</p>`);
 }
 function openVaultSearchResult(kind,id){closeModal();if(kind==='guest')return editGuest(id);if(kind==='convention')return editConvention(id);if(kind==='episode')return openEpisode(id);if(kind==='question')return openScheduledInterview(id);}
-function go(v){if(v==="interview"&&view!=="interview"){window.interviewConvention=closestInterviewConventionId();activeEpisode=null;}view=v;render()}
+function go(v){if(v==="interview"&&view!=="interview"){window.interviewConvention=closestInterviewConventionId();activeEpisode=null;}if(v==="day")window.dayConvention=nextConventionId();view=v;render()}
 function bind(){let tb=document.getElementById("themeBtn");if(tb)tb.onclick=cycleTheme;document.querySelectorAll("#nav button").forEach(b=>b.onclick=()=>{if(b.dataset.view==="day")window.dayConvention=nextConventionId();go(b.dataset.view)});if(view==="episodes"&&episodesMode==="kanban")setupKanbanDrag()}
 function changeEpisodeStatus(id,status){let e=db.episodes.find(x=>x.id===id);if(!e)return;e.status=Number(status);if(e.status===10)e.date="";save();render()}
 function setupKanbanDrag(){
@@ -2114,6 +2246,7 @@ document.getElementById("exportBtn").onclick=exportBackup;
 document.getElementById("importBtn").onclick=()=>document.getElementById("importFile").click();
 document.getElementById("importFile").onchange=async e=>{const file=e.target.files?.[0];if(!file)return;try{const incoming=JSON.parse(await file.text());if(!incoming||!Array.isArray(incoming.organizers)||!Array.isArray(incoming.conventions)||!Array.isArray(incoming.episodes))throw new Error("This file does not look like a Vault backup.");if(!confirm("Import this backup and replace the data saved on this device? Export a backup first if you want to keep the current data."))return;preserveVaultSafetyBackup("Before JSON import");db=incoming;if(!Array.isArray(db.checklistTemplate))db.checklistTemplate=DEFAULT_CHECKLIST.slice();save();render();alert("Backup imported.");}catch(err){alert("Could not import backup: "+err.message)}finally{e.target.value=""}};
 document.getElementById("cloudBtn").onclick=openAccountSync;
+initializePreparationSafety();
 render();
 initializeCloud();
 </script></body></html>
