@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>The Vault V3.0.2</title>
+<title>The Vault V3.0.4</title>
 <style>
 :root{--ink:#182033;--muted:#778096;--line:#e7eaf2;--paper:#f6f7fb;--card:#fff;--blue:#4169e1;--pink:#ed5a9b;--softblue:#edf1ff;--softpink:#fff0f6;--green:#16866b;--shadow:0 12px 34px #1c2b5010}
 *{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.45 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}button,input,select,textarea{font:inherit}button{cursor:pointer;border:0}button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:3px solid #8ba2ff;outline-offset:2px}
@@ -832,9 +832,9 @@ body[data-theme="dark"] .project-chip,body[data-theme="dark"] .status,body[data-
 .day-workspace-tabs button.active{background:var(--card);border-color:var(--line);box-shadow:0 2px 8px rgba(20,30,60,.09);color:var(--blue)}
 .day-workspace-panel{min-width:0}
 .day-task-heading{margin-top:22px;padding-top:16px;border-top:1px solid var(--line)}
-.day-checklist{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin:10px 0 14px}
-.day-check-row{display:flex;align-items:flex-start;gap:9px;padding:10px 11px;border:1px solid var(--line);border-radius:10px;background:var(--card);font-size:13px;line-height:1.35;min-width:0}
-.day-check-row input{flex:0 0 auto;margin-top:2px;accent-color:var(--blue);width:17px;height:17px}
+.day-checklist{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin:8px 0 12px;max-height:330px;overflow-y:auto;overscroll-behavior:contain;padding:2px 5px 2px 0;scrollbar-width:thin}
+.day-check-row{display:flex;align-items:center;gap:8px;padding:7px 9px;border:1px solid var(--line);border-radius:9px;background:var(--card);font-size:12px;line-height:1.25;min-width:0;min-height:40px}
+.day-check-row input{flex:0 0 auto;margin:0;accent-color:var(--blue);width:16px;height:16px}
 .day-check-row span{min-width:0;overflow-wrap:anywhere}
 .day-check-row.is-done span{text-decoration:line-through;color:var(--muted)}
 .setup-reminders{margin-top:20px;padding:14px;border:1px solid var(--line);border-radius:13px;background:var(--panel)}
@@ -843,12 +843,17 @@ body[data-theme="dark"] .project-chip,body[data-theme="dark"] .status,body[data-
 .setup-reminder span{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:800}
 .setup-reminder strong{font-size:24px;line-height:1.15;font-variant-numeric:tabular-nums}
 .setup-reminder small{font-size:11px;color:var(--muted)}
-@media(max-width:650px){.day-checklist{grid-template-columns:1fr}.day-workspace-tabs button{font-size:12px;padding:11px 6px}.setup-reminder strong{font-size:21px}}
+@media(max-width:650px){.day-checklist{grid-template-columns:1fr;max-height:280px;gap:5px}.day-check-row{min-height:36px;padding:6px 8px;font-size:12px}.day-workspace-tabs button{font-size:12px;padding:11px 6px}.setup-reminder strong{font-size:21px}}
 
-</style>
+
+.day-task-row{display:flex;align-items:center;gap:8px}
+.day-task-label{display:flex;align-items:center;gap:8px;flex:1;min-width:0;cursor:pointer}
+.day-task-delete{flex:0 0 auto;border:0;border-radius:8px;background:var(--panel);color:var(--muted);font-size:18px;line-height:1;width:28px;height:28px;cursor:pointer}
+.day-task-delete:active{background:var(--danger-bg);color:var(--danger)}
+\n</style>
 </head>
 <body><div class="app">
-<header class="top"><div class="brand"><div class="logo">✦</div><div>The Vault <span class="muted" style="font-weight:600;font-size:13px">V3.0.2</span></div></div><div class="topright"><span class="pill" id="syncStatus">Offline-first • not signed in</span><button class="btn secondary small" id="quickNotesBtn" onclick="openQuickNotes()">📝 Quick notes</button><button class="btn secondary small" id="themeBtn" title="Switch theme">☾</button><button class="btn secondary small" id="exportBtn">Export backup</button><button class="btn secondary small" id="importBtn">Import backup</button><button class="btn secondary small" id="cloudBtn">Account & sync</button><input id="importFile" type="file" accept="application/json,.json" hidden></div></header>
+<header class="top"><div class="brand"><div class="logo">✦</div><div>The Vault <span class="muted" style="font-weight:600;font-size:13px">V3.0.4</span></div></div><div class="topright"><span class="pill" id="syncStatus">Offline-first • not signed in</span><button class="btn secondary small" id="quickNotesBtn" onclick="openQuickNotes()">📝 Quick notes</button><button class="btn secondary small" id="themeBtn" title="Switch theme">☾</button><button class="btn secondary small" id="exportBtn">Export backup</button><button class="btn secondary small" id="importBtn">Import backup</button><button class="btn secondary small" id="cloudBtn">Account & sync</button><input id="importFile" type="file" accept="application/json,.json" hidden></div></header>
 <nav class="nav" id="nav">
 <button class="active" data-view="home">⌂ Dashboard</button><button data-view="episodes">▣ Episodes</button><button data-view="guests">👤 Guests</button><button data-view="interview">☷ Interview</button><button data-view="hub">✧ Convention Hub</button><button data-view="day">🎬 Convention Day</button><button data-view="kpis">📊 KPIs</button><button data-view="budget">💶 Budget</button><button data-view="venues">📍 Venues</button>
 </nav>
@@ -1344,6 +1349,12 @@ function toggleConventionTask(conventionId,list,index,checked){
  const count=document.getElementById(list+"TaskProgress");
  if(count)count.textContent=tasks.filter(x=>x.done).length+" / "+tasks.length+" completed";
 }
+function deleteConventionTask(conventionId,list,index){
+ const c=conv(conventionId);if(!c)return;ensureDayChecklistData(c);
+ const tasks=list==="preCon"?c.preConTasks:c.setupTasks;
+ if(!Array.isArray(tasks)||!tasks[index])return;
+ tasks.splice(index,1);save();render();
+}
 function addConventionTask(conventionId,list){
  const c=conv(conventionId);if(!c)return;ensureDayChecklistData(c);
  const label=list==="preCon"?"pre-convention task":"setup action";
@@ -1371,7 +1382,7 @@ function dayPreparationWorkspace(c,selected){
    <div class="sectionhead"><div><h3>Packing checklist</h3><p class="smalltext">Your existing convention packing template.</p></div><span class="tag">${packing.filter(x=>x.done).length}/${packing.length}</span></div>
    <div class="day-checklist">${packing.map((item,i)=>`<label class="day-check-row"><input type="checkbox" ${item.done?"checked":""} onchange="togglePackingItem('${selected}',${i},this.checked)"><span>${esc(item.text)}</span></label>`).join("")||'<p class="smalltext">No packing items yet. Add items through the checklist template in Convention Hub.</p>'}</div>
    <div class="sectionhead day-task-heading"><div><h3>Before you leave</h3><p class="smalltext">Tasks to complete before travelling to the convention.</p></div><span class="tag">${preDone}/${c.preConTasks.length}</span></div>
-   <div class="day-checklist">${c.preConTasks.map((item,i)=>`<label class="day-check-row ${item.done?"is-done":""}"><input type="checkbox" ${item.done?"checked":""} onchange="toggleConventionTask('${selected}','preCon',${i},this.checked)"><span>${esc(item.text)}</span></label>`).join("")}</div>
+   <div class="day-checklist">${c.preConTasks.map((item,i)=>`<div class="day-check-row day-task-row ${item.done?"is-done":""}"><label class="day-task-label"><input type="checkbox" ${item.done?"checked":""} onchange="toggleConventionTask('${selected}','preCon',${i},this.checked)"><span>${esc(item.text)}</span></label><button type="button" class="day-task-delete" title="Delete task" aria-label="Delete ${esc(item.text)}" onclick="deleteConventionTask('${selected}','preCon',${i})">×</button></div>`).join("")}</div>
    <button class="btn secondary small" onclick="addConventionTask('${selected}','preCon')">＋ Add pre-con task</button>
   </div>`:`<div class="day-workspace-panel">
    <div class="sectionhead"><div><h3>Interview set-up checklist</h3><p class="smalltext">Run through this before your first interview and whenever you rebuild the setup.</p></div><span class="tag">${setupDone}/${c.setupTasks.length}</span></div>
