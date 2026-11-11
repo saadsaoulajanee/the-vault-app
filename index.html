@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>The Vault V4.2.0</title>
+<title>The Vault V4.2.1</title>
 <meta name="theme-color" content="#13071e">
 <link rel="manifest" href="./manifest.webmanifest?v=404">
 <link rel="icon" type="image/png" sizes="192x192" href="./assets/vault-icon-192.png?v=404">
@@ -1103,7 +1103,7 @@ body[data-theme="dark"] .panel-day-tabs button.day-toggle.active .day-toggle-sta
  .topright .vault-header-icon{width:30px!important;min-width:30px!important;flex-basis:30px!important}
 }
 
-/* The Vault V4.2.0 tools */
+/* The Vault V4.2.1 tools */
 .auto-cost-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:10px 0}
 .auto-cost-grid .field{min-width:0;margin:0}.episode-cost-overrides{margin:14px 0;padding:13px;border:1px solid var(--line);border-radius:12px;background:var(--paper)}
 .production-workspace-action,.filmography-research-bar,.research-lab-actions{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
@@ -1157,7 +1157,7 @@ body[data-theme="dark"] .panel-day-tabs button.day-toggle.active .day-toggle-sta
 </style>
 </head>
 <body><div class="app">
-<header class="top"><div class="brand"><div class="logo" aria-hidden="true"></div><div>The Vault <span class="muted" style="font-weight:600;font-size:13px">V4.2.0</span></div></div><div class="topright"><span class="pill" id="syncStatus">Offline-first • not signed in</span><button class="btn secondary small vault-header-icon" id="searchVaultBtn" onclick="openVaultSearch()" aria-label="Search The Vault" title="Search The Vault">⌕</button><button class="btn secondary small" id="quickNotesBtn" onclick="openQuickNotes()">📝 Notes</button><button class="btn secondary small vault-header-icon" id="themeBtn" title="Switch theme" aria-label="Switch theme">☾</button><button type="button" class="btn secondary small vault-header-icon" id="vaultToolsBtn" onclick="openVaultTools()" title="Tools" aria-label="Tools">⚙</button><div class="vault-hidden-tools" hidden><button id="exportBtn">Export backup</button><button id="importBtn">Import backup</button><button id="cloudBtn">Account & sync</button></div><input id="importFile" type="file" accept="application/json,.json" hidden></div></header>
+<header class="top"><div class="brand"><div class="logo" aria-hidden="true"></div><div>The Vault <span class="muted" style="font-weight:600;font-size:13px">V4.2.1</span></div></div><div class="topright"><span class="pill" id="syncStatus">Offline-first • not signed in</span><button class="btn secondary small vault-header-icon" id="searchVaultBtn" onclick="openVaultSearch()" aria-label="Search The Vault" title="Search The Vault">⌕</button><button class="btn secondary small" id="quickNotesBtn" onclick="openQuickNotes()">📝 Notes</button><button class="btn secondary small vault-header-icon" id="themeBtn" title="Switch theme" aria-label="Switch theme">☾</button><button type="button" class="btn secondary small vault-header-icon" id="vaultToolsBtn" onclick="openVaultTools()" title="Tools" aria-label="Tools">⚙</button><div class="vault-hidden-tools" hidden><button id="exportBtn">Export backup</button><button id="importBtn">Import backup</button><button id="cloudBtn">Account & sync</button></div><input id="importFile" type="file" accept="application/json,.json" hidden></div></header>
 <nav class="nav" id="nav">
 <button class="active" data-view="home">⌂ Dashboard</button><button data-view="episodes">▣ Episodes</button><button data-view="guests">👤 Guests</button><button data-view="interview">☷ Interview</button><button data-view="hub">✧ Convention Hub</button><button data-view="day">🎬 Convention Day</button><button data-view="kpis">📊 KPIs</button><button data-view="budget">💶 Budget</button><button data-view="venues">📍 Venues</button>
 </nav>
@@ -2037,50 +2037,92 @@ function toggleInterviewProjects(button){
  const count=strip.querySelectorAll(".project-chip").length;
  button.textContent=expanded?"Show fewer ↑":"Show all "+count+" projects ↓";
 }
+function vaultGameFormats(){
+ db.settings=db.settings||{};
+ if(!Array.isArray(db.settings.gameFormats)){
+  db.settings.gameFormats=[{id:"this-or-that",name:"This or That",examples:[]},{id:"would-you-rather",name:"Would You Rather",examples:[]},{id:"rank",name:"Rank These",examples:[]},{id:"character",name:"Character Challenge",examples:[]},{id:"custom",name:"Custom Game",examples:[]}];
+ }
+ return db.settings.gameFormats;
+}
+
+function vaultGameFormatLabel(type){
+ return vaultGameFormats().find(f=>f.id===type)?.name||"Archived format";
+}
+
 function vaultGameTemplates(type,guest){
+ const saved=vaultGameFormats().find(x=>x.id===type);
+ if(saved?.examples?.length)return saved.examples.slice();
  const projects=(guest?.projects||[]).filter(p=>p.title);
  if(type==="this-or-that")return ["Rehearsals or improvisation?","Early call times or late night shoots?","Hero or villain?","Comedy or drama?","Auditions or first day on set?","Play yourself or someone completely different?"];
  if(type==="would-you-rather")return ["Would you rather instantly memorize any script or never forget a face?","Would you rather play a detective or an undercover spy?","Would you rather direct one episode or write one episode?","Would you rather improvise an entire scene or learn a ten-page monologue?","Would you rather revisit your first role or jump ahead to a role ten years from now?"];
  if(type==="rank")return ["Rank these from most to least nerve-racking: audition, first read-through, first day on set.","Rank these from most to least useful: rehearsal time, a great scene partner, a surprising script.","Rank these by your personal preference: comedy, drama, mystery."];
  if(type==="character")return projects.length?projects.slice(0,6).map(p=>`Describe your character${p.characterName?" "+p.characterName:""} from ${p.title} in three words, without explaining why until afterward.`):["Describe a character you've played in three words and let me guess who it is.","Choose a past character and describe their ideal vacation without naming them."];
- return ["Your custom game prompt goes here."];
+ return [];
 }
 
 function openInterviewGames(episodeId){
  const e=db.episodes.find(x=>x.id===episodeId);if(!e)return;
- const games=e.interviewGames||[];
- const types=[["this-or-that","This or That"],["would-you-rather","Would You Rather"],["rank","Rank These"],["character","Character Challenge"]];
- showModal("🎲 Interview games · "+e.guest,`<p class="smalltext">Create mini-games for this episode, personalize the questions and play them on your phone or tablet during filming.</p><div class="vault-game-presets">${types.map(([type,label])=>`<button class="btn secondary small" onclick="editInterviewGame('${esc(e.id)}','','${type}')">＋ ${label}</button>`).join("")}</div><div class="vault-game-list">${games.map(g=>`<article class="vault-game-item"><div><strong>${esc(g.title)}</strong><div class="smalltext">${(g.prompts||[]).length} prompts · ${g.lastPlayedAt?"Played "+esc(g.lastPlayedAt.slice(0,10)):"Not played yet"}</div></div><div class="vault-game-actions"><button class="btn blue small" onclick="playInterviewGame('${esc(e.id)}','${esc(g.id)}')">▶ Play</button><button class="btn secondary small" onclick="editInterviewGame('${esc(e.id)}','${esc(g.id)}')">Edit</button><button class="btn danger small" onclick="deleteInterviewGame('${esc(e.id)}','${esc(g.id)}')">×</button></div></article>`).join("")||'<div class="production-empty">No interview games yet. Choose a game format above to start.</div>'}</div><div class="production-footer"><button class="btn secondary" onclick="productionReturnToEpisode('${esc(e.id)}')">← Back to interview</button></div>`);
+ const formats=vaultGameFormats(),games=e.interviewGames||[];
+ showModal("🎲 Interview games · "+e.guest,`<p class="smalltext">Select a format to create a game, then edit the prompts for this episode.</p><div class="vault-game-presets">${formats.map(f=>`<button type="button" class="btn secondary small" onclick="editInterviewGame('${esc(e.id)}','','${esc(f.id)}')">＋ ${esc(f.name)}</button>`).join("")}<button type="button" class="btn secondary small" onclick="manageInterviewGameFormats('${esc(e.id)}')">⚙ Manage formats</button></div><div class="vault-game-list">${games.map(g=>`<article class="vault-game-item"><div><strong>${esc(vaultGameFormats().find(f=>f.id===g.type)?.name||g.title||"Archived format")}</strong><div class="smalltext">${(g.prompts||[]).length} prompts · ${g.lastPlayedAt?"Played "+esc(g.lastPlayedAt.slice(0,10)):"Not played yet"}</div></div><div class="vault-game-actions"><button class="btn blue small" onclick="playInterviewGame('${esc(e.id)}','${esc(g.id)}')">▶ Play</button><button class="btn secondary small" onclick="editInterviewGame('${esc(e.id)}','${esc(g.id)}')">Edit</button><button class="btn danger small" onclick="deleteInterviewGame('${esc(e.id)}','${esc(g.id)}')">×</button></div></article>`).join("")||'<div class="production-empty">No interview games yet. Choose a format above to start.</div>'}</div><div class="production-footer"><button class="btn secondary" onclick="productionReturnToEpisode('${esc(e.id)}')">← Back to interview</button></div>`);
+}
+
+function manageInterviewGameFormats(episodeId){
+ const formats=vaultGameFormats();
+ showModal("🎲 Manage game formats",`<p class="smalltext">Add, rename or remove the formats used by all episodes. You can also save reusable example prompts.</p><div class="vault-game-list">${formats.map(f=>`<article class="vault-game-item"><div><strong>${esc(f.name)}</strong><div class="smalltext">${f.examples?.length?f.examples.length+" custom example prompts":"Default starter prompts"}</div></div><div class="vault-game-actions"><button class="btn secondary small" onclick="editVaultGameFormat('${esc(episodeId)}','${esc(f.id)}')">Edit</button><button class="btn danger small" onclick="deleteVaultGameFormat('${esc(episodeId)}','${esc(f.id)}')">Delete</button></div></article>`).join("")||'<div class="production-empty">No formats saved. Add your first format.</div>'}</div><div class="production-footer"><button type="button" class="btn blue" onclick="editVaultGameFormat('${esc(episodeId)}')">＋ Add format</button><button class="btn secondary" onclick="openInterviewGames('${esc(episodeId)}')">Back to games</button></div>`);
+}
+
+function editVaultGameFormat(episodeId,id=""){
+ const current=vaultGameFormats().find(f=>f.id===id);
+ showModal(current?"Edit game format":"New game format",`<form id="vaultGameFormatForm"><div class="field"><label>Format name</label><input name="name" maxlength="100" required value="${esc(current?.name||"")}" placeholder="e.g. Who Said It?"></div><div class="field"><label>Default example prompts (one per line, optional)</label><textarea name="examples" rows="7" placeholder="Example prompt 1&#10;Example prompt 2">${esc((current?.examples||[]).join("\n"))}</textarea><p class="smalltext">Leave blank to use the built-in starter prompts for original formats. Existing episode games are not changed.</p></div><div class="production-footer"><button class="btn blue" type="submit">Save format</button><button type="button" class="btn secondary" onclick="manageInterviewGameFormats('${esc(episodeId)}')">Cancel</button></div></form>`);
+ document.getElementById("vaultGameFormatForm").onsubmit=event=>{
+  event.preventDefault();const f=new FormData(event.target),name=String(f.get("name")||"").trim();
+  const formats=vaultGameFormats();
+  if(!name)return;
+  if(formats.some(x=>x.id!==id&&x.name.toLowerCase()===name.toLowerCase())){alert("A format with this name already exists.");return}
+  const examples=String(f.get("examples")||"").split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
+  if(current){current.name=name;current.examples=examples}
+  else formats.push({id:"format-"+uid(),name,examples});
+  save();manageInterviewGameFormats(episodeId);
+ };
+}
+
+function deleteVaultGameFormat(episodeId,id){
+ const formats=vaultGameFormats(),f=formats.find(x=>x.id===id);if(!f)return;
+ if(!confirm(`Delete "${f.name}" from the default format list? Previously saved interview games will not be deleted.`))return;
+ db.settings.gameFormats=formats.filter(x=>x.id!==id);save();manageInterviewGameFormats(episodeId);
 }
 
 function editInterviewGame(episodeId,gameId="",templateType="this-or-that"){
  const e=db.episodes.find(x=>x.id===episodeId);if(!e)return;
  const g=(e.interviewGames||[]).find(x=>x.id===gameId),guest=db.guests.find(x=>x.id===e.guestId);
- const type=g?.type||templateType,types=[["this-or-that","This or That"],["would-you-rather","Would You Rather"],["rank","Rank These"],["character","Character Challenge"],["custom","Custom Game"]];
- const title=g?.title||types.find(x=>x[0]===type)?.[1]||"Custom Game",prompts=g?.prompts||vaultGameTemplates(type,guest);
- showModal(g?"Edit interview game":"New interview game",`<form id="vaultGameForm"><div class="field"><label>Game name</label><input name="title" maxlength="100" required value="${esc(title)}"></div><div class="field"><label>Format</label><select name="type" id="vaultGameType">${types.map(([value,label])=>`<option value="${value}" ${value===type?"selected":""}>${label}</option>`).join("")}</select></div><div class="field"><label>Prompts (one per line)</label><textarea name="prompts" id="vaultGamePrompts" rows="9" required>${esc(prompts.join("\n"))}</textarea><button type="button" class="btn secondary small" onclick="refillInterviewGamePrompts('${esc(episodeId)}')">↻ Load example prompts</button><p class="smalltext">You can freely rewrite these prompts. Loading examples replaces the current text after confirmation.</p></div><div class="production-footer"><button class="btn blue" type="submit">Save game</button><button class="btn secondary" type="button" onclick="openInterviewGames('${esc(episodeId)}')">Cancel</button></div></form>`);
+ const formats=vaultGameFormats(),type=g?.type||templateType,format=formats.find(x=>x.id===type);
+ const prompts=g?.prompts||vaultGameTemplates(type,guest);
+ const options=formats.map(f=>`<option value="${esc(f.id)}" ${f.id===type?"selected":""}>${esc(f.name)}</option>`).join("");
+ const archived=!format&&g?`<option value="${esc(type)}" selected>${esc(g.title||"Archived format")} (archived)</option>`:"";
+ showModal(g?"Edit interview game":"New interview game",`<form id="vaultGameForm"><div class="field"><label>Format</label><select name="type" id="vaultGameType" required>${archived}${options}</select></div><div class="field"><label>Prompts (one per line)</label><textarea name="prompts" id="vaultGamePrompts" rows="9" required>${esc(prompts.join("\n"))}</textarea><button type="button" class="btn secondary small" onclick="refillInterviewGamePrompts('${esc(episodeId)}')">↻ Load example prompts</button><p class="smalltext">Edit prompts freely. Loading examples replaces your current prompts after confirmation.</p></div><div class="production-footer"><button class="btn blue" type="submit">Save game</button><button class="btn secondary" type="button" onclick="openInterviewGames('${esc(episodeId)}')">Cancel</button></div></form>`);
  document.getElementById("vaultGameForm").onsubmit=ev=>{
-  ev.preventDefault();const f=new FormData(ev.target),title=String(f.get("title")||"").trim(),entries=String(f.get("prompts")||"").split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
-  if(!title||!entries.length){alert("Add a name and at least one game prompt.");return}
+  ev.preventDefault();const f=new FormData(ev.target),entries=String(f.get("prompts")||"").split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
+  const selectedType=String(f.get("type")||"");if(!selectedType||!entries.length){alert("Choose a format and add at least one prompt.");return}
   e.interviewGames=Array.isArray(e.interviewGames)?e.interviewGames:[];
-  const index=e.interviewGames.findIndex(x=>x.id===gameId);
-  const item={id:g?.id||uid(),title,type:String(f.get("type")||"custom"),prompts:entries,lastPlayedAt:g?.lastPlayedAt||""};
-  if(index>=0)e.interviewGames[index]=item;else e.interviewGames.push(item);
+  const i=e.interviewGames.findIndex(x=>x.id===gameId),chosen=vaultGameFormats().find(x=>x.id===selectedType);
+  const item={id:g?.id||uid(),title:chosen?.name||g?.title||"Archived format",type:selectedType,prompts:entries,lastPlayedAt:g?.lastPlayedAt||""};
+  if(i>=0)e.interviewGames[i]=item;else e.interviewGames.push(item);
   save();openInterviewGames(episodeId);
  };
 }
 
 function refillInterviewGamePrompts(episodeId){
  const e=db.episodes.find(x=>x.id===episodeId),type=document.getElementById("vaultGameType")?.value,textarea=document.getElementById("vaultGamePrompts");if(!e||!type||!textarea)return;
+ const examples=vaultGameTemplates(type,db.guests.find(g=>g.id===e.guestId));
+ if(!examples.length){alert("This format has no saved example prompts yet. You can write your own.");return}
  if(textarea.value.trim()&&!confirm("Replace the current prompts with starter examples?"))return;
- textarea.value=vaultGameTemplates(type,db.guests.find(g=>g.id===e.guestId)).join("\n");
+ textarea.value=examples.join("\n");
 }
 
 function deleteInterviewGame(episodeId,gameId){
  const e=db.episodes.find(x=>x.id===episodeId);if(!e||!confirm("Delete this game and its prompts?"))return;
  e.interviewGames=(e.interviewGames||[]).filter(g=>g.id!==gameId);save();openInterviewGames(episodeId);
 }
-
 function playInterviewGame(episodeId,gameId){
  const e=db.episodes.find(x=>x.id===episodeId),g=(e?.interviewGames||[]).find(x=>x.id===gameId);if(!g||(g.prompts||[]).length===0)return;
  vaultPlayingGame={episodeId,gameId,index:0};paintInterviewGame();
