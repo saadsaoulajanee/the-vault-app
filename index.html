@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>The Vault V4.0.5</title>
+<title>The Vault V4.1.0</title>
 <meta name="theme-color" content="#13071e">
 <link rel="manifest" href="./manifest.webmanifest?v=404">
 <link rel="icon" type="image/png" sizes="192x192" href="./assets/vault-icon-192.png?v=404">
@@ -1102,10 +1102,25 @@ body[data-theme="dark"] .panel-day-tabs button.day-toggle.active .day-toggle-sta
  .brand{font-size:15px!important}
  .topright .vault-header-icon{width:30px!important;min-width:30px!important;flex-basis:30px!important}
 }
+
+/* The Vault V4.1.0 tools */
+.auto-cost-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:10px 0}
+.auto-cost-grid .field{min-width:0;margin:0}.episode-cost-overrides{margin:14px 0;padding:13px;border:1px solid var(--line);border-radius:12px;background:var(--paper)}
+.production-workspace-action,.filmography-research-bar,.research-lab-actions{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+.production-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.production-issues{margin-top:12px;display:grid;gap:8px}
+.production-issue{display:flex;align-items:start;justify-content:space-between;gap:10px;padding:9px;border:1px solid var(--line);border-radius:9px}
+.production-issue small{display:block;color:var(--muted);margin-top:3px}
+.research-search-results{display:grid;gap:7px}.research-person{text-align:left;background:var(--paper);color:var(--ink);border:1px solid var(--line);padding:10px;border-radius:10px}
+.research-person b,.research-person small{display:block}.research-person small{color:var(--muted)}
+.research-credit-list{max-height:340px;overflow:auto;display:grid;gap:5px;border:1px solid var(--line);border-radius:12px;padding:7px}
+.research-credit{display:flex;align-items:center;gap:9px;padding:7px 6px;border-bottom:1px solid var(--line);font-size:12px}.research-credit>span{flex:1;min-width:0}.research-credit b,.research-credit small{display:block}.research-credit small{color:var(--muted)}.research-credit a{font-size:11px;white-space:nowrap}
+.draft-recovered{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;background:var(--softblue);padding:9px 12px;border-radius:10px;color:var(--ink);margin-bottom:12px;font-size:12px}
+.health-stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:12px 0 18px}.health-stats>div{display:grid;gap:5px;border:1px solid var(--line);border-radius:10px;padding:10px}.health-stats small{color:var(--muted)}.health-stats strong{overflow-wrap:anywhere;font-size:13px}.health-issues{max-height:220px;overflow:auto}.health-issue{padding:7px;border-bottom:1px solid var(--line);font-size:12px}
+@media(max-width:600px){.auto-cost-grid{grid-template-columns:1fr 1fr}.production-list{grid-template-columns:1fr}.research-credit-list{max-height:290px}}
 </style>
 </head>
 <body><div class="app">
-<header class="top"><div class="brand"><div class="logo" aria-hidden="true"></div><div>The Vault <span class="muted" style="font-weight:600;font-size:13px">V4.0.5</span></div></div><div class="topright"><span class="pill" id="syncStatus">Offline-first • not signed in</span><button class="btn secondary small vault-header-icon" id="searchVaultBtn" onclick="openVaultSearch()" aria-label="Search The Vault" title="Search The Vault">⌕</button><button class="btn secondary small" id="quickNotesBtn" onclick="openQuickNotes()">📝 Notes</button><button class="btn secondary small vault-header-icon" id="themeBtn" title="Switch theme" aria-label="Switch theme">☾</button><button type="button" class="btn secondary small vault-header-icon" id="vaultToolsBtn" onclick="openVaultTools()" title="Tools" aria-label="Tools">⚙</button><div class="vault-hidden-tools" hidden><button id="exportBtn">Export backup</button><button id="importBtn">Import backup</button><button id="cloudBtn">Account & sync</button></div><input id="importFile" type="file" accept="application/json,.json" hidden></div></header>
+<header class="top"><div class="brand"><div class="logo" aria-hidden="true"></div><div>The Vault <span class="muted" style="font-weight:600;font-size:13px">V4.1.0</span></div></div><div class="topright"><span class="pill" id="syncStatus">Offline-first • not signed in</span><button class="btn secondary small vault-header-icon" id="searchVaultBtn" onclick="openVaultSearch()" aria-label="Search The Vault" title="Search The Vault">⌕</button><button class="btn secondary small" id="quickNotesBtn" onclick="openQuickNotes()">📝 Notes</button><button class="btn secondary small vault-header-icon" id="themeBtn" title="Switch theme" aria-label="Switch theme">☾</button><button type="button" class="btn secondary small vault-header-icon" id="vaultToolsBtn" onclick="openVaultTools()" title="Tools" aria-label="Tools">⚙</button><div class="vault-hidden-tools" hidden><button id="exportBtn">Export backup</button><button id="importBtn">Import backup</button><button id="cloudBtn">Account & sync</button></div><input id="importFile" type="file" accept="application/json,.json" hidden></div></header>
 <nav class="nav" id="nav">
 <button class="active" data-view="home">⌂ Dashboard</button><button data-view="episodes">▣ Episodes</button><button data-view="guests">👤 Guests</button><button data-view="interview">☷ Interview</button><button data-view="hub">✧ Convention Hub</button><button data-view="day">🎬 Convention Day</button><button data-view="kpis">📊 KPIs</button><button data-view="budget">💶 Budget</button><button data-view="venues">📍 Venues</button>
 </nav>
@@ -1129,28 +1144,7 @@ function ensureGuestProfiles(){db.episodes.forEach(e=>{if(!e.guest)return;let g=
 ensureGuestProfiles();
 try{if(!localStorage.getItem("vault_v4_initialized")){preserveVaultSafetyBackup("Before V4 upgrade");localStorage.setItem("vault_v4_initialized","1")}}catch{}
 let view="home",editing=null,activeEpisode=null,inspireOffset=0,inspireSelected=new Set(),episodesMode="gallery";
-let cloudUser=null, cloudChannel=null, syncTimer=null, syncBusy=false, applyingRemote=false, lastCloudPayload=null;
-// Store the last mutually accepted snapshot per account. This survives page reloads.
-const VAULT_CLOUD_BASELINE_PREFIX="vault_cloud_baseline_v405_";
-function stableCloudValue(value){
- if(Array.isArray(value))return value.map(stableCloudValue);
- if(value&&typeof value==="object"){
-  const result={};for(const key of Object.keys(value).sort()){
-   if(value[key]!==undefined)result[key]=stableCloudValue(value[key]);
-  }return result;
- }
- return value;
-}
-function cloudFingerprint(payload){return JSON.stringify(stableCloudValue(payload));}
-function loadCloudBaseline(){
- if(!cloudUser)return null;
- try{return localStorage.getItem(VAULT_CLOUD_BASELINE_PREFIX+cloudUser.id)||null}catch{return null}
-}
-function rememberCloudBaseline(payload){
- lastCloudPayload=typeof payload==="string"?payload:cloudFingerprint(payload);
- if(cloudUser){try{localStorage.setItem(VAULT_CLOUD_BASELINE_PREFIX+cloudUser.id,lastCloudPayload)}catch(e){console.warn("Could not store sync baseline",e)}}
-}
-
+let cloudUser=null, cloudChannel=null, syncTimer=null, syncBusy=false, applyingRemote=false, lastCloudPayload=null, cloudAuthOwner=null, cloudAuthStarted=false;
 
 function preserveVaultSafetyBackup(reason="Before important change"){
  try{const raw=localStorage.getItem("vault03");if(!raw)return;
@@ -1201,7 +1195,11 @@ function syncEpisodeBudgetExpenses(){
     let x=matches[0];
     if(!x){x={id:uid(),episodeId:ep.id,autoEpisodeExpense:kind};c.expenses.push(x);changed=true}
     const title=(kind==="editing"?"Editing":"Marketing")+" Episode: "+(ep.guest||"Unnamed guest");
-    const values={title,amount:50,date:c.startDate||"",category:kind};
+    const configured=Number(db.settings?.autoCosts?.[kind]);
+    const defaultAmount=Number.isFinite(configured)&&configured>=0?configured:50;
+    const override=ep.autoCostOverrides?.[kind];
+    const amount=(override!==null&&override!==undefined&&String(override)!==""&&Number.isFinite(Number(override))&&Number(override)>=0)?Number(override):defaultAmount;
+    const values={title,amount,date:c.startDate||"",category:kind};
     for(const [key,value] of Object.entries(values)){if(x[key]!==value){x[key]=value;changed=true}}
     if("episodeStatus" in x){delete x.episodeStatus;changed=true}
    }
@@ -1304,14 +1302,51 @@ if(syncEpisodeBudgetExpenses())localStorage.setItem("vault03",JSON.stringify(db)
 function setSyncStatus(label){const el=document.getElementById("syncStatus");if(el)el.textContent=label;}
 function scheduleCloudSync(){clearTimeout(syncTimer);syncTimer=setTimeout(()=>syncNow("both"),1200);}
 function cloudPayload(){return {guests:db.guests,organizers:db.organizers,conventions:db.conventions,episodes:db.episodes,checklistTemplate:db.checklistTemplate,settings:db.settings,venues:db.venues,youtubeVideos:db.youtubeVideos,taskTemplates:db.taskTemplates||{},_checklistTemplateUpdatedAt:db._checklistTemplateUpdatedAt||0};}
+// Compare the actual data, not JSON property ordering. Supabase can return the same
+// JSON object with a different key order, which is not a sync conflict.
+function canonicalCloudSnapshot(value){
+ const seen=new WeakSet();
+ function order(v){
+  if(Array.isArray(v))return v.map(order);
+  if(v&&typeof v==="object"){
+   if(seen.has(v))throw new Error("Circular cloud data");
+   seen.add(v);
+   const out={};for(const k of Object.keys(v).sort())if(v[k]!==undefined)out[k]=order(v[k]);
+   seen.delete(v);return out;
+  }
+  return v;
+ }
+ return JSON.stringify(order(value));
+}
+function cloudBaseKey(ownerId){return "vault_cloud_baseline_v405_"+String(ownerId||"");}
+function restoreCloudBaseline(){
+ lastCloudPayload=null;
+ if(!cloudUser?.id)return;
+ try{const saved=localStorage.getItem(cloudBaseKey(cloudUser.id));if(saved)lastCloudPayload=saved;}catch{}
+}
+function rememberCloudBaseline(payload){try{localStorage.setItem('vault_last_sync_at_v410',new Date().toISOString())}catch{}
+ lastCloudPayload=canonicalCloudSnapshot(payload);
+ if(cloudUser?.id){try{localStorage.setItem(cloudBaseKey(cloudUser.id),lastCloudPayload)}catch(err){console.warn("Could not cache cloud sync baseline",err)}}
+}
+async function pushCloudPayload(payload){
+ const {error}=await supabaseClient.from("vault_sync_state").upsert({owner_id:cloudUser.id,payload,updated_at:new Date().toISOString()},{onConflict:"owner_id"});
+ if(error)throw error;
+ rememberCloudBaseline(payload);
+}
 function applyCloudPayload(payload){
  if(!payload || !Array.isArray(payload.organizers)||!Array.isArray(payload.conventions)||!Array.isArray(payload.episodes))throw new Error("The cloud data format is not valid.");
- const incomingCloudSnapshot=cloudFingerprint(payload);
  preserveVaultSafetyBackup("Before cloud replacement");
  applyingRemote=true;
- db={...db,guests:Array.isArray(payload.guests)?payload.guests:[],organizers:payload.organizers,conventions:payload.conventions,episodes:payload.episodes,checklistTemplate:Array.isArray(payload.checklistTemplate)?payload.checklistTemplate:DEFAULT_CHECKLIST.slice(),settings:payload.settings||db.settings||{theme:"system",youtubeApiKey:""},venues:Array.isArray(payload.venues)?payload.venues.map(v=>({...v,floorPlans:v.floorPlans||[]})):[],youtubeVideos:Array.isArray(payload.youtubeVideos)?payload.youtubeVideos:[],taskTemplates:payload.taskTemplates&&typeof payload.taskTemplates==="object"?payload.taskTemplates:(db.taskTemplates||{}),_checklistTemplateUpdatedAt:Number(payload._checklistTemplateUpdatedAt)||0};const prepRestored=mergeNewerLocalPreparation(db);ensureGuestProfiles();
- const migratedProjects=migrateGuestProjects();
- syncEpisodeBudgetExpenses();localStorage.setItem("vault03",JSON.stringify(db));rememberCloudBaseline(incomingCloudSnapshot);applyingRemote=false;render();
+ let prepRestored=false,migratedProjects=false;
+ try{
+  db={...db,guests:Array.isArray(payload.guests)?payload.guests:[],organizers:payload.organizers,conventions:payload.conventions,episodes:payload.episodes,checklistTemplate:Array.isArray(payload.checklistTemplate)?payload.checklistTemplate:DEFAULT_CHECKLIST.slice(),settings:payload.settings||db.settings||{theme:"system",youtubeApiKey:""},venues:Array.isArray(payload.venues)?payload.venues.map(v=>({...v,floorPlans:v.floorPlans||[]})):[],youtubeVideos:Array.isArray(payload.youtubeVideos)?payload.youtubeVideos:[],taskTemplates:payload.taskTemplates&&typeof payload.taskTemplates==="object"?payload.taskTemplates:(db.taskTemplates||{}),_checklistTemplateUpdatedAt:Number(payload._checklistTemplateUpdatedAt)||0};
+  prepRestored=mergeNewerLocalPreparation(db);ensureGuestProfiles();
+  migratedProjects=migrateGuestProjects();syncEpisodeBudgetExpenses();
+  localStorage.setItem("vault03",JSON.stringify(db));
+  rememberCloudBaseline(payload);render();
+ }finally{applyingRemote=false;}
+ // Locally newer preparation details are preserved and will be uploaded rather
+ // than being silently replaced by an older cloud copy.
  if((migratedProjects||prepRestored)&&cloudUser&&navigator.onLine)scheduleCloudSync();
 }
 async function syncNow(mode="both"){
@@ -1319,53 +1354,44 @@ async function syncNow(mode="both"){
  if(syncBusy)return;
  syncBusy=true;setSyncStatus("Syncing…");
  try{
-  const {data:remote,error}=await supabaseClient.from("vault_sync_state").select("payload,updated_at").eq("owner_id",cloudUser.id).maybeSingle();
+  const ownerId=cloudUser.id;
+  const {data:remote,error}=await supabaseClient.from("vault_sync_state").select("payload,updated_at").eq("owner_id",ownerId).maybeSingle();
   if(error)throw error;
-  const local=cloudPayload(),localHash=cloudFingerprint(local),remotePayload=remote?.payload,remoteHash=remotePayload?cloudFingerprint(remotePayload):null;
-  if(!lastCloudPayload)lastCloudPayload=loadCloudBaseline();
-  const upload=async()=>{
-   const {error:upErr}=await supabaseClient.from("vault_sync_state").upsert({owner_id:cloudUser.id,payload:local,updated_at:new Date().toISOString()},{onConflict:"owner_id"});
-   if(upErr)throw upErr;
-   rememberCloudBaseline(localHash);
-  };
-  // No confirmation for identical data, including records with reordered object properties.
-  // This also prevents an identical cloud notification from rebuilding the entire page.
-  if(remoteHash!==null&&remoteHash===localHash){
-   rememberCloudBaseline(localHash);setSyncStatus("Everything is synced");return;
-  }
+  if(!cloudUser||cloudUser.id!==ownerId)return;
+  const local=cloudPayload(),localText=canonicalCloudSnapshot(local);
+  const remotePayload=remote?.payload;
+  const remoteText=remotePayload?canonicalCloudSnapshot(remotePayload):null;
   if(mode==="pull"){
-   if(remotePayload){applyCloudPayload(remotePayload);setSyncStatus("Downloaded cloud data");}
-   else setSyncStatus("Cloud is empty • ready to upload");
+   if(remotePayload){
+    if(localText!==remoteText)applyCloudPayload(remotePayload);
+    else rememberCloudBaseline(remotePayload);
+    setSyncStatus("Synced just now");
+   }else setSyncStatus("Cloud is empty • ready to upload");
    return;
   }
   if(mode==="push"){
-   await upload();setSyncStatus("Synced just now");return;
+   if(remoteText!==localText)await pushCloudPayload(local);
+   else rememberCloudBaseline(remotePayload);
+   setSyncStatus("Synced just now");return;
   }
-  if(!remotePayload){await upload();setSyncStatus("First cloud backup complete");return;}
-  if(!lastCloudPayload){
-   // Never ask on an identical first sync (handled above). Only real differences
-   // require a decision when no previously agreed snapshot is available.
+  if(!remotePayload){await pushCloudPayload(local);setSyncStatus("First cloud backup complete");return;}
+  // This comparison must happen before any question about which copy to keep.
+  if(localText===remoteText){rememberCloudBaseline(remotePayload);setSyncStatus("Everything is synced");return;}
+  // If we have a known shared ancestor, only a true two-sided change is a conflict.
+  // A change to just one side can be synchronized without interrupting the user.
+  if(lastCloudPayload){
+   if(localText===lastCloudPayload){applyCloudPayload(remotePayload);setSyncStatus("Downloaded changes from cloud");return;}
+   if(remoteText===lastCloudPayload){await pushCloudPayload(local);setSyncStatus("Changes uploaded");return;}
+  }else{
+   // No previous sync on this device: an empty local workspace may safely download.
    const hasLocal=local.organizers.length||local.conventions.length||local.episodes.length;
    if(!hasLocal){applyCloudPayload(remotePayload);setSyncStatus("Downloaded cloud data");return;}
-   const choice=confirm("Cloud data and this device are different. OK = keep the cloud data on this device. Cancel = keep this device's data and upload it to the cloud.");
-   if(choice){applyCloudPayload(remotePayload);setSyncStatus("Cloud version kept");}
-   else{await upload();setSyncStatus("Device version kept");}
-   return;
   }
-  const localChanged=localHash!==lastCloudPayload,remoteChanged=remoteHash!==lastCloudPayload;
-  if(localChanged&&remoteChanged){
-   const choice=confirm("This device and the cloud contain different changes since the last sync. OK = keep the cloud version. Cancel = keep this device's version.");
-   if(choice){applyCloudPayload(remotePayload);setSyncStatus("Cloud version kept");}
-   else{await upload();setSyncStatus("Device version kept");}
-  }else if(remoteChanged){
-   applyCloudPayload(remotePayload);setSyncStatus("Downloaded changes from cloud");
-  }else if(localChanged){
-   await upload();setSyncStatus("Changes uploaded");
-  }else{
-   // Defensive fallback if a legacy snapshot's representation differs.
-   rememberCloudBaseline(localHash);setSyncStatus("Everything is synced");
-  }
- }catch(err){setSyncStatus("Sync error");alert("The Vault could not sync: "+(err.message||String(err)));}
+  // The copies actually differ and neither can be proved to be an unchanged base.
+  const choice=confirm("The cloud and this device contain different data. OK = keep the cloud version. Cancel = keep this device's version and upload it.");
+  if(choice){applyCloudPayload(remotePayload);setSyncStatus("Cloud version kept");}
+  else{await pushCloudPayload(local);setSyncStatus("Device version kept and uploaded");}
+ }catch(err){setSyncStatus("Sync error");console.error("Vault sync error",err);alert("The Vault could not sync: "+(err.message||String(err)));}
  finally{syncBusy=false;}
 }
 async function startRealtime(){
@@ -1374,40 +1400,42 @@ async function startRealtime(){
  cloudChannel=supabaseClient.channel("vault-sync-"+cloudUser.id).on("postgres_changes",{event:"*",schema:"public",table:"vault_sync_state",filter:"owner_id=eq."+cloudUser.id},payload=>{
   if(syncBusy)return;
   const remote=payload.new?.payload;if(!remote)return;
-  const remoteHash=cloudFingerprint(remote),localHash=cloudFingerprint(cloudPayload());
-  if(remoteHash===localHash){rememberCloudBaseline(localHash);setSyncStatus("Everything is synced");return;}
-  if(localHash===lastCloudPayload){applyCloudPayload(remote);setSyncStatus("Live update received");}
-  else if(remoteHash===lastCloudPayload){setSyncStatus("Device changes waiting to sync");}
-  else{setSyncStatus("Another device changed data • sync to resolve");}
+  const local=canonicalCloudSnapshot(cloudPayload()),incoming=canonicalCloudSnapshot(remote);
+  if(local===incoming){rememberCloudBaseline(remote);setSyncStatus("Everything is synced");return;}
+  if(lastCloudPayload&&local===lastCloudPayload){applyCloudPayload(remote);setSyncStatus("Live update received");}
+  else setSyncStatus("Another device changed data • sync to resolve");
  }).subscribe();
 }
 async function openAccountSync(){
  if(!supabaseClient){alert("Supabase client unavailable. Connect to the internet and reload.");return;}
  const {data:{session},error}=await supabaseClient.auth.getSession();if(error){alert(error.message);return;}
- if(session){cloudUser=session.user;showModal("The Vault account",`<p class="sub">Signed in as <b>${esc(cloudUser.email||"")}</b></p><p class="smalltext">Your data is saved locally and synchronized with your private cloud account when online.</p><div class="row"><button class="btn blue" id="syncNowBtn">Sync now</button><button class="btn secondary" id="signoutBtn">Sign out</button></div>`);document.getElementById("syncNowBtn").onclick=async()=>{closeModal();await syncNow("both")};document.getElementById("signoutBtn").onclick=async()=>{await supabaseClient.auth.signOut();cloudUser=null;if(cloudChannel)await supabaseClient.removeChannel(cloudChannel);cloudChannel=null;lastCloudPayload=null;closeModal();setSyncStatus("Offline-first • not signed in")};return;}
+ if(session){cloudUser=session.user;showModal("The Vault account",`<p class="sub">Signed in as <b>${esc(cloudUser.email||"")}</b></p><p class="smalltext">Your data is saved locally and synchronized with your private cloud account when online.</p><div class="row"><button class="btn blue" id="syncNowBtn">Sync now</button><button class="btn secondary" id="signoutBtn">Sign out</button></div>`);document.getElementById("syncNowBtn").onclick=async()=>{closeModal();await syncNow("both")};document.getElementById("signoutBtn").onclick=async()=>{await supabaseClient.auth.signOut();cloudUser=null;cloudAuthOwner=null;cloudAuthStarted=false;if(cloudChannel)await supabaseClient.removeChannel(cloudChannel);cloudChannel=null;lastCloudPayload=null;closeModal();setSyncStatus("Offline-first • not signed in")};return;}
  showModal("Sign in to The Vault",`<p class="sub">Enter your email and we’ll send you a secure sign-in link.</p><form id="cloudlogin"><div class="field"><label>Email address</label><input name="email" type="email" required autocomplete="email" placeholder="you@example.com"></div><button class="btn blue">Send sign-in link</button></form>`);
  document.getElementById("cloudlogin").onsubmit=async e=>{e.preventDefault();const email=new FormData(e.target).get("email");const {error}=await supabaseClient.auth.signInWithOtp({email,options:{emailRedirectTo:location.href}});if(error)alert(error.message);else{closeModal();alert("Sign-in link sent. Open it in this same browser, then return to The Vault.");}};
 }
 async function initializeCloud(){
  if(!supabaseClient)return;
- const {data:{session}}=await supabaseClient.auth.getSession();
- if(session){
-  cloudUser=session.user;lastCloudPayload=loadCloudBaseline();
-  setSyncStatus("Signed in • connecting…");await syncNow("both");await startRealtime();
- }
- supabaseClient.auth.onAuthStateChange(async(event,session)=>{
-  // getSession already processed the initial session; token refreshes do not
-  // represent data changes and must not invoke another sync/conflict dialog.
-  if(event==="INITIAL_SESSION"||event==="TOKEN_REFRESHED"||event==="USER_UPDATED")return;
-  if(session){
-   if(cloudUser?.id===session.user.id)return;
-   cloudUser=session.user;lastCloudPayload=loadCloudBaseline();
-   await syncNow("both");await startRealtime();
-  }else if(event==="SIGNED_OUT"){
-   cloudUser=null;lastCloudPayload=null;
-   if(cloudChannel)await supabaseClient.removeChannel(cloudChannel);
-   cloudChannel=null;setSyncStatus("Offline-first • not signed in");
+ async function useSession(session){
+  const user=session?.user;
+  if(!user){
+   cloudUser=null;cloudAuthOwner=null;cloudAuthStarted=false;lastCloudPayload=null;
+   if(cloudChannel){const old=cloudChannel;cloudChannel=null;await supabaseClient.removeChannel(old);}
+   setSyncStatus("Offline-first • not signed in");return;
   }
+  // getSession() and onAuthStateChange(INITIAL_SESSION / SIGNED_IN) often
+  // announce the same user on a refresh. Do not start two sync cycles.
+  if(cloudAuthOwner===user.id&&cloudAuthStarted){cloudUser=user;return;}
+  cloudUser=user;cloudAuthOwner=user.id;cloudAuthStarted=true;
+  restoreCloudBaseline();setSyncStatus("Signed in • connecting…");
+  await syncNow("both");
+  if(cloudAuthOwner===user.id)await startRealtime();
+ }
+ // Register once; Supabase will provide INITIAL_SESSION. This avoids racing a
+ // second getSession() request against the authentication callback.
+ supabaseClient.auth.onAuthStateChange((event,session)=>{
+  if(event==="TOKEN_REFRESHED"&&session?.user?.id===cloudAuthOwner)return;
+  // Schedule outside the Supabase auth callback to avoid re-entrant auth calls.
+  setTimeout(()=>{useSession(session).catch(err=>{console.error("Vault auth sync error",err);setSyncStatus("Sync error")})},0);
  });
 }
 window.addEventListener("online",()=>{if(cloudUser){setSyncStatus("Back online • syncing…");syncNow("both");}});
@@ -1434,7 +1462,7 @@ function possibleGuestDuplicates(name,excludeId=""){
  return db.guests.filter(g=>g.id!==excludeId&&guestNameSimilarity(g.name,name)>=.78).sort((a,b)=>guestNameSimilarity(b.name,name)-guestNameSimilarity(a.name,name));
 }
 
-function saveGuestForm(form,confirmed=false){let f=new FormData(form),name=String(f.get("name")||"").trim();if(!name)return;let editingId=form.dataset.id||"";let matches=possibleGuestDuplicates(name,editingId);if(matches.length&&!confirmed){let list=matches.slice(0,5).map(g=>g.name).join("\\n");if(!confirm("Possible duplicate guest found:\\n\\n"+list+"\\n\\nContinue creating this guest anyway?"))return;}let g=db.guests.find(x=>x.id===form.dataset.id)||db.guests.find(x=>normalizeGuestName(x.name)===normalizeGuestName(name));if(!g){g={id:uid()};db.guests.push(g)}Object.assign(g,{name,photo:String(f.get("photo")||""),photoX:Number(f.get("photoX")||50),photoY:Number(f.get("photoY")||50),photoZoom:Number(f.get("photoZoom")||1),notes:String(f.get("notes")||""),socials:{instagram:String(f.get("instagram")||""),tiktok:String(f.get("tiktok")||""),youtube:String(f.get("youtube")||""),website:String(f.get("website")||"")},projects:[...form.querySelectorAll("#guestprojectlist .project-editor-row")].map(r=>({title:r.querySelector('input[aria-label="Project title"]').value.trim(),type:r.querySelector(".project-type-button").dataset.type||"Film",characterName:r.querySelector(".project-character-input")?.value.trim()||""})).filter(p=>p.title)});db.episodes.forEach(e=>{if(normalizeGuestName(e.guest)===normalizeGuestName(name))e.guestId=g.id});save();closeModal();render()}
+function saveGuestForm(form,confirmed=false){let f=new FormData(form),name=String(f.get("name")||"").trim();if(!name)return;let editingId=form.dataset.id||"";let matches=possibleGuestDuplicates(name,editingId);if(matches.length&&!confirmed){let list=matches.slice(0,5).map(g=>g.name).join("\\n");if(!confirm("Possible duplicate guest found:\\n\\n"+list+"\\n\\nContinue creating this guest anyway?"))return;}let g=db.guests.find(x=>x.id===form.dataset.id)||db.guests.find(x=>normalizeGuestName(x.name)===normalizeGuestName(name));if(!g){g={id:uid()};db.guests.push(g)}Object.assign(g,{name,photo:String(f.get("photo")||""),photoX:Number(f.get("photoX")||50),photoY:Number(f.get("photoY")||50),photoZoom:Number(f.get("photoZoom")||1),notes:String(f.get("notes")||""),socials:{instagram:String(f.get("instagram")||""),tiktok:String(f.get("tiktok")||""),youtube:String(f.get("youtube")||""),website:String(f.get("website")||"")},projects:[...form.querySelectorAll("#guestprojectlist .project-editor-row")].map(r=>({title:r.querySelector('input[aria-label="Project title"]').value.trim(),type:r.querySelector(".project-type-button").dataset.type||"Film",characterName:r.querySelector(".project-character-input")?.value.trim()||"",sourceUrl:r.dataset.sourceUrl||"",year:r.dataset.creditYear||""})).filter(p=>p.title)});db.episodes.forEach(e=>{if(normalizeGuestName(e.guest)===normalizeGuestName(name))e.guestId=g.id});save();closeModal();render()}
 function updateGuestPhotoPreview(){
  const form=document.getElementById("guestform"),input=form?.querySelector('[name="photo"]'),preview=document.getElementById("guest-photo-preview");
  if(!form||!preview)return;
@@ -1617,6 +1645,105 @@ function openInterviewGuestPicker(){
  showModal("Choose a guest interview",`<div class="episode-picker-list">${items.map(e=>`<button type="button" class="episode-picker-option ${e.id===activeEpisode?'selected':''}" onclick="activeEpisode='${e.id}';closeModal();render()">${e.status===10?'✕ ':''}${esc(e.guest||'Untitled guest')} · Episode ${e.status===10?'X':esc(e.number)}</button>`).join("")}</div>`);
 }
 
+
+let vaultResearchCredits=[];
+let vaultResearchGuestId="";
+function questionSourceSafe(url){try{const u=new URL(url);return u.protocol==="https:"&&["www.wikidata.org","wikidata.org"].includes(u.hostname)?u.href:""}catch{return ""}}
+function researchedQuestionIdeas(credits,kind="single"){
+ if(!Array.isArray(credits)||!credits.length)return [];
+ const selected=credits.filter(c=>c&&c.title);
+ if(kind==="comparison"){
+  if(selected.length<2)return [];
+  const [a,b]=selected;
+  return [
+   `Looking at ${a.title} and ${b.title}, what changed most in your approach to acting between those projects?`,
+   `What acting instinct served you well on ${a.title} but you had to rethink for ${b.title}?`,
+   `If the creative teams behind ${a.title} and ${b.title} swapped places, what do you imagine would be different?`,
+   `What unexpected connection do you see between your work on ${a.title} and ${b.title}?`,
+   `Which lesson from ${a.title} helped you approach ${b.title}, even if the roles were completely different?`,
+   `If you could ask your younger self from ${a.title} one question after finishing ${b.title}, what would it be?`
+  ];
+ }
+ const p=selected[0],ch=p.characterName?` ${p.characterName}`:" your character";
+ return [
+  `What was the first choice you made when developing${ch} in ${p.title}?`,
+  `What is a small acting decision you made on ${p.title} that viewers might never have noticed?`,
+  `Which part of the experience of making ${p.title} would surprise someone who has only seen the finished result?`,
+  `If you could revisit ${p.title} today, which scene or choice would you approach differently?`,
+  `What did the creative process on ${p.title} teach you that you still use today?`,
+  `What is one question about ${p.title} that you wish people would ask more often?`
+ ];
+}
+function openFilmographyResearch(guestId){
+ const g=db.guests.find(x=>x.id===guestId);if(!g)return;
+ vaultResearchGuestId=guestId;vaultResearchCredits=[];
+ showModal("🔎 Free filmography research",`<p class="smalltext">Wikidata research is free and needs no API key. Select the right person, review the credits, then import only the projects you want. Wikidata may be incomplete; always check sources before asking fact-specific questions.</p><div class="field"><label>Search performer</label><div class="row"><input id="wikidataSearchName" value="${esc(g.name||'')}" placeholder="Actor's name"><button class="btn blue small" onclick="searchFilmographyPerson()">Search</button></div></div><div id="wikidataResults"><p class="smalltext">Choose Search to find matching public profiles.</p></div>`);
+}
+async function searchFilmographyPerson(){
+ const term=document.getElementById("wikidataSearchName")?.value.trim(),host=document.getElementById("wikidataResults");if(!host||!term)return;
+ host.textContent="Searching Wikidata…";
+ try{const q=new URLSearchParams({action:"wbsearchentities",search:term,language:"en",format:"json",type:"item",limit:"8",origin:"*"});
+  const res=await fetch('https://www.wikidata.org/w/api.php?'+q.toString());if(!res.ok)throw Error("Wikidata search unavailable ("+res.status+")");
+  const results=(await res.json()).search||[];
+  host.innerHTML=results.length?`<p class="smalltext">Confirm the correct person before retrieving credits:</p><div class="research-search-results">${results.map(x=>`<button class="research-person" type="button" onclick="loadFilmographyCredits('${esc(x.id)}')"><b>${esc(x.label||'Unnamed')}</b><small>${esc(x.description||'No description available')}</small></button>`).join('')}</div>`:'<p class="smalltext">No matching Wikidata person found. You can still use your saved guest projects.</p>';
+ }catch(err){host.innerHTML=`<p class="smalltext">Wikidata search failed: ${esc(err.message)}. Try again later, or use saved guest projects.</p>`}
+}
+async function loadFilmographyCredits(actorId){
+ if(!/^Q[1-9]\d{0,11}$/.test(actorId))return;
+ const host=document.getElementById("wikidataResults");if(!host)return;host.textContent="Loading film and TV credits from Wikidata…";
+ const query=`SELECT DISTINCT ?work ?workLabel ?releaseDate ?characterLabel WHERE {
+  ?work wdt:P161 wd:${actorId} .
+  OPTIONAL { ?work wdt:P577 ?releaseDate . }
+  OPTIONAL { ?work p:P161 ?statement . ?statement ps:P161 wd:${actorId} . ?statement pq:P453 ?character . }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
+ } LIMIT 90`;
+ try{const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),22000);
+  let res;try{res=await fetch('https://query.wikidata.org/sparql?format=json&query='+encodeURIComponent(query),{signal:controller.signal,headers:{Accept:'application/sparql-results+json'}})}finally{clearTimeout(timeout)}
+  if(!res.ok)throw Error("Wikidata query unavailable ("+res.status+")");
+  const bindings=(await res.json()).results?.bindings||[];
+  const records=new Map();for(const b of bindings){const uri=b.work?.value||'',id=uri.match(/\/(Q\d+)$/)?.[1],title=b.workLabel?.value||'';if(!id||!title||title===id)continue;
+   const existing=records.get(id)||{id,title,type:"Other",characterName:"",year:"",sourceUrl:'https://www.wikidata.org/wiki/'+id};
+   if(!existing.characterName&&b.characterLabel?.value&&!/^Q\d+$/.test(b.characterLabel.value))existing.characterName=b.characterLabel.value;
+   if(!existing.year&&b.releaseDate?.value)existing.year=String(b.releaseDate.value).slice(0,4);
+   records.set(id,existing);
+  }
+  vaultResearchCredits=[...records.values()].sort((a,b)=>(b.year||'').localeCompare(a.year||'')||a.title.localeCompare(b.title));
+  host.innerHTML=vaultResearchCredits.length?`<div class="sectionhead"><div><h3>Public credits · ${vaultResearchCredits.length}</h3><p class="smalltext">Check each title against the source. Import selected credits into this guest's profile.</p></div><button class="btn blue small" onclick="importFilmographyCredits()">Import checked</button></div><div class="research-credit-list">${vaultResearchCredits.map((x,i)=>`<label class="research-credit"><input type="checkbox" data-research-index="${i}" ${i<12?'checked':''}><span><b>${esc(x.title)}</b><small>${esc([x.year,x.characterName].filter(Boolean).join(' · ')||'Year and character not listed')}</small></span><a href="${esc(x.sourceUrl)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">Source ↗</a></label>`).join('')}</div>`:'<p class="smalltext">No film/TV cast credits found for this person on Wikidata. You can still manually add projects to the guest profile.</p>';
+ }catch(err){host.innerHTML=`<p class="smalltext">Couldn't load credits: ${esc(err.name==='AbortError'?'The query timed out. Try again later.':err.message)}. Wikidata is a public service and may be slow. Your saved projects are unaffected.</p>`}
+}
+function importFilmographyCredits(){
+ const g=db.guests.find(x=>x.id===vaultResearchGuestId),host=document.getElementById('wikidataResults');if(!g||!host)return;
+ const selected=[...host.querySelectorAll('input[data-research-index]:checked')].map(el=>vaultResearchCredits[Number(el.dataset.researchIndex)]).filter(Boolean);
+ if(!selected.length){alert('Select at least one credit to import.');return}
+ g.projects=Array.isArray(g.projects)?g.projects:[];let added=0;
+ for(const p of selected){const existing=g.projects.find(x=>String(x.title||'').trim().toLowerCase()===p.title.toLowerCase());
+  if(existing){if(!existing.sourceUrl)existing.sourceUrl=p.sourceUrl;if(!existing.characterName)existing.characterName=p.characterName;if(!existing.year)existing.year=p.year;continue}
+  g.projects.push({...p,type:'Other'});added++;
+ }
+ save();closeModal();render();alert(added+' filmography credit'+(added===1?'':'s')+' added. The interview question lab can now use them.');
+}
+function openCrossProjectQuestions(episodeId,guestId){
+ const g=db.guests.find(x=>x.id===guestId);if(!g)return;
+ const projects=(g.projects||[]).filter(p=>p.title);
+ if(projects.length<2){alert('Save at least two projects in the guest profile before comparing roles.');return}
+ showModal('↔ Cross-project questions',`<p class="smalltext">Choose two projects from ${esc(g.name)}'s credits. Suggestions explore their creative differences without inventing story details.</p><div class="auto-cost-grid"><div class="field"><label>First project</label><select id="crossFirst" onchange="renderCrossProjectIdeas('${episodeId}','${guestId}')">${projects.map((p,i)=>`<option value="${i}">${esc(p.title)}</option>`).join('')}</select></div><div class="field"><label>Second project</label><select id="crossSecond" onchange="renderCrossProjectIdeas('${episodeId}','${guestId}')">${projects.map((p,i)=>`<option value="${i}" ${i===1?'selected':''}>${esc(p.title)}</option>`).join('')}</select></div></div><div id="crossIdeaList"></div>`);
+ renderCrossProjectIdeas(episodeId,guestId);
+}
+let vaultCrossQuestions=[];
+function renderCrossProjectIdeas(episodeId,guestId){
+ const host=document.getElementById('crossIdeaList'),g=db.guests.find(x=>x.id===guestId);if(!host||!g)return;
+ const projects=(g.projects||[]).filter(p=>p.title),a=projects[Number(document.getElementById('crossFirst')?.value)],b=projects[Number(document.getElementById('crossSecond')?.value)];
+ if(!a||!b||a===b){host.innerHTML='<p class="smalltext">Choose two different projects.</p>';return}
+ vaultCrossQuestions=researchedQuestionIdeas([a,b],'comparison');
+ host.innerHTML=vaultCrossQuestions.map((q,i)=>`<div class="filmography-idea"><span>${esc(q)}</span><div class="idea-actions"><button type="button" class="btn secondary small" onclick="saveCrossProjectQuestion('${episodeId}',${i},'shortlist')">☆ Shortlist</button><button type="button" class="btn blue small" onclick="saveCrossProjectQuestion('${episodeId}',${i},'add')">＋ Add</button></div></div>`).join('');
+}
+function saveCrossProjectQuestion(episodeId,index,mode){const q=vaultCrossQuestions[index],ep=db.episodes.find(e=>e.id===episodeId);if(!q||!ep)return;
+ const key=x=>String(x.text||'').toLowerCase().trim();
+ if((ep.questions||[]).some(x=>key(x)===q.toLowerCase().trim())||(ep.questionShortlist||[]).some(x=>key(x)===q.toLowerCase().trim())){alert('Already saved in this interview.');return}
+ if(mode==='add'){ep.questions=ep.questions||[];ep.questions.push({id:uid(),text:q,asked:false,source:'cross-project'});save();closeModal();render();}
+ else {ep.questionShortlist=ep.questionShortlist||[];ep.questionShortlist.push({id:uid(),text:q,source:'cross-project'});save();alert('Added to shortlist.')}
+}
+
 function filmographyQuestionIdeas(project,guestName){
  const title=String(project.title||"the project").trim(),character=String(project.characterName||"").trim(),type=String(project.type||"project").toLowerCase();
  const base=[
@@ -1647,8 +1774,8 @@ function toggleFilmographyLab(episodeId,guestId){
  const host=document.getElementById("filmographyLab");if(!host)return;
  if(host.innerHTML.trim()){host.innerHTML="";return}
  const guest=db.guests.find(g=>g.id===guestId),projects=(guest?.projects||[]).filter(p=>p.title&&p.title.trim());
- if(!projects.length){host.innerHTML='<div class="note">Add projects to this guest profile first.</div>';return}
- host.innerHTML=`<section class="filmography-lab card"><div class="sectionhead"><div><h3>Filmography question lab</h3><p class="smalltext">Original prompts built from the project and character details saved in this guest profile. They avoid assuming plot facts.</p></div><button class="btn secondary small" onclick="document.getElementById('filmographyLab').innerHTML=''">Close</button></div><div class="field"><label>Choose a project</label><select id="filmographyProject" onchange="renderFilmographyIdeas('${episodeId}','${guestId}')">${projects.map((p,i)=>`<option value="${i}">${esc(p.title)} · ${esc(p.type||"Other")}</option>`).join("")}</select></div><div id="filmographyIdeas"></div></section>`;
+ if(!projects.length){host.innerHTML=`<div class="filmography-lab"><p class="smalltext">No saved credits yet. Search public Wikidata filmography for free and add credits to the guest profile.</p><button class="btn blue small" onclick="openFilmographyResearch('${guestId}')">🔎 Research filmography (free)</button></div>`;return}
+ host.innerHTML=`<section class="filmography-lab card"><div class="research-lab-actions"><button class="btn secondary small" onclick="openFilmographyResearch('${guestId}')">🔎 Find credits (free)</button><button class="btn secondary small" onclick="openCrossProjectQuestions('${episodeId}','${guestId}')">↔ Compare projects</button></div><div class="sectionhead"><div><h3>Filmography question lab</h3><p class="smalltext">Original prompts built from the project and character details saved in this guest profile. They avoid assuming plot facts.</p></div><button class="btn secondary small" onclick="document.getElementById('filmographyLab').innerHTML=''">Close</button></div><div class="field"><label>Choose a project</label><select id="filmographyProject" onchange="renderFilmographyIdeas('${episodeId}','${guestId}')">${projects.map((p,i)=>`<option value="${i}">${esc(p.title)} · ${esc(p.type||"Other")}</option>`).join("")}</select></div><div id="filmographyIdeas"></div></section>`;
  renderFilmographyIdeas(episodeId,guestId);
 }
 function renderFilmographyIdeas(episodeId,guestId){
@@ -1668,6 +1795,27 @@ function pickFilmographyQuestion(episodeId,guestId,index,action){
  episode.questionShortlist.push({id:uid(),text:question});save();
  const badge=document.getElementById('questionShortlistCount');if(badge)badge.textContent=episode.questionShortlist.length;
 }
+
+const VAULT_FOOTAGE_ITEMS=[
+ ["cameraA","Camera A transferred"],["cameraB","Camera B transferred"],["cameraC","Camera C transferred"],
+ ["audio","External audio transferred"],["integrity","Files opened and checked"],
+ ["backup","Second backup verified"],["cards","Memory cards safe to format"]
+];
+function ensureProductionLog(e){
+ if(!e.productionLog||typeof e.productionLog!=="object")e.productionLog={};
+ if(!e.productionLog.footage||typeof e.productionLog.footage!=="object")e.productionLog.footage={};
+ if(!Array.isArray(e.productionLog.issues))e.productionLog.issues=[];
+ return e.productionLog;
+}
+function productionChecklistCount(ep){const log=ep?.productionLog?.footage||{};return VAULT_FOOTAGE_ITEMS.filter(([id])=>!!log[id]).length}
+function openProductionLog(episodeId){
+ const e=db.episodes.find(x=>x.id===episodeId);if(!e)return;const log=ensureProductionLog(e);
+ showModal("🎥 Production log · "+(e.guest||"Interview"),`<div class="production-log"><p class="smalltext">Track all camera files, backups and technical issues. Each item is saved with this episode and included in cloud sync.</p><div class="sectionhead"><div><h3>Footage safety</h3><p class="smalltext">${productionChecklistCount(e)}/${VAULT_FOOTAGE_ITEMS.length} verified</p></div></div><div class="production-list">${VAULT_FOOTAGE_ITEMS.map(([key,label])=>`<label class="day-check-row"><input type="checkbox" ${log.footage[key]?"checked":""} onchange="updateFootageCheck('${e.id}','${key}',this.checked)"><span>${esc(label)}</span></label>`).join("")}</div><p class="smalltext">Keep original cards until you have verified the primary copy and a second backup.</p><div class="sectionhead" style="margin-top:18px"><h3>Filming issues</h3><span class="tag">${log.issues.length} logged</span></div><form id="issueForm"><div class="auto-cost-grid"><div class="field"><label>Type</label><select name="type">${["Audio","Focus","Exposure / color","Camera overheating","Card / battery","Interrupted recording","Other"].map(x=>`<option>${x}</option>`).join("")}</select></div><div class="field"><label>Approx. timestamp (optional)</label><input name="time" placeholder="e.g. 03:15"></div></div><div class="field"><label>What happened?</label><textarea name="note" rows="2" required placeholder="e.g. Camera B lost focus at 03:15"></textarea></div><button type="submit" class="btn blue small">＋ Add issue</button></form><div class="production-issues">${log.issues.map((x,i)=>`<div class="production-issue"><div><b>${esc(x.type)}</b>${x.time?` · ${esc(x.time)}`:""}<small>${esc(x.note)}</small></div><button type="button" class="btn danger small" onclick="removeProductionIssue('${e.id}',${i})" aria-label="Delete issue">×</button></div>`).join("")||'<p class="smalltext">No issues recorded.</p>'}</div></div>`);
+ document.getElementById('issueForm').onsubmit=event=>{event.preventDefault();const f=new FormData(event.target),note=String(f.get('note')||'').trim();if(!note)return;log.issues.push({id:uid(),type:String(f.get('type')||'Other'),time:String(f.get('time')||'').trim(),note,createdAt:new Date().toISOString()});save();openProductionLog(episodeId)};
+}
+function updateFootageCheck(id,key,checked){if(!VAULT_FOOTAGE_ITEMS.some(x=>x[0]===key))return;const e=db.episodes.find(x=>x.id===id);if(!e)return;ensureProductionLog(e).footage[key]=!!checked;save();}
+function removeProductionIssue(id,index){const e=db.episodes.find(x=>x.id===id);if(!e)return;const log=ensureProductionLog(e);log.issues.splice(index,1);save();openProductionLog(id)}
+
 function openInterviewShortlist(episodeId){
  const episode=db.episodes.find(e=>e.id===episodeId);if(!episode)return;
  episode.questionShortlist=Array.isArray(episode.questionShortlist)?episode.questionShortlist:[];
@@ -1707,7 +1855,7 @@ function interview(){
  return `<section class="hero"><div><div class="eyebrow">Live interview workspace</div><h1>Questions, in your flow.</h1><p class="sub">Choose a convention first, then select the guest you are interviewing.</p></div></section>
  <section class="card interview-controls"><div class="field"><label>1. Convention</label><button type="button" class="episode-picker-trigger" onclick="openInterviewConventionPicker()">${esc(convention?.name||"Choose a convention")}<span>⌄</span></button></div>
  <div class="field"><label>2. Guest interview</label><button type="button" class="episode-picker-trigger" ${available.length?'':'disabled'} onclick="openInterviewGuestPicker()">${esc(e?`${e.guest||"Untitled guest"} · Episode ${e.status===10?"X":e.number}`:available.length?"Choose a guest":"No guest interviews for this convention")}<span>⌄</span></button></div></section>
- ${!convention?'<div class="empty">Create a convention in Convention Hub to get started.</div>':!e?'<div class="empty">Add an episode and link it to this convention to prepare an interview.</div>':`<section class="card"><div class="sectionhead"><div><h2>${e.status===10?"✕ ":""}${esc(epTitle(e))}</h2>${e.status===10?'<span class="tag">Cancelled</span>':""}<span class="smalltext">${e.questions.filter(q=>q.asked).length} of ${e.questions.length} asked</span></div><div class="interview-top-actions"><button class="btn blue small" onclick="openInterviewFocusMode('${e.id}')">◎ Focus questions</button><button class="btn secondary small" onclick="openEpisode('${e.id}')">Edit episode</button></div></div><div class="bar"><i style="width:${e.questions.length?100*e.questions.filter(q=>q.asked).length/e.questions.length:0}%"></i></div><div class="interview-focus-row"><section class="interview-timer-panel"><div class="interview-timer-readout"><span class="eyebrow">Interview timer</span><strong id="interviewElapsed">00:00:00</strong><small id="interviewTimerState">Ready when you are</small></div><div class="interview-timer-controls"><button class="btn blue small" id="interviewTimerStart" onclick="startInterviewTimer('${e.id}')">▶ Start</button><button class="btn secondary small" onclick="pauseInterviewTimer('${e.id}')">Ⅱ Pause</button><button class="btn secondary small" onclick="resetInterviewTimer('${e.id}')">↺ Reset</button></div></section>${(()=>{const photo=guest?.photo&&safeGuestUrl(guest.photo);return `<div class="interview-guest-photo">${photo?`<img src="${esc(photo)}" alt="${esc(guest?.name||e.guest||'Guest')}" style="object-position:${Number(guest.photoX??50)}% ${Number(guest.photoY??50)}%;transform:scale(${Number(guest.photoZoom??1)});transform-origin:${Number(guest.photoX??50)}% ${Number(guest.photoY??50)}%">`:`<span>${esc(String(e.guest||"?").trim().split(/\s+/).slice(0,2).map(x=>x[0]||"").join("").toUpperCase()||"✦")}</span>`}</div>`})()}</div><div class="question-library-workspace"><div class="sectionhead"><h3>Question library</h3><div class="question-library-actions"><button class="btn secondary small" onclick="openInterviewShortlist('${e.id}')">☆ Shortlist <span id="questionShortlistCount">${(e.questionShortlist||[]).length}</span></button><button class="btn secondary small" onclick="openFavoriteQuestions('${e.id}')">★ Saved questions</button></div></div>${(guest?.projects||[]).filter(p=>p.title&&p.title.trim()).length?`<div class="project-strip-label">Guest projects</div><div class="project-strip">${guest.projects.filter(p=>p.title&&p.title.trim()).map(p=>`<span class="project-chip"><strong>${esc(p.title)}</strong> · ${esc(p.type||"Other")}${p.characterName?` · ${esc(p.characterName)}`:""}</span>`).join("")}</div><div class="filmography-generator-launch"><button class="btn secondary small" type="button" onclick="toggleFilmographyLab('${e.id}','${guest.id}')">✨ Generate questions from filmography</button><span class="smalltext">Uses the guest's saved projects and character details.</span></div><div id="filmographyLab"></div>`:""}<div class="question-library-scroll" role="region" aria-label="Interview questions" tabindex="0">${e.questions.map(q=>`<div class="interview-question-row"><label class="qrow"><input type="checkbox" ${q.asked?'checked':''} onchange="toggleAsked('${e.id}','${q.id}',this.checked)"><span class="qtext ${q.asked?'done':''}">${esc(q.text)}</span></label><button class="favorite-question-btn ${q.favorite?'active':''}" title="Save question to favorites" onclick="toggleFavoriteQuestion('${e.id}','${q.id}')">${q.favorite?"★":"☆"}</button></div>`).join("")||'<div class="empty">No questions yet. Add them in the episode editor.</div>'}</div></div></section>`}${thumbnailArchive()}`
+ ${!convention?'<div class="empty">Create a convention in Convention Hub to get started.</div>':!e?'<div class="empty">Add an episode and link it to this convention to prepare an interview.</div>':`<section class="card"><div class="sectionhead"><div><h2>${e.status===10?"✕ ":""}${esc(epTitle(e))}</h2>${e.status===10?'<span class="tag">Cancelled</span>':""}<span class="smalltext">${e.questions.filter(q=>q.asked).length} of ${e.questions.length} asked</span></div><div class="interview-top-actions"><button class="btn blue small" onclick="openInterviewFocusMode('${e.id}')">◎ Focus questions</button><button class="btn secondary small" onclick="openEpisode('${e.id}')">Edit episode</button></div></div><div class="bar"><i style="width:${e.questions.length?100*e.questions.filter(q=>q.asked).length/e.questions.length:0}%"></i></div><div class="production-workspace-action"><button type="button" class="btn secondary small" onclick="openProductionLog('${e.id}')">🎥 Footage & filming notes · ${productionChecklistCount(e)}/${VAULT_FOOTAGE_ITEMS.length}</button></div><div class="interview-focus-row"><section class="interview-timer-panel"><div class="interview-timer-readout"><span class="eyebrow">Interview timer</span><strong id="interviewElapsed">00:00:00</strong><small id="interviewTimerState">Ready when you are</small></div><div class="interview-timer-controls"><button class="btn blue small" id="interviewTimerStart" onclick="startInterviewTimer('${e.id}')">▶ Start</button><button class="btn secondary small" onclick="pauseInterviewTimer('${e.id}')">Ⅱ Pause</button><button class="btn secondary small" onclick="resetInterviewTimer('${e.id}')">↺ Reset</button></div></section>${(()=>{const photo=guest?.photo&&safeGuestUrl(guest.photo);return `<div class="interview-guest-photo">${photo?`<img src="${esc(photo)}" alt="${esc(guest?.name||e.guest||'Guest')}" style="object-position:${Number(guest.photoX??50)}% ${Number(guest.photoY??50)}%;transform:scale(${Number(guest.photoZoom??1)});transform-origin:${Number(guest.photoX??50)}% ${Number(guest.photoY??50)}%">`:`<span>${esc(String(e.guest||"?").trim().split(/\s+/).slice(0,2).map(x=>x[0]||"").join("").toUpperCase()||"✦")}</span>`}</div>`})()}</div><div class="question-library-workspace"><div class="sectionhead"><h3>Question library</h3><div class="question-library-actions"><button class="btn secondary small" onclick="openInterviewShortlist('${e.id}')">☆ Shortlist <span id="questionShortlistCount">${(e.questionShortlist||[]).length}</span></button><button class="btn secondary small" onclick="openFavoriteQuestions('${e.id}')">★ Saved questions</button></div></div>${guest?`<div class="filmography-research-bar"><button class="btn secondary small" onclick="openFilmographyResearch('${guest.id}')">🔎 Research filmography (free)</button>${(guest.projects||[]).length>1?`<button class="btn secondary small" onclick="openCrossProjectQuestions('${e.id}','${guest.id}')">↔ Cross-project questions</button>`:''}</div>`:''}${(guest?.projects||[]).filter(p=>p.title&&p.title.trim()).length?`<div class="project-strip-label">Guest projects <button class="btn secondary small" style="margin-left:7px" onclick="openFilmographyResearch('${guest.id}')">🔎 Find credits (free)</button></div><div class="project-strip">${guest.projects.filter(p=>p.title&&p.title.trim()).map(p=>`<span class="project-chip"><strong>${esc(p.title)}</strong> · ${esc(p.type||"Other")}${p.characterName?` · ${esc(p.characterName)}`:""}</span>`).join("")}</div><div class="filmography-generator-launch"><button class="btn secondary small" type="button" onclick="toggleFilmographyLab('${e.id}','${guest.id}')">✨ Generate questions from filmography</button><span class="smalltext">Uses the guest's saved projects and character details.</span></div><div id="filmographyLab"></div>`:""}<div class="question-library-scroll" role="region" aria-label="Interview questions" tabindex="0">${e.questions.map(q=>`<div class="interview-question-row"><label class="qrow"><input type="checkbox" ${q.asked?'checked':''} onchange="toggleAsked('${e.id}','${q.id}',this.checked)"><span class="qtext ${q.asked?'done':''}">${esc(q.text)}</span></label><button class="favorite-question-btn ${q.favorite?'active':''}" title="Save question to favorites" onclick="toggleFavoriteQuestion('${e.id}','${q.id}')">${q.favorite?"★":"☆"}</button></div>`).join("")||'<div class="empty">No questions yet. Add them in the episode editor.</div>'}</div></div></section>`}${thumbnailArchive()}`
 }
 function thumbnailArchive(){
  let items=db.episodes.filter(e=>e.thumbnailUrl&&/^https?:\/\//i.test(e.thumbnailUrl));
@@ -2057,8 +2205,15 @@ function budgetView(){
   </div>
   <div class="budget-limit-row"><div class="field"><label>Budget limit (€)</label><input type="number" min="0" step=".01" value="${budget||""}" placeholder="e.g. 500" onchange="setBudget('${c.id}',this.value)"></div><div class="budget-remaining-tile"><span>Budget status</span><strong>${budget?(remaining<0?"Over budget":remaining===0?"Exactly on budget":"On track"):"Not set"}</strong></div></div>
  </section>
+ <section class="card budget-card" style="margin-top:14px"><div class="sectionhead"><div><h2>Automatic episode costs</h2><p class="smalltext">Set defaults for automatic editing and marketing expenses. Episode-specific overrides take priority. Cancelled episodes generate no costs.</p></div></div><div class="auto-cost-grid"><div class="field"><label>Editing default (€)</label><input type="number" min="0" step=".01" value="${esc(db.settings?.autoCosts?.editing??50)}" onchange="setAutomaticCost('editing',this.value)"></div><div class="field"><label>Marketing default (€)</label><input type="number" min="0" step=".01" value="${esc(db.settings?.autoCosts?.marketing??50)}" onchange="setAutomaticCost('marketing',this.value)"></div></div></section>
  <section class="card budget-card" style="margin-top:14px"><div class="sectionhead"><div><h2>Expenses</h2><div class="smalltext">Your costs for this convention</div></div><button class="btn secondary small" onclick="addExpense('${c.id}')">＋ Add</button></div>
  <div class="budget-expenses">${rows.slice().sort((a,b)=>(b.date||"").localeCompare(a.date||"")).map(x=>`<div class="budget-expense ${x.autoEpisodeExpense?'is-automatic':''}"><div class="budget-expense-main"><b>${esc(x.title)}</b><div class="smalltext">${esc(x.category||"Other")}${x.date?' · '+esc(x.date):''}${x.autoEpisodeExpense?' <span class="expense-auto-label">Auto</span>':''}</div></div><div class="budget-expense-controls"><strong class="budget-expense-amount">${money(x.amount)}</strong>${x.autoEpisodeExpense?'':`<button class="expense-delete-btn" title="Delete expense" aria-label="Delete expense" onclick="removeExpense('${c.id}','${x.id}')">×</button>`}</div></div>`).join("")||'<div class="empty">No expenses recorded yet. Add your first one above.</div>'}</div></section>`;
+}
+function setAutomaticCost(kind,value){
+ if(!["editing","marketing"].includes(kind))return;
+ const amount=Number(value);if(!Number.isFinite(amount)||amount<0){alert("Enter a valid non-negative euro amount.");render();return}
+ db.settings=db.settings||{};db.settings.autoCosts=db.settings.autoCosts||{editing:50,marketing:50};
+ db.settings.autoCosts[kind]=amount;save();render();
 }
 function selectBudgetConvention(id){window.budgetConventionId=id;render()}
 
@@ -2095,7 +2250,7 @@ function venuesView(){
  ${(v.floorPlans||[]).length?`<div class="smalltext">${v.floorPlans.length} plan${v.floorPlans.length===1?"":"s"} saved · Images and PDF pages</div><div class="floorplan-tabs">${v.floorPlans.map((p,i)=>`<button class="floorplan-tab" onclick="openFloorplanEditor('${v.id}',${i})">${esc(p.name||"Plan "+(i+1))}</button>`).join("")}</div>`:'<div class="floorplan-empty">No floor plan uploaded yet. Add JPG, PNG, or PDF files to get started.</div>'}
  </section>`).join("")||'<div class="empty">No saved venues yet.</div>'}`;
 }
-function editVenue(id){
+function editVenue(id){window.__draftVenueId=id||"new";
  let v=(db.venues||[]).find(x=>x.id===id)||{id:"",name:"",address:"",floorPlans:[]};
  showModal("Venue details",`<form id="venue-form"><div class="field"><label>Venue name</label><input name="name" required value="${esc(v.name)}"></div><div class="field"><label>Address</label><input name="address" value="${esc(v.address||"")}"></div><div class="field"><label>Room directory</label><textarea name="rooms" rows="6" placeholder="Panel Room | Main stage, Level 1&#10;Interview Room | Near registration&#10;Photoshoot Room | Hall B">${(v.rooms||[]).map(r=>esc(r.name+(r.notes?" | "+r.notes:""))).join("\n")}</textarea><div class="smalltext">One room per line. Optional: add a description after a | character. Example: Interview Room | Behind the main stage.</div></div><div class="smalltext">Floor plans are uploaded and annotated from the venue card after saving.</div><button class="btn blue">Save venue</button></form>`);
  document.getElementById("venue-form").onsubmit=e=>{e.preventDefault();let f=new FormData(e.target);db.venues=db.venues||[];let row={...v,id:v.id||uid(),name:String(f.get("name")).trim(),address:String(f.get("address")||""),rooms:String(f.get("rooms")||"").split(/\r?\n/).map(line=>{let parts=line.split("|");return {name:(parts.shift()||"").trim(),notes:parts.join("|").trim()}}).filter(r=>r.name),floorPlans:v.floorPlans||[]};let i=db.venues.findIndex(x=>x.id===v.id);if(i<0)db.venues.push(row);else db.venues[i]=row;save();closeModal();render()};
@@ -2134,11 +2289,30 @@ function normalizeQuestion(s){return String(s||"").toLowerCase().normalize("NFD"
 function questionSimilarity(a,b){let A=new Set(normalizeQuestion(a).split(" ").filter(x=>x.length>2)),B=new Set(normalizeQuestion(b).split(" ").filter(x=>x.length>2));if(!A.size||!B.size)return 0;let n=[...A].filter(x=>B.has(x)).length;return n/(A.size+B.size-n)}
 function detectDuplicateQuestions(){let rows=[...document.querySelectorAll("#editquestions .qrow")].map(r=>r.querySelector('[aria-label="Question"]')?.value.trim()).filter(Boolean),prior=db.episodes.filter(e=>e.id!==editing).flatMap(e=>(e.questions||[]).map(q=>({text:q.text,ep:epTitle(e)}))),hits=[];rows.forEach(q=>prior.forEach(p=>{let s=questionSimilarity(q,p.text);if(normalizeQuestion(q)===normalizeQuestion(p.text)||s>=.55)hits.push({q,p,s})}));showModal("Duplicate question check",hits.length?hits.slice(0,30).map(x=>`<div class="expense-row"><div><b>${esc(x.q)}</b><div class="smalltext">Similar to "${esc(x.p.text)}" · ${esc(x.p.ep)}</div></div><span class="tag">${Math.round(x.s*100)}%</span></div>`).join(""):'<div class="empty">No likely duplicates found.</div>')}
 
-function openScheduledInterview(episodeId){const episode=db.episodes.find(e=>String(e.id)===String(episodeId));if(!episode)return;activeEpisode=episode.id;window.interviewConvention=episode.conventionId||"";view="interview";render()} function openVaultTools(){
- showModal("Tools & backups",`<div class="vault-tools-actions"><button class="btn secondary" onclick="closeModal();document.getElementById('exportBtn').click()">↧ Export backup</button><button class="btn secondary" onclick="closeModal();document.getElementById('importBtn').click()">↥ Import backup</button><button class="btn secondary" onclick="closeModal();document.getElementById('cloudBtn').click()">☁ Account & sync</button><button class="btn secondary" onclick="closeModal();openVaultSafetyBackups()">↶ Restore local backup</button></div>`);
+function openScheduledInterview(episodeId){const episode=db.episodes.find(e=>String(e.id)===String(episodeId));if(!episode)return;activeEpisode=episode.id;window.interviewConvention=episode.conventionId||"";view="interview";render()} 
+function vaultDataHealth(){
+ const issues=[];
+ const knownGuests=new Set(db.guests.map(g=>g.id)),knownConventions=new Set(db.conventions.map(c=>c.id)),knownOrganizers=new Set(db.organizers.map(o=>o.id)),knownVenues=new Set((db.venues||[]).map(v=>v.id));
+ for(const e of db.episodes){if(e.conventionId&&!knownConventions.has(e.conventionId))issues.push('Episode '+(e.guest||e.id)+': missing convention');if(e.guestId&&!knownGuests.has(e.guestId))issues.push('Episode '+(e.guest||e.id)+': missing guest profile');}
+ for(const c of db.conventions){if(c.organizerId&&!knownOrganizers.has(c.organizerId))issues.push('Convention '+c.name+': missing organizer');if(c.venueId&&!knownVenues.has(c.venueId))issues.push('Convention '+c.name+': missing venue');for(const id of c.guestIds||[])if(!knownGuests.has(id))issues.push('Convention '+c.name+': missing guest reference');}
+ for(const g of db.guests){if(g.photo&&!safeGuestUrl(g.photo))issues.push('Guest '+g.name+': invalid photo URL')}
+ let storage=0;try{for(let i=0;i<localStorage.length;i++){let key=localStorage.key(i);storage+=(key.length+(localStorage.getItem(key)||'').length)*2}}catch{}
+ let backups=[];try{backups=JSON.parse(localStorage.getItem('vault_v4_safety_backups')||'[]')}catch{}
+ let drafts=0;try{for(let i=0;i<localStorage.length;i++)if(localStorage.key(i).startsWith(VAULT_FORM_DRAFT_PREFIX))drafts++}catch{}
+ return {issues,storage,backups:backups.length,drafts};
+}
+async function openVaultDataHealth(){
+ const h=vaultDataHealth(),fmtSize=b=>b>1024*1024?(b/(1024*1024)).toFixed(1)+' MB':Math.round(b/1024)+' KB';
+ const last=localStorage.getItem('vault_last_sync_at_v410');
+ showModal('🩺 Data health',`<p class="smalltext">A quick check of your local records. This is not a substitute for a downloaded backup.</p><div class="health-stats"><div><small>Cloud connection</small><strong>${cloudUser?'Signed in':'Not signed in'}</strong></div><div><small>Last synced</small><strong>${last?esc(new Date(last).toLocaleString()):'Not recorded'}</strong></div><div><small>Browser data</small><strong>${fmtSize(h.storage)}</strong></div><div><small>Safety backups</small><strong>${h.backups}</strong></div><div><small>Unfinished drafts</small><strong>${h.drafts}</strong></div><div><small>Reference warnings</small><strong>${h.issues.length}</strong></div></div><div class="sectionhead"><h3>Data checks</h3><span class="tag">${h.issues.length?`${h.issues.length} warnings`:'All references valid'}</span></div><div class="health-issues">${h.issues.length?h.issues.slice(0,40).map(x=>`<div class="health-issue">⚠ ${esc(x)}</div>`).join(''):'<p class="smalltext">No broken internal references or invalid photo URLs detected. External image availability is not checked automatically.</p>'}${h.issues.length>40?`<p class="smalltext">Showing 40 of ${h.issues.length} warnings.</p>`:''}</div><div class="row"><button class="btn blue small" onclick="closeModal();document.getElementById('exportBtn').click()">↧ Export backup</button><button class="btn secondary small" onclick="openVaultDataHealth()">↻ Recheck</button></div><p class="smalltext">Sync conflicts still require your approval when both cloud and device have changed. This screen doesn't modify your data.</p>`);
+ if(navigator.storage?.estimate){try{const estimate=await navigator.storage.estimate(),el=document.getElementById('vaultQuota');if(el)el.textContent=fmtSize(estimate.usage||0)+' used'}catch{}}
+}
+
+function openVaultTools(){
+ showModal("Tools & backups",`<div class="vault-tools-actions"><button class="btn secondary" onclick="closeModal();document.getElementById('exportBtn').click()">↧ Export backup</button><button class="btn secondary" onclick="closeModal();document.getElementById('importBtn').click()">↥ Import backup</button><button class="btn secondary" onclick="closeModal();document.getElementById('cloudBtn').click()">☁ Account & sync</button><button class="btn secondary" onclick="closeModal();openVaultSafetyBackups()">↶ Restore local backup</button><button class="btn secondary" onclick="closeModal();openVaultDataHealth()">🩺 Data health</button></div>`);
 }
 function openVaultMoreMenu(){
- showModal("Navigate The Vault",`<div class="vault-more-links">${[["episodes","▣ Episodes"],["guests","👤 Guests"],["kpis","📊 KPIs"],["budget","💶 Budget"],["venues","📍 Venues"]].map(([id,name])=>`<button class="btn secondary" onclick="closeModal();go('${id}')">${name}</button>`).join("")}</div><div class="vault-more-links"><button class="btn secondary" onclick="closeModal();openVaultSearch()">⌕ Search everything</button><button class="btn secondary" onclick="closeModal();openQuickNotes()">📝 Quick notes</button><button class="btn secondary" onclick="closeModal();openVaultSafetyBackups()">Safety backups</button></div>`);
+ showModal("Navigate The Vault",`<div class="vault-more-links">${[["episodes","▣ Episodes"],["guests","👤 Guests"],["kpis","📊 KPIs"],["budget","💶 Budget"],["venues","📍 Venues"]].map(([id,name])=>`<button class="btn secondary" onclick="closeModal();go('${id}')">${name}</button>`).join("")}</div><div class="vault-more-links"><button class="btn secondary" onclick="closeModal();openVaultSearch()">⌕ Search everything</button><button class="btn secondary" onclick="closeModal();openQuickNotes()">📝 Quick notes</button><button class="btn secondary" onclick="closeModal();openVaultSafetyBackups()">Safety backups</button><button class="btn secondary" onclick="closeModal();openVaultDataHealth()">🩺 Data health</button></div>`);
 }
 function openVaultSearch(){
  showModal("Search The Vault",`<div class="field"><label for="vaultGlobalSearch">Guests, episodes, conventions, projects, questions</label><input type="search" id="vaultGlobalSearch" placeholder="Search everything…" oninput="drawVaultSearchResults(this.value)" autocomplete="off" autofocus></div><div id="vaultSearchResults" class="vault-search-results"></div>`);
@@ -2163,7 +2337,48 @@ function setupKanbanDrag(){
  document.querySelectorAll(".kanban-lane").forEach(l=>{l.addEventListener("dragover",e=>{e.preventDefault();l.classList.add("drop-target")});l.addEventListener("dragleave",()=>l.classList.remove("drop-target"));l.addEventListener("drop",e=>{e.preventDefault();l.classList.remove("drop-target");let id=e.dataTransfer.getData("text/plain");if(id)changeEpisodeStatus(id,Number(l.dataset.status))})});
  document.querySelectorAll(".kanban-lane .episode").forEach(card=>{let id=card.getAttribute("onclick")?.match(/openEpisode\('([^']+)'\)/)?.[1];if(!id)return;card.draggable=true;card.addEventListener("dragstart",e=>{e.dataTransfer.setData("text/plain",id);card.classList.add("dragging")});card.addEventListener("dragend",()=>card.classList.remove("dragging"));let timer=null;card.addEventListener("pointerdown",e=>{if(e.pointerType!=="touch")return;timer=setTimeout(()=>{card.dataset.touchDrag="1";card.classList.add("touch-dragging");try{card.setPointerCapture(e.pointerId)}catch(err){}},450)});card.addEventListener("pointerup",e=>{if(timer)clearTimeout(timer);timer=null;if(card.dataset.touchDrag){let lane=document.elementFromPoint(e.clientX,e.clientY)?.closest(".kanban-lane");if(lane)changeEpisodeStatus(id,Number(lane.dataset.status));delete card.dataset.touchDrag;card.classList.remove("touch-dragging");window.__suppressEpisodeOpen=Date.now()+500}});card.addEventListener("pointercancel",()=>{if(timer)clearTimeout(timer);timer=null;delete card.dataset.touchDrag;card.classList.remove("touch-dragging")})});
 }
-function showModal(title,html){document.getElementById("modtitle").textContent=title;document.getElementById("modbody").innerHTML=html;document.getElementById("modalback").classList.add("show");upgradeVaultSelects(document.getElementById("modbody"));if(document.getElementById("epform"))setupEpisodeStatusFields()}
+
+const VAULT_FORM_DRAFT_PREFIX="vault_form_draft_v410_";
+const VAULT_DRAFT_FORMS=new Set(["epform","conform","guestform","orgform","expense-form","venue-form"]);
+let vaultDraftTimer=null;
+function vaultFormDraftKey(form){
+ if(!form||!VAULT_DRAFT_FORMS.has(form.id))return "";
+ const id=form.dataset.id||((form.id==='epform')?(editing||'new'):(form.id==='conform')?(window.__draftConventionId||'new'):(form.id==='orgform')?(window.__draftOrganizerId||'new'):(form.id==='expense-form')?(window.budgetConventionId||'new'):(form.id==='venue-form')?(window.__draftVenueId||'new'):'new');
+ return VAULT_FORM_DRAFT_PREFIX+form.id+'_'+String(id);
+}
+function vaultDraftSnapshot(form){
+ const values=[...form.querySelectorAll('input,select,textarea')].filter(el=>el.type!=='password'&&el.type!=='file'&&el.type!=='hidden').map((el,i)=>({index:i,name:el.name||'',type:el.type||'',value:el.value,checked:el.type==='checkbox'||el.type==='radio'?el.checked:undefined}));
+ const dynamic={};for(const id of ['editquestions','shorts','guestprojectlist','organizerContacts']){
+  const box=form.querySelector('#'+id);if(!box)continue;
+  const clone=box.cloneNode(true);const old=[...box.querySelectorAll('input,select,textarea')],fresh=[...clone.querySelectorAll('input,select,textarea')];
+  old.forEach((el,i)=>{const copy=fresh[i];if(!copy)return;if(el.type==='checkbox'||el.type==='radio')el.checked?copy.setAttribute('checked',''):copy.removeAttribute('checked');else if(el.tagName==='TEXTAREA')copy.textContent=el.value;else if(el.tagName==='SELECT'){[...copy.options].forEach((opt,j)=>j===el.selectedIndex?opt.setAttribute('selected',''):opt.removeAttribute('selected'))}else copy.setAttribute('value',el.value)});
+  dynamic[id]=clone.innerHTML;
+ }
+ return {updatedAt:new Date().toISOString(),values,dynamic};
+}
+function saveVaultDraft(form){const key=vaultFormDraftKey(form);if(!key)return;try{localStorage.setItem(key,JSON.stringify(vaultDraftSnapshot(form)))}catch(err){console.warn('Draft could not be saved',err)}}
+function clearVaultDraft(form){const key=vaultFormDraftKey(form);if(key){clearTimeout(vaultDraftTimer);try{localStorage.removeItem(key)}catch{}}}
+function restoreVaultDraft(form){const key=vaultFormDraftKey(form);if(!key)return;
+ let data;try{data=JSON.parse(localStorage.getItem(key)||'null')}catch{return}if(!data?.values)return;
+ // Only restore drafts for this precise form/entity. No pop-up on every refresh.
+ for(const [id,markup] of Object.entries(data.dynamic||{})){
+  const box=form.querySelector('#'+id);if(box&&typeof markup==='string'&&markup.length<150000)box.innerHTML=markup;
+ }
+ const fields=[...form.querySelectorAll('input,select,textarea')].filter(el=>el.type!=='password'&&el.type!=='file'&&el.type!=='hidden');
+ for(const item of data.values){const el=fields[item.index];if(!el||el.type!==item.type||el.name!==item.name)continue;
+  if(el.type==='checkbox'||el.type==='radio')el.checked=!!item.checked;else el.value=item.value;
+ }
+ const note=document.createElement('div');note.className='draft-recovered';note.innerHTML='<span>↶ Recovered an unfinished draft from this device.</span><button type="button" class="btn secondary small" id="discardVaultDraft">Discard draft</button>';
+ form.prepend(note);note.querySelector('button').onclick=()=>{if(confirm('Discard this draft and reload the saved values?')){clearVaultDraft(form);const title=document.getElementById('modtitle')?.textContent||'';closeModal();if(form.id==='epform')editing?openEpisode(editing):newEpisode();else if(form.id==='guestform')form.dataset.id?editGuest(form.dataset.id):addGuest();else if(form.id==='conform')editConvention(window.__draftConventionId||undefined);else if(form.id==='orgform')editOrganizer(window.__draftOrganizerId||undefined);else if(form.id==='expense-form')addExpense(window.budgetConventionId);else if(form.id==='venue-form')editVenue(window.__draftVenueId||undefined)}};
+}
+function attachVaultDraft(form){if(!form||!VAULT_DRAFT_FORMS.has(form.id))return;restoreVaultDraft(form);
+ const schedule=()=>{form.dataset.vaultDraftDirty='yes';clearTimeout(vaultDraftTimer);vaultDraftTimer=setTimeout(()=>{if(form.isConnected)saveVaultDraft(form)},350)};
+ form.addEventListener('input',schedule);form.addEventListener('change',schedule);
+ form.addEventListener('click',e=>{if(e.target.closest('button[type="button"]'))schedule()});
+}
+
+document.addEventListener('submit',e=>{if(VAULT_DRAFT_FORMS.has(e.target?.id))e.target.dataset.vaultSubmitted='yes'},true);
+function showModal(title,html){const previous=document.querySelector('#modbody form[data-vault-draft-dirty="yes"]');if(previous&&previous.dataset.vaultSubmitted!=='yes')saveVaultDraft(previous);document.getElementById("modtitle").textContent=title;document.getElementById("modbody").innerHTML=html;document.getElementById("modalback").classList.add("show");upgradeVaultSelects(document.getElementById("modbody"));if(document.getElementById("epform"))setupEpisodeStatusFields();const draftForm=document.querySelector('#modbody form');if(draftForm)attachVaultDraft(draftForm)}
 function syncEpisodeStatusFields(){
  const form=document.getElementById("epform"),status=form?.querySelector('[name="status"]'),numberBox=document.getElementById("episodeNumberField"),dateBox=document.getElementById("publishDateField");
  if(!form||!status||!numberBox||!dateBox)return;
@@ -2190,7 +2405,7 @@ function setupEpisodeStatusFields(){
  if(status){status.addEventListener("change",syncEpisodeStatusFields);status.addEventListener("input",syncEpisodeStatusFields);syncEpisodeStatusFields()}
  if(guestStatus){guestStatus.addEventListener("change",syncInterviewDetails);guestStatus.addEventListener("input",syncInterviewDetails);syncInterviewDetails()}
 }
-function closeModal(){const el=document.getElementById("modalback"),wasInterviewFocus=el.classList.contains('interview-focus-mode');el.classList.remove("show","focus-mode","interview-focus-mode");if(wasInterviewFocus)render()}
+function closeModal(){const form=document.querySelector('#modbody form[data-vault-submitted="yes"]');if(form)clearVaultDraft(form);else{const dirty=document.querySelector('#modbody form[data-vault-draft-dirty="yes"]');if(dirty)saveVaultDraft(dirty)}const el=document.getElementById("modalback"),wasInterviewFocus=el.classList.contains('interview-focus-mode');el.classList.remove("show","focus-mode","interview-focus-mode");if(wasInterviewFocus)render()}
 document.getElementById("modbody").addEventListener("submit",e=>{if(e.target.id==="guestform"){e.preventDefault();saveGuestForm(e.target)}});
 document.getElementById("closemodal").onclick=closeModal;document.getElementById("modalback").onclick=e=>{if(e.target.id==="modalback")closeModal()};
 function newEpisode(daymode=false){editing=null;let num=nextNum();showModal("Create episode",episodeForm({number:num,guest:"",conventionId:"",date:nextDate(),status:0,questions:[],longLink:"",shorts:[],notes:"",time:"",duration:""}));}
@@ -2226,7 +2441,7 @@ function migrateGuestProjects(){
 function projectEditor(e){return (e.projects||[]).map((p,i)=>projectRow(p,i)).join("")}
 function projectRow(p={},i=0){
  let type=PROJECT_TYPES.includes(p.type)?p.type:"Film",needsCharacter=["Film","TV show"].includes(type);
- return `<div class="project-editor-row" data-project-type="${esc(type)}">
+ return `<div class="project-editor-row" data-project-type="${esc(type)}" data-source-url="${esc(p.sourceUrl||"")}" data-credit-year="${esc(p.year||"")}">
  <input aria-label="Project title" placeholder="Project title" value="${esc(p.title||"")}">
  <button type="button" class="vault-select-button project-type-button" data-type="${esc(type)}" onclick="openProjectTypePicker(this)"><span class="vault-select-label">${esc(type)}</span><span class="vault-select-chevron" aria-hidden="true">⌄</span></button>
  <button type="button" class="btn danger small" aria-label="Remove project" onclick="this.closest('.project-editor-row').remove()">×</button>
@@ -2239,7 +2454,7 @@ function closeProjectTypePicker(){document.getElementById("project-type-overlay"
 function setProjectType(type){let b=window.__projectTypeButton;if(!b)return;b.dataset.type=type;b.querySelector(".vault-select-label").textContent=type;let row=b.closest(".project-editor-row"),field=row?.querySelector(".project-character-input");if(field){field.style.display=["Film","TV show"].includes(type)?"":"none";if(!["Film","TV show"].includes(type))field.value=""}closeProjectTypePicker()}
 function addProjectRow(){let box=document.getElementById("projectlist");if(!box)return;box.insertAdjacentHTML("beforeend",projectRow({type:"Film"}));upgradeVaultSelects(box)}
 function addGuestProjectRow(){let box=document.getElementById("guestprojectlist");if(!box)return;box.insertAdjacentHTML("beforeend",projectRow({type:"Film"}));upgradeVaultSelects(box)}
-function episodeForm(e,existing=false){return `<form id="epform"><div class="row"><div class="field" id="episodeNumberField"><label>Episode number</label><input value="${e.status===10?'X':(e.number||nextNum())}" readonly aria-label="Automatically assigned episode number"><div class="smalltext">Assigned automatically when you save.</div></div><div class="field"><label>Guest</label><div class="row guest-picker-row"><select name="guestId" id="episodeGuestSelect" required><option value="">Choose a guest</option>${db.guests.slice().sort((a,b)=>a.name.localeCompare(b.name)).map(g=>`<option value="${g.id}" ${(e.guestId===g.id||(!e.guestId&&normalizeGuestName(g.name)===normalizeGuestName(e.guest)))?"selected":""}>${esc(g.name)}</option>`).join("")}</select><button type="button" class="btn secondary small" onclick="createEpisodeGuest()">＋ Create guest</button></div><div class="smalltext">Select an existing Guest CRM profile or create a new one.</div></div></div><div class="field"><label>Guest status</label><select name="guestStatus">${["Invited","Confirmed","Interview planned","Interviewed","Published"].map(x=>`<option value="${x}" ${(e.guestStatus||"Invited")===x?"selected":""}>${x}</option>`).join("")}</select><div class="smalltext">Invited or confirmed guests stay in the invitation list. Choose “Interview planned” when you are ready to prepare the interview.</div></div><div class="field"><label>Convention</label><select name="conventionId"><option value="">Choose convention</option>${db.conventions.map(c=>`<option value="${c.id}" ${e.conventionId===c.id?'selected':''}>${esc(c.name)}</option>`).join("")}</select></div><div class="row"><div class="field" id="publishDateField"><label>Publish date</label><input name="date" type="date" value="${e.status===10?"":(e.date||"")}" ${e.status===10?"disabled":""}></div><div class="field"><label>Production status</label><select name="status">${STATUSES.map((s,i)=>`<option value="${i}" ${e.status===i?'selected':''}>${s[0]} ${s[1]}</option>`).join("")}</select></div></div><div class="row"><div class="field"><label>Interview day</label><select name="interviewDay"><option value="">Not scheduled</option><option value="Saturday" ${e.interviewDay==="Saturday"?"selected":""}>Saturday</option><option value="Sunday" ${e.interviewDay==="Sunday"?"selected":""}>Sunday</option></select></div><div class="field"><label>Interview time (Convention Day)</label><input name="time" type="time" value="${e.time||""}"></div><div class="field"><label>Interview room / location</label><input name="room" value="${esc(e.room||"")}" placeholder="e.g. Interview Room 2"></div><div class="field"><label>Duration</label><input name="duration" value="${esc(e.duration||"")}" placeholder="e.g. 15 min"></div></div><div id="interview-details" class="interview-details-gate" style="${isInterviewPlanned(e)?"":"display:none"}"><div class="sectionhead"><h3>Interview preparation & production</h3><span class="tag">Interview planned</span></div><p class="gate-note">Questions, YouTube links, notes and Shorts tracking appear once an interview is planned.</p><div class="field"><label>Long-form YouTube link</label><input name="longLink" type="url" value="${esc(e.longLink||"")}" placeholder="https://..."></div><div class="field"><label>Thumbnail image URL</label><input name="thumbnailUrl" type="url" value="${esc(e.thumbnailUrl||"")}" placeholder="https://...jpg"><div class="smalltext">Paste a direct image link. It will appear in the interview thumbnail archive.</div></div><div class="field"><label>Quick notes / standout moments / follow-ups</label><textarea name="notes">${esc(e.notes||"")}</textarea></div><div class="smalltext">Guest projects and credits are managed once in the Guest CRM profile and shared across all interviews.</div><div class="sectionhead"><h3>Questions</h3><div class="row" style="flex:0 1 auto"><button type="button" class="btn secondary small" onclick="detectDuplicateQuestions()">◎ Check duplicates</button><button type="button" class="btn secondary small" onclick="bulkQuestions()">＋ Bulk import</button></div></div><div id="editquestions">${questionEditor(e)}</div><div class="row"><button type="button" class="btn secondary" onclick="addQuestion()">＋ Add question</button><button type="button" class="btn pink" onclick="getInspired('${e.id||""}')">✦ Get Inspired</button></div><div class="field" style="margin-top:16px"><label>Shorts tracking (up to six)</label><div class="smalltext">Each short can be tracked by platform and link.</div><div id="shorts">${shortEditor(e)}</div><button type="button" class="btn secondary small" onclick="addShort()">＋ Add Short</button></div></div><div class="row" style="margin-top:18px"><button class="btn blue" type="submit">Save episode</button>${existing?`<button type="button" class="btn danger" onclick="deleteEpisode('${e.id}')">Delete episode</button>`:""}<button type="button" class="btn secondary" onclick="closeModal()">Cancel</button></div></form>`}
+function episodeForm(e,existing=false){return `<form id="epform"><div class="row"><div class="field" id="episodeNumberField"><label>Episode number</label><input value="${e.status===10?'X':(e.number||nextNum())}" readonly aria-label="Automatically assigned episode number"><div class="smalltext">Assigned automatically when you save.</div></div><div class="field"><label>Guest</label><div class="row guest-picker-row"><select name="guestId" id="episodeGuestSelect" required><option value="">Choose a guest</option>${db.guests.slice().sort((a,b)=>a.name.localeCompare(b.name)).map(g=>`<option value="${g.id}" ${(e.guestId===g.id||(!e.guestId&&normalizeGuestName(g.name)===normalizeGuestName(e.guest)))?"selected":""}>${esc(g.name)}</option>`).join("")}</select><button type="button" class="btn secondary small" onclick="createEpisodeGuest()">＋ Create guest</button></div><div class="smalltext">Select an existing Guest CRM profile or create a new one.</div></div></div><div class="field"><label>Guest status</label><select name="guestStatus">${["Invited","Confirmed","Interview planned","Interviewed","Published"].map(x=>`<option value="${x}" ${(e.guestStatus||"Invited")===x?"selected":""}>${x}</option>`).join("")}</select><div class="smalltext">Invited or confirmed guests stay in the invitation list. Choose “Interview planned” when you are ready to prepare the interview.</div></div><div class="field"><label>Convention</label><select name="conventionId"><option value="">Choose convention</option>${db.conventions.map(c=>`<option value="${c.id}" ${e.conventionId===c.id?'selected':''}>${esc(c.name)}</option>`).join("")}</select></div><div class="row"><div class="field" id="publishDateField"><label>Publish date</label><input name="date" type="date" value="${e.status===10?"":(e.date||"")}" ${e.status===10?"disabled":""}></div><div class="field"><label>Production status</label><select name="status">${STATUSES.map((s,i)=>`<option value="${i}" ${e.status===i?'selected':''}>${s[0]} ${s[1]}</option>`).join("")}</select></div></div><div class="row"><div class="field"><label>Interview day</label><select name="interviewDay"><option value="">Not scheduled</option><option value="Saturday" ${e.interviewDay==="Saturday"?"selected":""}>Saturday</option><option value="Sunday" ${e.interviewDay==="Sunday"?"selected":""}>Sunday</option></select></div><div class="field"><label>Interview time (Convention Day)</label><input name="time" type="time" value="${e.time||""}"></div><div class="field"><label>Interview room / location</label><input name="room" value="${esc(e.room||"")}" placeholder="e.g. Interview Room 2"></div><div class="field"><label>Duration</label><input name="duration" value="${esc(e.duration||"")}" placeholder="e.g. 15 min"></div></div><div id="interview-details" class="interview-details-gate" style="${isInterviewPlanned(e)?"":"display:none"}"><div class="sectionhead"><h3>Interview preparation & production</h3><span class="tag">Interview planned</span></div><p class="gate-note">Questions, YouTube links, notes and Shorts tracking appear once an interview is planned.</p><div class="field"><label>Long-form YouTube link</label><input name="longLink" type="url" value="${esc(e.longLink||"")}" placeholder="https://..."></div><div class="field"><label>Thumbnail image URL</label><input name="thumbnailUrl" type="url" value="${esc(e.thumbnailUrl||"")}" placeholder="https://...jpg"><div class="smalltext">Paste a direct image link. It will appear in the interview thumbnail archive.</div></div><div class="field"><label>Quick notes / standout moments / follow-ups</label><textarea name="notes">${esc(e.notes||"")}</textarea></div><div class="smalltext">Guest projects and credits are managed once in the Guest CRM profile and shared across all interviews.</div><div class="episode-production-link"><button type="button" class="btn secondary small" ${e.id?`onclick="openProductionLog('${e.id}')"`:'disabled title="Save the episode first"'}>🎥 Footage backup & filming issues (${productionChecklistCount(e)}/${VAULT_FOOTAGE_ITEMS.length})</button></div><div class="sectionhead"><h3>Questions</h3><div class="row" style="flex:0 1 auto"><button type="button" class="btn secondary small" onclick="detectDuplicateQuestions()">◎ Check duplicates</button><button type="button" class="btn secondary small" onclick="bulkQuestions()">＋ Bulk import</button></div></div><div id="editquestions">${questionEditor(e)}</div><div class="row"><button type="button" class="btn secondary" onclick="addQuestion()">＋ Add question</button><button type="button" class="btn pink" onclick="getInspired('${e.id||""}')">✦ Get Inspired</button></div><div class="episode-cost-overrides"><h3>Episode budget overrides</h3><p class="smalltext">Leave blank to use the Budget tab defaults. Set 0 for no charge. Existing conventions retain their manual expenses.</p><div class="auto-cost-grid"><div class="field"><label>Editing (€)</label><input name="episodeEditingCost" type="number" min="0" step=".01" value="${e.autoCostOverrides?.editing??""}" placeholder="Default"></div><div class="field"><label>Marketing (€)</label><input name="episodeMarketingCost" type="number" min="0" step=".01" value="${e.autoCostOverrides?.marketing??""}" placeholder="Default"></div></div></div><div class="field" style="margin-top:16px"><label>Shorts tracking (up to six)</label><div class="smalltext">Each short can be tracked by platform and link.</div><div id="shorts">${shortEditor(e)}</div><button type="button" class="btn secondary small" onclick="addShort()">＋ Add Short</button></div></div><div class="row" style="margin-top:18px"><button class="btn blue" type="submit">Save episode</button>${existing?`<button type="button" class="btn danger" onclick="deleteEpisode('${e.id}')">Delete episode</button>`:""}<button type="button" class="btn secondary" onclick="closeModal()">Cancel</button></div></form>`}
 function questionEditor(e){return (e.questions||[]).map(q=>`<div class="qrow"><input type="checkbox" ${q.asked?'checked':''} title="Asked"><input style="flex:1;min-width:0;border:1px solid var(--line);border-radius:8px;padding:8px" value="${esc(q.text)}" data-qid="${q.id}" aria-label="Question"><button type="button" class="btn danger small" onclick="this.parentElement.remove()">×</button></div>`).join("")}
 function addQuestion(){let box=document.getElementById("editquestions");let div=document.createElement("div");div.className="qrow";div.innerHTML='<input type="checkbox" title="Asked"><input style="flex:1;min-width:0;border:1px solid var(--line);border-radius:8px;padding:8px" aria-label="Question" placeholder="Write a question"><button type="button" class="btn danger small" onclick="this.parentElement.remove()">×</button>';box.appendChild(div)}
 function bulkQuestions(){let old=document.getElementById("bulkpanel");if(old){old.remove();return}let panel=document.createElement("div");panel.id="bulkpanel";panel.className="card";panel.style.cssText="margin:12px 0;padding:14px;background:#f8f9fd";panel.innerHTML=`<div class="field"><label>Paste one question per line</label><textarea id="bulktext" rows="6" placeholder="Question one&#10;Question two&#10;Question three"></textarea></div><div class="row"><button type="button" class="btn blue" id="bulkAdd">Add questions</button><button type="button" class="btn secondary" id="bulkCancel">Cancel</button></div>`;document.getElementById("editquestions").after(panel);document.getElementById("bulkAdd").onclick=applyBulk;document.getElementById("bulkCancel").onclick=()=>panel.remove()}
@@ -2247,7 +2462,7 @@ function applyBulk(){let field=document.getElementById("bulktext"),box=document.
 function shortEditor(e){return (e.shorts||[]).map((s,i)=>`<div class="row" style="margin:8px 0"><select data-shortplatform="${i}"><option ${s.platform==="YouTube"?'selected':''}>YouTube</option><option ${s.platform==="TikTok"?'selected':''}>TikTok</option><option ${s.platform==="Instagram"?'selected':''}>Instagram</option></select><input data-shortlink="${i}" placeholder="Short link" value="${esc(s.link||"")}"><button type="button" class="btn danger small" onclick="this.parentElement.remove()">×</button></div>`).join("")}
 function addShort(){let box=document.getElementById("shorts");if(box.children.length>=6)return alert("Up to six Shorts per episode.");let div=document.createElement("div");div.className="row";div.style.margin="8px 0";div.innerHTML='<select><option>YouTube</option><option>TikTok</option><option>Instagram</option></select><input placeholder="Short link"><button type="button" class="btn danger small" onclick="this.parentElement.remove()">×</button>';box.appendChild(div)}
 document.getElementById("modbody").addEventListener?.("submit",()=>{});
-document.addEventListener("submit",e=>{if(e.target.id!=="epform")return;e.preventDefault();let f=new FormData(e.target),id=editing||uid();let old=db.episodes.find(x=>x.id===id)||{};let status=+f.get("status"),cancelled=status===10;let planned=["Interview planned","Interviewed","Published"].includes(f.get("guestStatus"))||!!(f.get("interviewDay")||f.get("time"))||isInterviewPlanned(db.episodes.find(x=>x.id===id)||{});let qs=planned?[...document.querySelectorAll("#editquestions .qrow")].map(r=>({id:r.querySelector("[data-qid]")?.dataset.qid||uid(),text:r.querySelector('input[aria-label="Question"]')?.value.trim()||r.querySelector('input:not([type=checkbox])')?.value.trim()||"",asked:r.querySelector('input[type=checkbox]')?.checked||false})).filter(q=>q.text):(old.questions||[]);let shorts=planned?[...document.querySelectorAll("#shorts .row")].map(r=>({platform:r.querySelector("select").value,link:r.querySelector("input").value})):(old.shorts||[]);let linkedGuest=db.guests.find(g=>g.id===f.get("guestId"));if(!linkedGuest){alert("Please select a guest or create a new guest profile.");return;}let guestName=linkedGuest.name;let ep={...old,id,guestId:linkedGuest.id,number:cancelled?null:((old.number&&old.status!==10)?old.number:nextNum()),guest:guestName,guestStatus:f.get("guestStatus")||"Invited",conventionId:f.get("conventionId"),date:cancelled?"":f.get("date"),status,interviewDay:f.get("interviewDay")||"",time:f.get("time"),room:f.get("room")||"",duration:planned?f.get("duration"):(old.duration||""),longLink:planned?f.get("longLink"):(old.longLink||""),thumbnailUrl:planned?f.get("thumbnailUrl"):(old.thumbnailUrl||""),notes:planned?f.get("notes"):(old.notes||""),questions:qs,shorts};let idx=db.episodes.findIndex(x=>x.id===id);if(idx<0)db.episodes.push(ep);else db.episodes[idx]=ep;save();closeModal();render()});
+document.addEventListener("submit",e=>{if(e.target.id!=="epform")return;e.preventDefault();let f=new FormData(e.target),id=editing||uid();let old=db.episodes.find(x=>x.id===id)||{};let status=+f.get("status"),cancelled=status===10;let planned=["Interview planned","Interviewed","Published"].includes(f.get("guestStatus"))||!!(f.get("interviewDay")||f.get("time"))||isInterviewPlanned(db.episodes.find(x=>x.id===id)||{});let qs=planned?[...document.querySelectorAll("#editquestions .qrow")].map(r=>({id:r.querySelector("[data-qid]")?.dataset.qid||uid(),text:r.querySelector('input[aria-label="Question"]')?.value.trim()||r.querySelector('input:not([type=checkbox])')?.value.trim()||"",asked:r.querySelector('input[type=checkbox]')?.checked||false})).filter(q=>q.text):(old.questions||[]);let shorts=planned?[...document.querySelectorAll("#shorts .row")].map(r=>({platform:r.querySelector("select").value,link:r.querySelector("input").value})):(old.shorts||[]);let linkedGuest=db.guests.find(g=>g.id===f.get("guestId"));if(!linkedGuest){alert("Please select a guest or create a new guest profile.");return;}let guestName=linkedGuest.name;let ep={...old,id,guestId:linkedGuest.id,number:cancelled?null:((old.number&&old.status!==10)?old.number:nextNum()),guest:guestName,guestStatus:f.get("guestStatus")||"Invited",conventionId:f.get("conventionId"),date:cancelled?"":f.get("date"),status,interviewDay:f.get("interviewDay")||"",time:f.get("time"),room:f.get("room")||"",duration:planned?f.get("duration"):(old.duration||""),longLink:planned?f.get("longLink"):(old.longLink||""),thumbnailUrl:planned?f.get("thumbnailUrl"):(old.thumbnailUrl||""),notes:planned?f.get("notes"):(old.notes||""),autoCostOverrides:planned?{editing:f.get("episodeEditingCost")!==""?Number(f.get("episodeEditingCost")):null,marketing:f.get("episodeMarketingCost")!==""?Number(f.get("episodeMarketingCost")):null}:(old.autoCostOverrides||{}),questions:qs,shorts};let idx=db.episodes.findIndex(x=>x.id===id);if(idx<0)db.episodes.push(ep);else db.episodes[idx]=ep;save();closeModal();render()});
 function timerStore(){db.settings=db.settings||{};db.settings.interviewTimers=db.settings.interviewTimers||{};return db.settings.interviewTimers}
 function timerElapsed(t){return (Number(t?.elapsedMs)||0)+(t?.runningSince?Math.max(0,Date.now()-t.runningSince):0)}
 function formatElapsed(ms){let sec=Math.floor(ms/1000),hh=String(Math.floor(sec/3600)).padStart(2,"0"),mm=String(Math.floor(sec%3600/60)).padStart(2,"0"),ss=String(sec%60).padStart(2,"0");return `${hh}:${mm}:${ss}`}
@@ -2276,7 +2491,7 @@ function organizerContactRow(contact={}){
  return `<div class="organizer-contact-row"><div class="field"><label>Name</label><input data-contact="name" value="${esc(contact.name||"")}" placeholder="Contact name"></div><div class="field"><label>Role</label><input data-contact="role" value="${esc(contact.role||"")}" placeholder="e.g. Press officer"></div><div class="field"><label>Phone</label><input data-contact="phone" type="tel" value="${esc(contact.phone||"")}" placeholder="+33…"></div><div class="field"><label>Website</label><input data-contact="website" type="url" value="${esc(contact.website||"")}" placeholder="https://…"></div><button type="button" class="btn danger small" onclick="this.closest('.organizer-contact-row').remove()">Remove</button></div>`;
 }
 function addOrganizerContactRow(){const host=document.getElementById("organizerContacts");if(host)host.insertAdjacentHTML("beforeend",organizerContactRow())}
-function editOrganizer(id){
+function editOrganizer(id){window.__draftOrganizerId=id||"new";
  let o=db.organizers.find(x=>x.id===id)||{id:"",name:"",contacts:[]};
  showModal(id?"Edit organizer":"Add organizer",`<form id="orgform"><div class="field"><label>Organizer name</label><input name="name" value="${esc(o.name)}" required></div><div class="sectionhead"><div><h3>Organizer contacts</h3><p class="smalltext">Shared across all conventions run by this organizer.</p></div><button type="button" class="btn secondary small" onclick="addOrganizerContactRow()">＋ Add contact</button></div><div id="organizerContacts" class="organizer-contacts-editor">${(o.contacts||[]).map(organizerContactRow).join("")}</div><button class="btn blue">Save organizer</button></form>`);
  document.getElementById("orgform").onsubmit=e=>{
@@ -2299,7 +2514,7 @@ function updateConventionGuestCount(){
  const out=document.getElementById("conventionGuestCount");
  if(out)out.textContent=n+" selected";
 }
-function editConvention(id){let c=db.conventions.find(x=>x.id===id)||{id:"",name:"",organizerId:"",startDate:"",endDate:"",checklist:[]};showModal(id?"Edit convention":"Add convention",`<form id="conform"><div class="field"><label>Convention name</label><input name="name" value="${esc(c.name)}" required></div><div class="row"><div class="field"><label>Start date</label><input name="startDate" type="text" inputmode="numeric" placeholder="DD/MM/YYYY" value="${toDMY(c.startDate)}" required></div><div class="field"><label>End date</label><input name="endDate" type="text" inputmode="numeric" placeholder="DD/MM/YYYY" value="${toDMY(c.endDate)}" required></div></div><div class="field"><label>Venue (optional)</label><select name="venueId"><option value="">Choose saved venue</option>${(db.venues||[]).map(v=>`<option value="${v.id}" ${c.venueId===v.id?"selected":""}>${esc(v.name)}</option>`).join("")}</select></div><div class="card" style="padding:12px;margin:10px 0"><b>🏨 Hotel accommodation (optional)</b><p class="smalltext">Leave these fields empty if you are staying with a friend or elsewhere.</p><div class="field"><label>Hotel name</label><input name="hotelName" value="${esc(c.hotelName||"")}" placeholder="e.g. Hôtel Example"></div><div class="field"><label>Hotel address</label><input name="hotelAddress" value="${esc(c.hotelAddress||"")}" placeholder="Street, city, postal code"></div><div class="field"><label>Hotel room</label><input name="hotelRoom" value="${esc(c.hotelRoom||"")}" placeholder="e.g. Room 412"></div></div><div class="field"><label>Flights for this convention</label><div class="smalltext">Add your outbound and return flight date, departure time, and flight number. The Convention Day page will show quick Google links.</div></div>
+function editConvention(id){window.__draftConventionId=id||"new";let c=db.conventions.find(x=>x.id===id)||{id:"",name:"",organizerId:"",startDate:"",endDate:"",checklist:[]};showModal(id?"Edit convention":"Add convention",`<form id="conform"><div class="field"><label>Convention name</label><input name="name" value="${esc(c.name)}" required></div><div class="row"><div class="field"><label>Start date</label><input name="startDate" type="text" inputmode="numeric" placeholder="DD/MM/YYYY" value="${toDMY(c.startDate)}" required></div><div class="field"><label>End date</label><input name="endDate" type="text" inputmode="numeric" placeholder="DD/MM/YYYY" value="${toDMY(c.endDate)}" required></div></div><div class="field"><label>Venue (optional)</label><select name="venueId"><option value="">Choose saved venue</option>${(db.venues||[]).map(v=>`<option value="${v.id}" ${c.venueId===v.id?"selected":""}>${esc(v.name)}</option>`).join("")}</select></div><div class="card" style="padding:12px;margin:10px 0"><b>🏨 Hotel accommodation (optional)</b><p class="smalltext">Leave these fields empty if you are staying with a friend or elsewhere.</p><div class="field"><label>Hotel name</label><input name="hotelName" value="${esc(c.hotelName||"")}" placeholder="e.g. Hôtel Example"></div><div class="field"><label>Hotel address</label><input name="hotelAddress" value="${esc(c.hotelAddress||"")}" placeholder="Street, city, postal code"></div><div class="field"><label>Hotel room</label><input name="hotelRoom" value="${esc(c.hotelRoom||"")}" placeholder="e.g. Room 412"></div></div><div class="field"><label>Flights for this convention</label><div class="smalltext">Add your outbound and return flight date, departure time, and flight number. The Convention Day page will show quick Google links.</div></div>
 <div class="card" style="padding:12px;margin:10px 0"><b>✈ Toulouse → Paris</b><div class="row"><div class="field"><label>Date</label><input type="date" name="outFlightDate" value="${esc(c.flights?.outbound?.date||"")}"></div><div class="field"><label>Departure time</label><input type="time" name="outFlightTime" value="${esc(c.flights?.outbound?.time||"")}"></div></div><div class="field"><label>Flight number (optional)</label><input name="outFlightNumber" placeholder="e.g. AF7401" value="${esc(c.flights?.outbound?.flightNumber||"")}"></div></div>
 <div class="card" style="padding:12px;margin:10px 0"><b>✈ Paris → Toulouse</b><div class="row"><div class="field"><label>Date</label><input type="date" name="returnFlightDate" value="${esc(c.flights?.return?.date||"")}"></div><div class="field"><label>Departure time</label><input type="time" name="returnFlightTime" value="${esc(c.flights?.return?.time||"")}"></div></div><div class="field"><label>Flight number (optional)</label><input name="returnFlightNumber" placeholder="e.g. AF7408" value="${esc(c.flights?.return?.flightNumber||"")}"></div></div><div class="field"><label>Convention packing checklist</label><div class="checklist-scroll">${db.checklistTemplate.map((item,i)=>`<label class="checkrow"><input type="checkbox" name="prep${i}" ${c.checklist?.[i]?"checked":""}><span>${esc(item)}</span></label>`).join("")}</div></div><div class="field"><label>Guests attending this convention</label><div class="smalltext">Search by name, then select the guests attending this event.</div><input type="search" id="conventionGuestSearch" placeholder="Search guests..." autocomplete="off" oninput="filterConventionGuests(this.value)"><div class="smalltext" id="conventionGuestCount">${(c.guestIds||[]).length} selected</div><div class="guest-check-grid" id="conventionGuestGrid">${db.guests.slice().sort((a,b)=>a.name.localeCompare(b.name)).map(g=>`<label data-guest-search="${esc(g.name.toLocaleLowerCase())}"><input type="checkbox" name="guest_${g.id}" ${((c.guestIds||[]).includes(g.id))?"checked":""} onchange="updateConventionGuestCount()"><span>${esc(g.name)}</span></label>`).join("")||'<div class="empty">No guest profiles yet. Add guests in Guest CRM first.</div>'}</div></div><div class="field"><label>Organizer</label><select name="organizerId" data-native-picker><option value="">Choose organizer</option>${db.organizers.map(o=>`<option value="${o.id}" ${c.organizerId===o.id?'selected':''}>${esc(o.name)}</option>`).join("")}</select></div><button class="btn blue">Save convention</button></form>`);setupOrganizerPicker();document.getElementById("conform").onsubmit=e=>{e.preventDefault();let f=new FormData(e.target);let start=fromDMY(f.get("startDate")),end=fromDMY(f.get("endDate"));if(!start||!end){alert("Enter valid dates as DD/MM/YYYY.");return}if(c.id){c.name=f.get("name").trim();c.organizerId=f.get("organizerId");c.startDate=start;c.endDate=end;c.venueId=f.get("venueId")||"";c.hotelName=(f.get("hotelName")||"").trim();c.hotelAddress=(f.get("hotelAddress")||"").trim();c.hotelRoom=(f.get("hotelRoom")||"").trim();c.flights={outbound:{date:f.get("outFlightDate")||"",time:f.get("outFlightTime")||"",flightNumber:f.get("outFlightNumber")||""},return:{date:f.get("returnFlightDate")||"",time:f.get("returnFlightTime")||"",flightNumber:f.get("returnFlightNumber")||""}};c.checklist=db.checklistTemplate.map((_,i)=>f.get("prep"+i)==="on");c.guestIds=db.guests.filter(g=>f.get("guest_"+g.id)==="on").map(g=>g.id)}else db.conventions.push({id:uid(),name:f.get("name").trim(),organizerId:f.get("organizerId"),startDate:start,endDate:end,venueId:f.get("venueId")||"",hotelName:(f.get("hotelName")||"").trim(),hotelAddress:(f.get("hotelAddress")||"").trim(),hotelRoom:(f.get("hotelRoom")||"").trim(),flights:{outbound:{date:f.get("outFlightDate")||"",time:f.get("outFlightTime")||"",flightNumber:f.get("outFlightNumber")||""},return:{date:f.get("returnFlightDate")||"",time:f.get("returnFlightTime")||"",flightNumber:f.get("returnFlightNumber")||""}},checklist:db.checklistTemplate.map((_,i)=>f.get("prep"+i)==="on"),guestIds:db.guests.filter(g=>f.get("guest_"+g.id)==="on").map(g=>g.id),panels:[]});save();closeModal();render()}}
 function editChecklistTemplate(){showModal("Edit packing checklist",`<div class="smalltext">One item per line. Changes apply to new conventions and the checklist shown when editing existing ones.</div><textarea id="checklist-template" rows="14" style="width:100%;max-width:100%;height:42vh;max-height:420px;min-height:180px;box-sizing:border-box;overflow-y:auto;resize:vertical;white-space:pre-wrap;overflow-wrap:anywhere;margin:12px 0">${esc(db.checklistTemplate.join("\n"))}</textarea><div class="row"><button class="btn blue" onclick="saveChecklistTemplate()">Save template</button><button class="btn secondary" onclick="closeModal()">Cancel</button></div>`)}
