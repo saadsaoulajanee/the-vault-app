@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>The Vault V4.0.4</title>
+<title>The Vault V4.0.5</title>
 <meta name="theme-color" content="#13071e">
 <link rel="manifest" href="./manifest.webmanifest?v=404">
 <link rel="icon" type="image/png" sizes="192x192" href="./assets/vault-icon-192.png?v=404">
@@ -1105,7 +1105,7 @@ body[data-theme="dark"] .panel-day-tabs button.day-toggle.active .day-toggle-sta
 </style>
 </head>
 <body><div class="app">
-<header class="top"><div class="brand"><div class="logo" aria-hidden="true"></div><div>The Vault <span class="muted" style="font-weight:600;font-size:13px">V4.0.4</span></div></div><div class="topright"><span class="pill" id="syncStatus">Offline-first • not signed in</span><button class="btn secondary small vault-header-icon" id="searchVaultBtn" onclick="openVaultSearch()" aria-label="Search The Vault" title="Search The Vault">⌕</button><button class="btn secondary small" id="quickNotesBtn" onclick="openQuickNotes()">📝 Notes</button><button class="btn secondary small vault-header-icon" id="themeBtn" title="Switch theme" aria-label="Switch theme">☾</button><button type="button" class="btn secondary small vault-header-icon" id="vaultToolsBtn" onclick="openVaultTools()" title="Tools" aria-label="Tools">⚙</button><div class="vault-hidden-tools" hidden><button id="exportBtn">Export backup</button><button id="importBtn">Import backup</button><button id="cloudBtn">Account & sync</button></div><input id="importFile" type="file" accept="application/json,.json" hidden></div></header>
+<header class="top"><div class="brand"><div class="logo" aria-hidden="true"></div><div>The Vault <span class="muted" style="font-weight:600;font-size:13px">V4.0.5</span></div></div><div class="topright"><span class="pill" id="syncStatus">Offline-first • not signed in</span><button class="btn secondary small vault-header-icon" id="searchVaultBtn" onclick="openVaultSearch()" aria-label="Search The Vault" title="Search The Vault">⌕</button><button class="btn secondary small" id="quickNotesBtn" onclick="openQuickNotes()">📝 Notes</button><button class="btn secondary small vault-header-icon" id="themeBtn" title="Switch theme" aria-label="Switch theme">☾</button><button type="button" class="btn secondary small vault-header-icon" id="vaultToolsBtn" onclick="openVaultTools()" title="Tools" aria-label="Tools">⚙</button><div class="vault-hidden-tools" hidden><button id="exportBtn">Export backup</button><button id="importBtn">Import backup</button><button id="cloudBtn">Account & sync</button></div><input id="importFile" type="file" accept="application/json,.json" hidden></div></header>
 <nav class="nav" id="nav">
 <button class="active" data-view="home">⌂ Dashboard</button><button data-view="episodes">▣ Episodes</button><button data-view="guests">👤 Guests</button><button data-view="interview">☷ Interview</button><button data-view="hub">✧ Convention Hub</button><button data-view="day">🎬 Convention Day</button><button data-view="kpis">📊 KPIs</button><button data-view="budget">💶 Budget</button><button data-view="venues">📍 Venues</button>
 </nav>
@@ -1130,6 +1130,27 @@ ensureGuestProfiles();
 try{if(!localStorage.getItem("vault_v4_initialized")){preserveVaultSafetyBackup("Before V4 upgrade");localStorage.setItem("vault_v4_initialized","1")}}catch{}
 let view="home",editing=null,activeEpisode=null,inspireOffset=0,inspireSelected=new Set(),episodesMode="gallery";
 let cloudUser=null, cloudChannel=null, syncTimer=null, syncBusy=false, applyingRemote=false, lastCloudPayload=null;
+// Store the last mutually accepted snapshot per account. This survives page reloads.
+const VAULT_CLOUD_BASELINE_PREFIX="vault_cloud_baseline_v405_";
+function stableCloudValue(value){
+ if(Array.isArray(value))return value.map(stableCloudValue);
+ if(value&&typeof value==="object"){
+  const result={};for(const key of Object.keys(value).sort()){
+   if(value[key]!==undefined)result[key]=stableCloudValue(value[key]);
+  }return result;
+ }
+ return value;
+}
+function cloudFingerprint(payload){return JSON.stringify(stableCloudValue(payload));}
+function loadCloudBaseline(){
+ if(!cloudUser)return null;
+ try{return localStorage.getItem(VAULT_CLOUD_BASELINE_PREFIX+cloudUser.id)||null}catch{return null}
+}
+function rememberCloudBaseline(payload){
+ lastCloudPayload=typeof payload==="string"?payload:cloudFingerprint(payload);
+ if(cloudUser){try{localStorage.setItem(VAULT_CLOUD_BASELINE_PREFIX+cloudUser.id,lastCloudPayload)}catch(e){console.warn("Could not store sync baseline",e)}}
+}
+
 
 function preserveVaultSafetyBackup(reason="Before important change"){
  try{const raw=localStorage.getItem("vault03");if(!raw)return;
@@ -1285,50 +1306,64 @@ function scheduleCloudSync(){clearTimeout(syncTimer);syncTimer=setTimeout(()=>sy
 function cloudPayload(){return {guests:db.guests,organizers:db.organizers,conventions:db.conventions,episodes:db.episodes,checklistTemplate:db.checklistTemplate,settings:db.settings,venues:db.venues,youtubeVideos:db.youtubeVideos,taskTemplates:db.taskTemplates||{},_checklistTemplateUpdatedAt:db._checklistTemplateUpdatedAt||0};}
 function applyCloudPayload(payload){
  if(!payload || !Array.isArray(payload.organizers)||!Array.isArray(payload.conventions)||!Array.isArray(payload.episodes))throw new Error("The cloud data format is not valid.");
- const incomingCloudSnapshot=JSON.stringify(payload);
+ const incomingCloudSnapshot=cloudFingerprint(payload);
  preserveVaultSafetyBackup("Before cloud replacement");
  applyingRemote=true;
  db={...db,guests:Array.isArray(payload.guests)?payload.guests:[],organizers:payload.organizers,conventions:payload.conventions,episodes:payload.episodes,checklistTemplate:Array.isArray(payload.checklistTemplate)?payload.checklistTemplate:DEFAULT_CHECKLIST.slice(),settings:payload.settings||db.settings||{theme:"system",youtubeApiKey:""},venues:Array.isArray(payload.venues)?payload.venues.map(v=>({...v,floorPlans:v.floorPlans||[]})):[],youtubeVideos:Array.isArray(payload.youtubeVideos)?payload.youtubeVideos:[],taskTemplates:payload.taskTemplates&&typeof payload.taskTemplates==="object"?payload.taskTemplates:(db.taskTemplates||{}),_checklistTemplateUpdatedAt:Number(payload._checklistTemplateUpdatedAt)||0};const prepRestored=mergeNewerLocalPreparation(db);ensureGuestProfiles();
  const migratedProjects=migrateGuestProjects();
- syncEpisodeBudgetExpenses();localStorage.setItem("vault03",JSON.stringify(db));lastCloudPayload=incomingCloudSnapshot;applyingRemote=false;render();
+ syncEpisodeBudgetExpenses();localStorage.setItem("vault03",JSON.stringify(db));rememberCloudBaseline(incomingCloudSnapshot);applyingRemote=false;render();
  if((migratedProjects||prepRestored)&&cloudUser&&navigator.onLine)scheduleCloudSync();
 }
 async function syncNow(mode="both"){
  if(!cloudUser||!supabaseClient||!navigator.onLine)return;
- if(syncBusy)return;syncBusy=true;setSyncStatus("Syncing…");
+ if(syncBusy)return;
+ syncBusy=true;setSyncStatus("Syncing…");
  try{
   const {data:remote,error}=await supabaseClient.from("vault_sync_state").select("payload,updated_at").eq("owner_id",cloudUser.id).maybeSingle();
   if(error)throw error;
-  const local=cloudPayload(), localText=JSON.stringify(local);
+  const local=cloudPayload(),localHash=cloudFingerprint(local),remotePayload=remote?.payload,remoteHash=remotePayload?cloudFingerprint(remotePayload):null;
+  if(!lastCloudPayload)lastCloudPayload=loadCloudBaseline();
+  const upload=async()=>{
+   const {error:upErr}=await supabaseClient.from("vault_sync_state").upsert({owner_id:cloudUser.id,payload:local,updated_at:new Date().toISOString()},{onConflict:"owner_id"});
+   if(upErr)throw upErr;
+   rememberCloudBaseline(localHash);
+  };
+  // No confirmation for identical data, including records with reordered object properties.
+  // This also prevents an identical cloud notification from rebuilding the entire page.
+  if(remoteHash!==null&&remoteHash===localHash){
+   rememberCloudBaseline(localHash);setSyncStatus("Everything is synced");return;
+  }
   if(mode==="pull"){
-   if(remote?.payload){applyCloudPayload(remote.payload);setSyncStatus("Synced just now");}
+   if(remotePayload){applyCloudPayload(remotePayload);setSyncStatus("Downloaded cloud data");}
    else setSyncStatus("Cloud is empty • ready to upload");
    return;
   }
   if(mode==="push"){
-   const {error:upErr}=await supabaseClient.from("vault_sync_state").upsert({owner_id:cloudUser.id,payload:local,updated_at:new Date().toISOString()},{onConflict:"owner_id"});
-   if(upErr)throw upErr;
-   lastCloudPayload=localText;setSyncStatus("Synced just now");return;
+   await upload();setSyncStatus("Synced just now");return;
   }
-  if(remote?.payload){
-   const remoteText=JSON.stringify(remote.payload);
-   if(!lastCloudPayload){
-    const hasLocal=local.organizers.length||local.conventions.length||local.episodes.length;
-    if(hasLocal){
-     const choice=confirm("Cloud data already exists. Press OK to DOWNLOAD it and replace this device's current data. Press Cancel to keep this device's data and upload it to the cloud.");
-     if(choice){applyCloudPayload(remote.payload);setSyncStatus("Downloaded cloud data");}
-     else{const {error:pushError}=await supabaseClient.from("vault_sync_state").upsert({owner_id:cloudUser.id,payload:local,updated_at:new Date().toISOString()},{onConflict:"owner_id"});if(pushError)throw pushError;lastCloudPayload=localText;setSyncStatus("Conflict resolved • this device kept");}
-    }else{applyCloudPayload(remote.payload);setSyncStatus("Downloaded cloud data");}
-   }else if(localText!==lastCloudPayload && remoteText!==lastCloudPayload && localText!==remoteText){
-    const choice=confirm("This device and the cloud both changed since the last sync. OK = use cloud version on this device. Cancel = upload this device's version to the cloud.");
-    if(choice){applyCloudPayload(remote.payload);setSyncStatus("Conflict resolved • cloud version kept");}
-    else{const {error:pushError}=await supabaseClient.from("vault_sync_state").upsert({owner_id:cloudUser.id,payload:local,updated_at:new Date().toISOString()},{onConflict:"owner_id"});if(pushError)throw pushError;lastCloudPayload=localText;setSyncStatus("Conflict resolved • this device kept");}
-   }else if(remoteText!==lastCloudPayload && localText===lastCloudPayload){applyCloudPayload(remote.payload);setSyncStatus("Downloaded changes from cloud");}
-   else if(localText!==lastCloudPayload){const {error:pushError}=await supabaseClient.from("vault_sync_state").upsert({owner_id:cloudUser.id,payload:local,updated_at:new Date().toISOString()},{onConflict:"owner_id"});if(pushError)throw pushError;lastCloudPayload=localText;setSyncStatus("Changes uploaded");}
-   else setSyncStatus("Everything is synced");
+  if(!remotePayload){await upload();setSyncStatus("First cloud backup complete");return;}
+  if(!lastCloudPayload){
+   // Never ask on an identical first sync (handled above). Only real differences
+   // require a decision when no previously agreed snapshot is available.
+   const hasLocal=local.organizers.length||local.conventions.length||local.episodes.length;
+   if(!hasLocal){applyCloudPayload(remotePayload);setSyncStatus("Downloaded cloud data");return;}
+   const choice=confirm("Cloud data and this device are different. OK = keep the cloud data on this device. Cancel = keep this device's data and upload it to the cloud.");
+   if(choice){applyCloudPayload(remotePayload);setSyncStatus("Cloud version kept");}
+   else{await upload();setSyncStatus("Device version kept");}
+   return;
+  }
+  const localChanged=localHash!==lastCloudPayload,remoteChanged=remoteHash!==lastCloudPayload;
+  if(localChanged&&remoteChanged){
+   const choice=confirm("This device and the cloud contain different changes since the last sync. OK = keep the cloud version. Cancel = keep this device's version.");
+   if(choice){applyCloudPayload(remotePayload);setSyncStatus("Cloud version kept");}
+   else{await upload();setSyncStatus("Device version kept");}
+  }else if(remoteChanged){
+   applyCloudPayload(remotePayload);setSyncStatus("Downloaded changes from cloud");
+  }else if(localChanged){
+   await upload();setSyncStatus("Changes uploaded");
   }else{
-   const {error:upErr}=await supabaseClient.from("vault_sync_state").upsert({owner_id:cloudUser.id,payload:local,updated_at:new Date().toISOString()},{onConflict:"owner_id"});
-   if(upErr)throw upErr;lastCloudPayload=localText;setSyncStatus("First cloud backup complete");
+   // Defensive fallback if a legacy snapshot's representation differs.
+   rememberCloudBaseline(localHash);setSyncStatus("Everything is synced");
   }
  }catch(err){setSyncStatus("Sync error");alert("The Vault could not sync: "+(err.message||String(err)));}
  finally{syncBusy=false;}
@@ -1336,11 +1371,13 @@ async function syncNow(mode="both"){
 async function startRealtime(){
  if(!cloudUser||!supabaseClient)return;
  if(cloudChannel)await supabaseClient.removeChannel(cloudChannel);
- cloudChannel=supabaseClient.channel("vault-sync-"+cloudUser.id).on("postgres_changes",{event:"*",schema:"public",table:"vault_sync_state",filter:"owner_id=eq."+cloudUser.id},async payload=>{
+ cloudChannel=supabaseClient.channel("vault-sync-"+cloudUser.id).on("postgres_changes",{event:"*",schema:"public",table:"vault_sync_state",filter:"owner_id=eq."+cloudUser.id},payload=>{
   if(syncBusy)return;
   const remote=payload.new?.payload;if(!remote)return;
-  const current=JSON.stringify(cloudPayload());
-  if(current===lastCloudPayload){applyCloudPayload(remote);setSyncStatus("Live update received");}
+  const remoteHash=cloudFingerprint(remote),localHash=cloudFingerprint(cloudPayload());
+  if(remoteHash===localHash){rememberCloudBaseline(localHash);setSyncStatus("Everything is synced");return;}
+  if(localHash===lastCloudPayload){applyCloudPayload(remote);setSyncStatus("Live update received");}
+  else if(remoteHash===lastCloudPayload){setSyncStatus("Device changes waiting to sync");}
   else{setSyncStatus("Another device changed data • sync to resolve");}
  }).subscribe();
 }
@@ -1354,8 +1391,24 @@ async function openAccountSync(){
 async function initializeCloud(){
  if(!supabaseClient)return;
  const {data:{session}}=await supabaseClient.auth.getSession();
- if(session){cloudUser=session.user;setSyncStatus("Signed in • connecting…");await syncNow("both");await startRealtime();}
- supabaseClient.auth.onAuthStateChange(async(_event,session)=>{if(session){cloudUser=session.user;await syncNow("both");await startRealtime();}else{cloudUser=null;lastCloudPayload=null;if(cloudChannel)await supabaseClient.removeChannel(cloudChannel);cloudChannel=null;setSyncStatus("Offline-first • not signed in");}});
+ if(session){
+  cloudUser=session.user;lastCloudPayload=loadCloudBaseline();
+  setSyncStatus("Signed in • connecting…");await syncNow("both");await startRealtime();
+ }
+ supabaseClient.auth.onAuthStateChange(async(event,session)=>{
+  // getSession already processed the initial session; token refreshes do not
+  // represent data changes and must not invoke another sync/conflict dialog.
+  if(event==="INITIAL_SESSION"||event==="TOKEN_REFRESHED"||event==="USER_UPDATED")return;
+  if(session){
+   if(cloudUser?.id===session.user.id)return;
+   cloudUser=session.user;lastCloudPayload=loadCloudBaseline();
+   await syncNow("both");await startRealtime();
+  }else if(event==="SIGNED_OUT"){
+   cloudUser=null;lastCloudPayload=null;
+   if(cloudChannel)await supabaseClient.removeChannel(cloudChannel);
+   cloudChannel=null;setSyncStatus("Offline-first • not signed in");
+  }
+ });
 }
 window.addEventListener("online",()=>{if(cloudUser){setSyncStatus("Back online • syncing…");syncNow("both");}});
 window.addEventListener("offline",()=>setSyncStatus("Offline • changes saved on this device"));
