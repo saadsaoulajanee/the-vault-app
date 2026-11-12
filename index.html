@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>The Vault V4.3.3</title>
+<title>The Vault V4.3.4</title>
 <meta name="theme-color" content="#13071e">
 <link rel="manifest" href="./manifest.webmanifest?v=404">
 <link rel="icon" type="image/png" sizes="192x192" href="./assets/vault-icon-192.png?v=404">
@@ -1103,7 +1103,7 @@ body[data-theme="dark"] .panel-day-tabs button.day-toggle.active .day-toggle-sta
  .topright .vault-header-icon{width:30px!important;min-width:30px!important;flex-basis:30px!important}
 }
 
-/* The Vault V4.3.3 tools */
+/* The Vault V4.3.4 tools */
 .auto-cost-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:10px 0}
 .auto-cost-grid .field{min-width:0;margin:0}.episode-cost-overrides{margin:14px 0;padding:13px;border:1px solid var(--line);border-radius:12px;background:var(--paper)}
 .production-workspace-action,.filmography-research-bar,.research-lab-actions{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
@@ -1165,7 +1165,7 @@ body[data-theme="dark"] .panel-day-tabs button.day-toggle.active .day-toggle-sta
 </style>
 </head>
 <body><div class="app">
-<header class="top"><div class="brand"><div class="logo" aria-hidden="true"></div><div>The Vault <span class="muted" style="font-weight:600;font-size:13px">V4.3.3</span></div></div><div class="topright"><span class="pill" id="syncStatus">Offline-first • not signed in</span><button class="btn secondary small vault-header-icon" id="searchVaultBtn" onclick="openVaultSearch()" aria-label="Search The Vault" title="Search The Vault">⌕</button><button class="btn secondary small" id="quickNotesBtn" onclick="openQuickNotes()">📝 Notes</button><button class="btn secondary small vault-header-icon" id="themeBtn" title="Switch theme" aria-label="Switch theme">☾</button><button type="button" class="btn secondary small vault-header-icon" id="vaultToolsBtn" onclick="openVaultTools()" title="Tools" aria-label="Tools">⚙</button><div class="vault-hidden-tools" hidden><button id="exportBtn">Export backup</button><button id="importBtn">Import backup</button><button id="cloudBtn">Account & sync</button></div><input id="importFile" type="file" accept="application/json,.json" hidden></div></header>
+<header class="top"><div class="brand"><div class="logo" aria-hidden="true"></div><div>The Vault <span class="muted" style="font-weight:600;font-size:13px">V4.3.4</span></div></div><div class="topright"><span class="pill" id="syncStatus">Offline-first • not signed in</span><button class="btn secondary small vault-header-icon" id="searchVaultBtn" onclick="openVaultSearch()" aria-label="Search The Vault" title="Search The Vault">⌕</button><button class="btn secondary small" id="quickNotesBtn" onclick="openQuickNotes()">📝 Notes</button><button class="btn secondary small vault-header-icon" id="themeBtn" title="Switch theme" aria-label="Switch theme">☾</button><button type="button" class="btn secondary small vault-header-icon" id="vaultToolsBtn" onclick="openVaultTools()" title="Tools" aria-label="Tools">⚙</button><div class="vault-hidden-tools" hidden><button id="exportBtn">Export backup</button><button id="importBtn">Import backup</button><button id="cloudBtn">Account & sync</button></div><input id="importFile" type="file" accept="application/json,.json" hidden></div></header>
 <nav class="nav" id="nav">
 <button class="active" data-view="home">⌂ Dashboard</button><button data-view="episodes">▣ Episodes</button><button data-view="guests">👤 Guests</button><button data-view="interview">☷ Studio</button><button data-view="hub">✧ Convention Hub</button><button data-view="day">🎬 Convention Day</button><button data-view="kpis">📊 KPIs</button><button data-view="budget">💶 Budget</button><button data-view="venues">📍 Venues</button>
 </nav>
@@ -1196,12 +1196,12 @@ function preserveVaultSafetyBackup(reason="Before important change"){
  const key="vault_v4_safety_backups",backups=JSON.parse(localStorage.getItem(key)||"[]");
  if(backups[0]?.content===raw)return;
  backups.unshift({date:new Date().toISOString(),reason,content:raw});
- localStorage.setItem(key,JSON.stringify(backups.slice(0,3)));
+ localStorage.setItem(key,JSON.stringify(backups.slice(0,5)));
  }catch(err){console.warn("Could not preserve a safety backup",err)}
 }
 function openVaultSafetyBackups(){
  let backups=[];try{backups=JSON.parse(localStorage.getItem("vault_v4_safety_backups")||"[]")}catch{}
- showModal("Local safety backups",`<p class="smalltext">Up to three snapshots are kept on this device before data replacement. Export a JSON backup for long-term protection.</p>${backups.map((b,i)=>`<div class="vault-backup-row"><div><b>${esc(new Date(b.date).toLocaleString())}</b><div class="smalltext">${esc(b.reason||"Backup")}</div></div><button class="btn secondary small" onclick="restoreVaultSafetyBackup(${i})">Restore</button></div>`).join("")||'<div class="empty">No safety backups yet.</div>'}`);
+ showModal("Local safety backups",`<p class="smalltext">Up to five snapshots are kept on this device before data replacement. Export a JSON backup for long-term protection.</p>${backups.map((b,i)=>`<div class="vault-backup-row"><div><b>${esc(new Date(b.date).toLocaleString())}</b><div class="smalltext">${esc(b.reason||"Backup")}</div></div><button class="btn secondary small" onclick="restoreVaultSafetyBackup(${i})">Restore</button></div>`).join("")||'<div class="empty">No safety backups yet.</div>'}`);
 }
 function restoreVaultSafetyBackup(index){
  let backups;try{backups=JSON.parse(localStorage.getItem("vault_v4_safety_backups")||"[]")}catch{return}
